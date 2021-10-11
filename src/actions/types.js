@@ -1,0 +1,11 @@
+export const SIGN_IN = 'SIGN_IN';
+export const SIGN_OUT = 'SIGN_OUT';
+export const SHRINK_LOGO = 'SHRINK_LOGO';
+export const SHRINK_ICON = 'SHRINK_ICON';
+export const SHOW_CHECK_IN_OUT = 'SHOW_CHECK_IN_OUT';
+export const SEARCH_BY_MOBILE = 'SEARCH_BY_MOBILE';
+export const LOADING = 'LOADING';
+export const SHEET_DATE = 'SHEET_DATE';
+export const NEW_SHEET_ID = 'NEW_SHEET_ID';
+export const NUMBER_EXISTS = 'NUMBER_EXISTS';
+export const VALUES_MATCHED = 'VALUES_MATCHED';
