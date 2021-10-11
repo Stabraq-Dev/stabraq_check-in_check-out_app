@@ -9,3 +9,4 @@ export const SHEET_DATE = 'SHEET_DATE';
 export const NEW_SHEET_ID = 'NEW_SHEET_ID';
 export const NUMBER_EXISTS = 'NUMBER_EXISTS';
 export const VALUES_MATCHED = 'VALUES_MATCHED';
+export const WRONG_USER_PASS = 'WRONG_USER_PASS';

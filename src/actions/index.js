@@ -10,6 +10,7 @@ import {
   NEW_SHEET_ID,
   NUMBER_EXISTS,
   VALUES_MATCHED,
+  WRONG_USER_PASS,
 } from './types';
 
 import {
@@ -24,7 +25,7 @@ import {
   getSheetValues,
 } from '../functions/executeFunc';
 
-// import history from '../history';
+import history from '../history';
 
 export const signIn = (userId) => {
   return {
@@ -38,10 +39,56 @@ export const signOut = () => {
     type: SIGN_OUT,
   };
 };
+export const wrongUserPass = (userPassStatus) => {
+  return {
+    type: WRONG_USER_PASS,
+    payload: userPassStatus,
+  };
+};
 
-export const doShrinkLogo = () => {
+export const doLogIn = (formValues) => async (dispatch) => {
+  dispatch(doLoading(true));
+  const { username, password } = formValues;
+  await executeValuesUpdateAdminAuth(username, password);
+  const getSheetValuesMatchedRange = 'Auth!G2';
+  const isSignedIn = await getSheetValues(getSheetValuesMatchedRange);
+  await executeValuesUpdateAdminAuth('', '');
+
+  switch (isSignedIn[0]) {
+    case 'TRUE':
+      dispatch(signIn());
+      dispatch(wrongUserPass(false));
+      localStorage.setItem('user', Date.now() + 60 * 60 * 1000);
+      history.push('/preferences/main');
+      break;
+    case 'FALSE':
+      dispatch(wrongUserPass(true));
+      break;
+    default:
+      dispatch(signOut());
+      break;
+  }
+
+  dispatch(doLoading(false));
+};
+
+export const doCheckSignedIn = () => async (dispatch) => {
+  const user = localStorage.getItem('user');
+  if (user > Date.now()) {
+    dispatch(signIn());
+  }
+};
+
+export const doLogOut = () => async (dispatch) => {
+  localStorage.removeItem('user');
+  dispatch(signOut());
+  history.push('/dashboard');
+};
+
+export const doShrinkLogo = (shrinkStatus) => {
   return {
     type: SHRINK_LOGO,
+    payload: shrinkStatus,
   };
 };
 
