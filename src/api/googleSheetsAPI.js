@@ -15,7 +15,7 @@ export const axiosAuth = async () => {
 
     const ACCESS_TOKEN = sessionStorage.getItem('token');
     const expiry_date = sessionStorage.getItem('expiry_date');
-    
+
     if (expiry_date < Date.now()) {
       await getNewToken();
     }
@@ -35,6 +35,6 @@ export const axiosAuth = async () => {
     });
   } catch (err) {
     console.error('Execute error', err);
-    return false;
+    return;
   }
 };
