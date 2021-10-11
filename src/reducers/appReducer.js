@@ -20,7 +20,7 @@ const INITIAL_STATE = {
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case SHRINK_LOGO:
-      return { ...state, shrinkLogo: true };
+      return { ...state, shrinkLogo: action.payload };
     case SHRINK_ICON:
       return { ...state, shrinkIcon: action.payload };
     case SHOW_CHECK_IN_OUT:
