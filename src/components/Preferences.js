@@ -1,30 +1,55 @@
 import React from 'react';
 import { Router, Route } from 'react-router-dom';
+import { connect } from 'react-redux';
+
 import history from '../history';
 import Main from './Main';
 import SearchBar from './SearchBar';
 import NewUserForm from './NewUserForm';
 import CheckInOut from './CheckInOut';
 
-function Preferences() {
+function Preferences(props) {
+  if (props.isSignedIn) {
+    return (
+      <Router history={history}>
+        <div>
+          <Route path='/preferences/main' component={Main}></Route>
+          <Route path='/preferences/main/user' component={SearchBar}></Route>
+          <Route
+            path='/preferences/main/user/check-in-out'
+            exact
+            component={CheckInOut}
+          ></Route>
+          <Route
+            path='/preferences/main/new-user'
+            exact
+            component={NewUserForm}
+          ></Route>
+        </div>
+      </Router>
+    );
+  }
   return (
-    <Router history={history}>
-      <div>
-        <Route path='/preferences/main' component={Main}></Route>
-        <Route path='/preferences/main/user' component={SearchBar}></Route>
-        <Route
-          path='/preferences/main/user/check-in-out'
-          exact
-          component={CheckInOut}
-        ></Route>
-        <Route
-          path='/preferences/main/new-user'
-          exact
-          component={NewUserForm}
-        ></Route>
+    <div className='text-center'>
+      <div className='alert alert-danger mt-5' role='alert'>
+        You need to login first!
       </div>
-    </Router>
+      <button
+        className='ui primary button stabraq-bg'
+        onClick={() => history.push('/dashboard')}
+        type='submit'
+      >
+        <i className='sign-in icon' />
+        Go to sign in page
+      </button>
+    </div>
   );
 }
 
-export default Preferences;
+const mapStateToProps = (state) => {
+  return {
+    isSignedIn: state.auth.isSignedIn,
+  };
+};
+
+export default connect(mapStateToProps, {})(Preferences);
