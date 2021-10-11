@@ -24,9 +24,7 @@ class SearchBar extends React.Component {
 
   urlSearch = async () => {
     await this.onURLSearchSet(this.mobile);
-    this.setState({
-      errorMessage: await checkForMobNum(this.state.mobileNumber),
-    });
+    await this.checkForErrors();
     await this.search();
   };
 
@@ -42,19 +40,24 @@ class SearchBar extends React.Component {
     }
   };
 
+  checkForErrors = async () => {
+    this.setState({
+      errorMessage: await checkForMobNum(this.state.mobileNumber),
+    });
+  };
+
   onFormChangeSet = async (e) => {
     this.setState({ mobileNumber: e.target.value });
   };
 
   onFormChange = async (e) => {
     await this.onFormChangeSet(e);
-    this.setState({
-      errorMessage: await checkForMobNum(this.state.mobileNumber),
-    });
+    await this.checkForErrors();
   };
 
   onFormSubmit = async (event) => {
     event.preventDefault();
+    await this.checkForErrors();
     if (this.props.loading) return;
     await this.search();
   };
