@@ -30,6 +30,8 @@ function Splash(props) {
 const mapStateToProps = (state) => {
   return {
     shrinkLogo: state.app.shrinkLogo,
+    isSignedIn: state.auth.isSignedIn,
   };
 };
+
 export default connect(mapStateToProps, { doShrinkLogo })(Splash);
