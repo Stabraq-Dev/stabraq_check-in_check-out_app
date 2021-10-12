@@ -6,6 +6,7 @@ import {
   checkForUserName,
   checkForMobNum,
   checkForEmail,
+  checkForMembership,
 } from '../functions/validation';
 import { doOnNewUserFormSubmit } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
@@ -27,6 +28,31 @@ const NewUserForm = (props) => {
       <div className={className}>
         <label>{label}</label>
         <input {...input} placeholder={placeholder} maxLength={maxLength} />
+        {renderError(meta)}
+      </div>
+    );
+  };
+
+  const renderOptions = (input, options) => {
+    return (
+      <select {...input}>
+        {options.map((o) => {
+          return (
+            <option key={o.key} value={o.value}>
+              {o.text}
+            </option>
+          );
+        })}
+      </select>
+    );
+  };
+
+  const renderSelect = ({ input, label, meta, options }) => {
+    const className = `field ${meta.error && meta.touched ? 'error' : ''}`;
+    return (
+      <div className={className}>
+        <label>{label}</label>
+        {renderOptions(input, options)}
         {renderError(meta)}
       </div>
     );
@@ -54,11 +80,12 @@ const NewUserForm = (props) => {
       onSubmit={onSubmit}
       validate={async (formValues) => {
         const errors = {};
-        const { username, mobile, email } = formValues;
+        const { username, mobile, email, membership } = formValues;
 
         const validUserName = await checkForUserName(username);
         const validMobile = await checkForMobNum(mobile);
         const validEmail = await checkForEmail(email);
+        const validMembership = await checkForMembership(membership);
 
         if (validUserName) {
           errors.username = validUserName;
@@ -70,6 +97,10 @@ const NewUserForm = (props) => {
 
         if (validEmail) {
           errors.email = validEmail;
+        }
+
+        if (validMembership) {
+          errors.membership = validMembership;
         }
 
         return errors;
@@ -97,6 +128,20 @@ const NewUserForm = (props) => {
             type='text'
             placeholder='stabraq@stabraq.com'
           />
+          <Field
+            name='membership'
+            component={renderSelect}
+            label='Membership'
+            options={[
+              { key: 0, value: '', text: '...Select...' },
+              { key: 1, value: 'NOT_MEMBER', text: 'Not Member' },
+              { key: 2, value: 'GREEN', text: 'Green' },
+              { key: 3, value: 'ORANGE', text: 'Orange' },
+              { key: 4, value: 'BUSINESS', text: 'Business' },
+              { key: 5, value: '10_DAYS', text: 'Ten Days' },
+              { key: 6, value: 'HOURS_MEMBERSHIP', text: 'Hours' },
+            ]}
+          ></Field>
           <div className='mt-3 text-center'>{renderSubmitButton()}</div>
         </form>
       )}

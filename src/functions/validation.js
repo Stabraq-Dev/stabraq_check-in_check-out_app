@@ -65,8 +65,13 @@ export const checkForMembership = async (inputTerm) => {
     return regexp.test(inputTerm);
   }
 
-  if (validMembership(inputTerm)) {
-    return true;
+  if (inputTerm === undefined) {
+    return 'Please Select Membership';
   }
-  return false;
+
+  if (validMembership(inputTerm)) {
+    return '';
+  }
+
+  return 'Please Select Membership';
 };
