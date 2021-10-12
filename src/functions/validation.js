@@ -13,6 +13,7 @@ export const checkForMobNum = async (inputTerm) => {
   if (validMobNum(inputTerm)) {
     return '';
   }
+
   return 'Please Enter Valid Mobile Number';
 };
 
@@ -25,10 +26,15 @@ export const checkForEmail = async (inputTerm) => {
     return regexp.test(inputTerm);
   }
 
-  if (validEmail(inputTerm)) {
-    return true;
+  if (!inputTerm) {
+    return 'Please Enter E-Mail Address';
   }
-  return false;
+
+  if (validEmail(inputTerm)) {
+    return '';
+  }
+
+  return 'Please Enter Valid E-Mail Address';
 };
 
 export const checkForUserName = async (inputTerm) => {
@@ -40,10 +46,15 @@ export const checkForUserName = async (inputTerm) => {
     return regexp.test(inputTerm);
   }
 
-  if (validUserName(inputTerm)) {
-    return true;
+  if (!inputTerm) {
+    return 'Please Enter User Name';
   }
-  return false;
+
+  if (validUserName(inputTerm)) {
+    return '';
+  }
+
+  return 'Please Enter Valid User Name';
 };
 
 export const checkForMembership = async (inputTerm) => {
