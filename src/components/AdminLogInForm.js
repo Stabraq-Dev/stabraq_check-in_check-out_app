@@ -1,7 +1,8 @@
 import React from 'react';
 import { Form, Field } from 'react-final-form';
-import { checkForUserName } from '../functions/validation';
 import { connect } from 'react-redux';
+
+import { checkForUserName } from '../functions/validation';
 import { doLogIn, doLogOut } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
 import history from '../history';
@@ -49,9 +50,11 @@ const AdminLogInForm = (props) => {
       );
     }
   };
+
   const onSubmit = (formValues) => {
     props.doLogIn(formValues);
   };
+
   if (props.isSignedIn) {
     return (
       <div className='ui segment text-center'>
@@ -61,7 +64,7 @@ const AdminLogInForm = (props) => {
           onClick={() => history.push('/preferences/main')}
           type='submit'
         >
-         Go to Main page
+          Go to Main page
         </button>
         <button
           className='ui red button'
@@ -73,25 +76,23 @@ const AdminLogInForm = (props) => {
       </div>
     );
   }
+
   return (
     <Form
       initialValues={props.initialValues}
       onSubmit={onSubmit}
       validate={async (formValues) => {
         const errors = {};
+        const { username, password } = formValues;
 
-        if (!formValues.username) {
-          errors.username = 'You must enter a user name';
+        const validUserName = await checkForUserName(username);
+
+        if (validUserName) {
+          errors.username = validUserName;
         }
 
-        const validUserName = await checkForUserName(formValues.username);
-
-        if (!validUserName) {
-          errors.username = 'You must enter valid user name';
-        }
-
-        if (!formValues.password) {
-          errors.password = 'You must enter a password';
+        if (!password) {
+          errors.password = 'You Must Enter a Password';
         }
 
         return errors;
