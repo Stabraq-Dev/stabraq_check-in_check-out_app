@@ -4,6 +4,7 @@ import { checkForMobNum } from '../functions/validation';
 import { connect } from 'react-redux';
 import { doSearchByMobile } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
+import { axiosAuth } from '../api/googleSheetsAPI';
 
 class SearchBar extends React.Component {
   state = { mobileNumber: '', errorMessage: '' };
@@ -23,6 +24,7 @@ class SearchBar extends React.Component {
   };
 
   urlSearch = async () => {
+    await axiosAuth();
     await this.onURLSearchSet(this.mobile);
     await this.checkForErrors();
     await this.search();

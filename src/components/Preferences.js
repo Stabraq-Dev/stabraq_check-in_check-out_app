@@ -1,6 +1,7 @@
 import React from 'react';
 import { Router, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
+import { doRedirectToSignIn } from '../actions';
 
 import history from '../history';
 import Main from './Main';
@@ -36,7 +37,7 @@ function Preferences(props) {
       </div>
       <button
         className='ui primary button stabraq-bg'
-        onClick={() => history.push('/dashboard')}
+        onClick={props.doRedirectToSignIn}
         type='submit'
       >
         <i className='sign-in icon' />
@@ -52,4 +53,4 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps, {})(Preferences);
+export default connect(mapStateToProps, { doRedirectToSignIn })(Preferences);

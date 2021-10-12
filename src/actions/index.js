@@ -11,6 +11,7 @@ import {
   NUMBER_EXISTS,
   VALUES_MATCHED,
   WRONG_USER_PASS,
+  FROM_URL,
 } from './types';
 
 import {
@@ -39,6 +40,14 @@ export const signOut = () => {
     type: SIGN_OUT,
   };
 };
+
+export const fromURL = () => {
+  return {
+    type: FROM_URL,
+    payload: history.location.pathname + history.location.search,
+  };
+};
+
 export const wrongUserPass = (userPassStatus) => {
   return {
     type: WRONG_USER_PASS,
@@ -46,7 +55,7 @@ export const wrongUserPass = (userPassStatus) => {
   };
 };
 
-export const doLogIn = (formValues) => async (dispatch) => {
+export const doLogIn = (formValues) => async (dispatch, getState) => {
   dispatch(doLoading(true));
   const { username, password } = formValues;
   await executeValuesUpdateAdminAuth(username, password);
@@ -59,7 +68,12 @@ export const doLogIn = (formValues) => async (dispatch) => {
       dispatch(signIn());
       dispatch(wrongUserPass(false));
       localStorage.setItem('user', Date.now() + 60 * 60 * 1000);
-      history.push('/preferences/main');
+      const { fromURL } = getState().auth;
+      if (fromURL) {
+        history.push(fromURL);
+      } else {
+        history.push('/preferences/main');
+      }
       break;
     case 'FALSE':
       dispatch(wrongUserPass(true));
@@ -82,6 +96,11 @@ export const doCheckSignedIn = () => async (dispatch) => {
 export const doLogOut = () => async (dispatch) => {
   localStorage.removeItem('user');
   dispatch(signOut());
+  history.push('/dashboard');
+};
+
+export const doRedirectToSignIn = () => async (dispatch) => {
+  dispatch(fromURL());
   history.push('/dashboard');
 };
 
