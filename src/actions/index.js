@@ -174,6 +174,14 @@ export const doSearchByMobile = (mobile) => async (dispatch) => {
   // history.push('/');
 };
 
+export const doOnNewUserFormSubmit = (formValues) => async (dispatch) => {
+  console.log(formValues);
+
+  dispatch(doLoading(true));
+
+  dispatch(doLoading(false));
+};
+
 /* 
  @a Helper Functions 
  */
