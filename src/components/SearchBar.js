@@ -79,7 +79,8 @@ class SearchBar extends React.Component {
         onClick={this.onFormSubmit}
         type='submit'
       >
-        Submit
+        <i className='chevron circle right icon me-1' />
+        Search
       </button>
     );
   }
