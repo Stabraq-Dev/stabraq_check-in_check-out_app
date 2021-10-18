@@ -2,7 +2,7 @@ import React from 'react';
 
 import { checkForMobNum } from '../functions/validation';
 import { connect } from 'react-redux';
-import { doSearchByMobile } from '../actions';
+import { searchMobileNumber, doSearchByMobile } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
 import { axiosAuth } from '../api/googleSheetsAPI';
 
@@ -53,6 +53,7 @@ class SearchBar extends React.Component {
   };
 
   onFormChange = async (e) => {
+    this.props.searchMobileNumber(e.target.value);
     await this.onFormChangeSet(e);
     await this.checkForErrors();
   };
@@ -116,4 +117,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps, { doSearchByMobile })(SearchBar);
+export default connect(mapStateToProps, {
+  searchMobileNumber,
+  doSearchByMobile,
+})(SearchBar);

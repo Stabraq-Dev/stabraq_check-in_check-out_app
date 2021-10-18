@@ -12,6 +12,16 @@ import {
   VALUES_MATCHED,
   WRONG_USER_PASS,
   FROM_URL,
+  SHOW_MY_MODAL,
+  SUBMIT_TYPE,
+  ON_SEARCH_SUBMIT,
+  ON_USER_SUBMIT,
+  ON_NEW_USER_SUBMIT,
+  ON_CHECK_IN_OUT_SUBMIT,
+  CHECKED_IN_STATUS,
+  CHECKED_OUT_STATUS,
+  CLEAR_PREV_USER_STATE,
+  CALC_DURATION_COST,
 } from './types';
 
 import {
@@ -52,6 +62,34 @@ export const wrongUserPass = (userPassStatus) => {
   return {
     type: WRONG_USER_PASS,
     payload: userPassStatus,
+  };
+};
+
+export const doShowMyModal = (showStatus) => {
+  return {
+    type: SHOW_MY_MODAL,
+    payload: showStatus,
+  };
+};
+
+export const submitType = (submitType) => {
+  return {
+    type: SUBMIT_TYPE,
+    payload: submitType,
+  };
+};
+
+export const doCheckedIn = (checkedInStatus) => {
+  return {
+    type: CHECKED_IN_STATUS,
+    payload: checkedInStatus,
+  };
+};
+
+export const doCheckedOut = (checkedOutStatus) => {
+  return {
+    type: CHECKED_OUT_STATUS,
+    payload: checkedOutStatus,
   };
 };
 
@@ -132,6 +170,29 @@ export const doLoading = (loadingStatus) => {
   };
 };
 
+export const searchMobileNumber = (mobile) => {
+  if (history.location.pathname === '/preferences/main/user/check-in-out') {
+    history.push('/preferences/main/user');
+  }
+  return {
+    type: SEARCH_BY_MOBILE,
+    payload: mobile,
+  };
+};
+
+export const doClearPrevUserState = () => {
+  return {
+    type: CLEAR_PREV_USER_STATE,
+  };
+};
+
+export const doCalcDurationCost = (resData) => {
+  return {
+    type: CALC_DURATION_COST,
+    payload: resData,
+  };
+};
+
 export const doCreateNewSheet = () => async (dispatch) => {
   const getSheetValuesSheetDateRange = 'Data!L1';
   const sheetDate = await getSheetValues(getSheetValuesSheetDateRange);
@@ -150,13 +211,16 @@ export const doCreateNewSheet = () => async (dispatch) => {
   }
 };
 
-export const doSearchByMobile = (mobile) => async (dispatch) => {
-  console.log(mobile);
-  dispatch({ type: SEARCH_BY_MOBILE, payload: mobile });
+export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
+  dispatch(submitType(ON_SEARCH_SUBMIT));
+  dispatch(doClearPrevUserState());
+
+  if (history.location.pathname === '/preferences/main/user/check-in-out') {
+    history.push('/preferences/main/user');
+  }
 
   dispatch(doLoading(true));
-  // Check to Add new Sheet for new day
-  dispatch(doCreateNewSheet());
+
   // Search for the user by mobile number
   await executeValuesUpdate(mobile);
   const getSheetValuesNumberExistsRange = 'Clients!I2';
@@ -168,10 +232,12 @@ export const doSearchByMobile = (mobile) => async (dispatch) => {
     const valuesMatched = await getSheetValues(getSheetValuesMatchedRange);
     dispatch({ type: VALUES_MATCHED, payload: valuesMatched });
   }
-
   dispatch(doLoading(false));
-
-  // history.push('/');
+  const { showMyModal } = getState().app;
+  if (showMyModal) {
+    dispatch(doShowMyModal(false));
+  }
+  dispatch(doShowMyModal(true));
 };
 
 export const doOnNewUserFormSubmit = (formValues) => async (dispatch) => {
@@ -181,6 +247,51 @@ export const doOnNewUserFormSubmit = (formValues) => async (dispatch) => {
 
   dispatch(doLoading(false));
 };
+
+export const doCheckInOut =
+  (checkInOutStatus) => async (dispatch, getState) => {
+    dispatch(submitType(ON_CHECK_IN_OUT_SUBMIT));
+    console.log(checkInOutStatus);
+
+    dispatch(doLoading(true));
+
+    const { mobileNumber, userName, eMailAddress, membership, rowNumber } =
+      getState().app.valuesMatched;
+
+    if (checkInOutStatus === 'CHECK_IN') {
+      console.log('Welcome CHECK_IN');
+      if (rowNumber !== 'NOT_CHECKED_IN') {
+        dispatch(doCheckedIn(true));
+      } else {
+        await executeValuesAppendCheckIn(
+          checkInOutStatus,
+          mobileNumber,
+          userName,
+          eMailAddress,
+          membership,
+          rowNumber
+        );
+      }
+    } else {
+      console.log('Welcome CheckOut');
+      const { checkedOut } = getState().app.valuesMatched;
+      if (checkedOut === 'CHECK_OUT') {
+        dispatch(doCheckedOut(true));
+      } else if (checkedOut === 'NOT_CHECKED_IN') {
+        dispatch(doCheckedOut(false));
+      } else {
+        await executeValuesAppendCheckOut(
+          checkInOutStatus,
+          rowNumber,
+          membership
+        );
+        const getSheetValuesDurationRange = `Data!H${rowNumber}:K${rowNumber}`;
+        const resData = await getSheetValues(getSheetValuesDurationRange);
+        dispatch(doCalcDurationCost(resData));
+      }
+    }
+    dispatch(doLoading(false));
+  };
 
 /* 
  @a Helper Functions 

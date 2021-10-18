@@ -10,13 +10,15 @@ import { axiosAuth } from '../api/googleSheetsAPI';
 import Splash from './Splash';
 import Preferences from './Preferences';
 import AdminLogInForm from './AdminLogInForm';
-import { doCheckSignedIn } from '../actions/index';
+import { doCheckSignedIn, doCreateNewSheet } from '../actions/index';
 import { connect } from 'react-redux';
 
 const App = (props) => {
   useEffect(() => {
     load();
     props.doCheckSignedIn();
+    // Check to Add new Sheet for new day
+    props.doCreateNewSheet();
   });
 
   const load = async () => {
@@ -41,4 +43,4 @@ const App = (props) => {
   );
 };
 
-export default connect(null, { doCheckSignedIn })(App);
+export default connect(null, { doCheckSignedIn, doCreateNewSheet })(App);

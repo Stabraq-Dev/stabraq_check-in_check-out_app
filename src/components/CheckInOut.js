@@ -1,32 +1,42 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import { doCheckInOut } from '../actions';
+import history from '../history';
+import LoadingSpinner from './LoadingSpinner';
 
 class CheckInOut extends React.Component {
-  state = { checkInOut: '' };
+  componentDidMount() {
+    if (this.props.numberExists === '' && this.props.mobileNumber.length < 11) {
+      history.push('/preferences/main/user');
+    }
+  }
 
   onCheckInOut = (event) => {
     event.preventDefault();
 
-    this.setState({ checkInOut: event.target.value }, function () {
-      this.props.onSubmit(this.state.checkInOut);
-    });
+    this.props.doCheckInOut(event.target.value);
   };
 
   render() {
+    if (this.props.loading) {
+      return <LoadingSpinner />;
+    }
+
     return (
-      <div className='ui segment'>
+      <div className='ui segment text-center'>
         <button
-          className='ui primary button stabraq-bg'
+          className='ui primary button stabraq-bg me-3'
           name='checkIn'
-          value='Check In'
+          value='CHECK_IN'
           onClick={this.onCheckInOut}
           type='submit'
         >
           Check In
         </button>
         <button
-          className='ui primary button stabraq-bg'
+          className='ui primary button stabraq-bg ms-3'
           name='checkOut'
-          value='Check Out'
+          value='CHECK_OUT'
           onClick={this.onCheckInOut}
           type='submit'
         >
@@ -37,4 +47,12 @@ class CheckInOut extends React.Component {
   }
 }
 
-export default CheckInOut;
+const mapStateToProps = (state) => {
+  return {
+    loading: state.app.loading,
+    mobileNumber: state.app.mobileNumber,
+    numberExists: state.app.numberExists,
+  };
+};
+
+export default connect(mapStateToProps, { doCheckInOut })(CheckInOut);
