@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Router, Route, Switch } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -12,20 +12,48 @@ import Preferences from './Preferences';
 import AdminLogInForm from './AdminLogInForm';
 import { doCheckSignedIn, doCreateNewSheet } from '../actions/index';
 import { connect } from 'react-redux';
+import MyAlert from './MyAlert';
 
 const App = (props) => {
+  const [online, setOnline] = useState(true);
   useEffect(() => {
+    if (!navigator.onLine) {
+      return;
+    }
     load();
-    props.doCheckSignedIn();
-    // Check to Add new Sheet for new day
-    props.doCreateNewSheet();
   });
 
   const load = async () => {
     await axiosAuth();
+    await props.doCheckSignedIn();
+    // Check to Add new Sheet for new day
+    await props.doCreateNewSheet();
   };
+
+  // We are "offline".
+  window.addEventListener('offline', () => {
+    // Show "No Internet Connection." message.
+    console.log('offline');
+    setOnline(false);
+  });
+  // We are "online".
+  window.addEventListener('online', () => {
+    // Hide "No Internet Connection." message.
+    console.log('online');
+    setOnline(true);
+  });
+
+  const renderNoInternet = () => {
+    if (!online) return <MyAlert bodyContent='NO INTERNET CONNECTION' />;
+  };
+
+  // if (!navigator.onLine) {
+  //   return <div className='ui container mt-3'>NO INTERNET CONNECTION</div>;
+  // }
+
   return (
     <div className='ui container mt-3'>
+      {renderNoInternet()}
       <Router history={history}>
         <div>
           <Splash />

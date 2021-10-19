@@ -1,11 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import { doShowCheckInOut, doShrinkIcon, doLogOut } from '../actions';
+import {
+  doShowCheckInOut,
+  doShrinkIcon,
+  doLogOut,
+  doClearPrevUserState,
+} from '../actions';
 // import { Person, PersonAdd } from '@mui/icons-material';
 
 class Main extends React.Component {
   onFormSubmitUser = async () => {
+    this.props.doClearPrevUserState();
     this.props.doShrinkIcon(true);
     this.props.doShowCheckInOut(true);
   };
@@ -90,4 +96,5 @@ export default connect(mapStateToProps, {
   doShowCheckInOut,
   doShrinkIcon,
   doLogOut,
+  doClearPrevUserState,
 })(Main);

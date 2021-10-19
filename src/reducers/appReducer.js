@@ -14,6 +14,7 @@ import {
   CLEAR_PREV_USER_STATE,
   SEARCH_BY_MOBILE,
   CALC_DURATION_COST,
+  CHECK_IN_OUT_STATUS,
 } from '../actions/types';
 
 const INITIAL_STATE = {
@@ -37,6 +38,7 @@ const INITIAL_STATE = {
   },
   showMyModal: false,
   submitType: '',
+  checkInOutStatus: '',
   checkInOut: {
     checked_In: false,
     checked_Out: false,
@@ -88,8 +90,11 @@ export default (state = INITIAL_STATE, action) => {
     case CLEAR_PREV_USER_STATE:
       return {
         ...state,
+        mobileNumber: INITIAL_STATE.mobileNumber,
+        numberExists: INITIAL_STATE.numberExists,
         valuesMatched: INITIAL_STATE.valuesMatched,
         checkInOut: INITIAL_STATE.checkInOut,
+        durationCost: INITIAL_STATE.durationCost,
       };
     case CALC_DURATION_COST:
       return {
@@ -100,6 +105,8 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, showMyModal: action.payload };
     case SUBMIT_TYPE:
       return { ...state, submitType: action.payload };
+    case CHECK_IN_OUT_STATUS:
+      return { ...state, checkInOutStatus: action.payload };
     case CHECKED_IN_STATUS:
       return {
         ...state,

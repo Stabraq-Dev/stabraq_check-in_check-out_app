@@ -15,13 +15,13 @@ import {
   SHOW_MY_MODAL,
   SUBMIT_TYPE,
   ON_SEARCH_SUBMIT,
-  ON_USER_SUBMIT,
   ON_NEW_USER_SUBMIT,
   ON_CHECK_IN_OUT_SUBMIT,
   CHECKED_IN_STATUS,
   CHECKED_OUT_STATUS,
   CLEAR_PREV_USER_STATE,
   CALC_DURATION_COST,
+  CHECK_IN_OUT_STATUS,
 } from './types';
 
 import {
@@ -94,6 +94,7 @@ export const doCheckedOut = (checkedOutStatus) => {
 };
 
 export const doLogIn = (formValues) => async (dispatch, getState) => {
+  if (!navigator.onLine) return;
   dispatch(doLoading(true));
   const { username, password } = formValues;
   await executeValuesUpdateAdminAuth(username, password);
@@ -163,6 +164,13 @@ export const doShowCheckInOut = (showCheckInOutStatus) => {
   };
 };
 
+export const doCheckInOutStatus = (checkInOutStatus) => {
+  return {
+    type: CHECK_IN_OUT_STATUS,
+    payload: checkInOutStatus,
+  };
+};
+
 export const doLoading = (loadingStatus) => {
   return {
     type: LOADING,
@@ -212,6 +220,7 @@ export const doCreateNewSheet = () => async (dispatch) => {
 };
 
 export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
+  if (!navigator.onLine) return;
   dispatch(submitType(ON_SEARCH_SUBMIT));
   dispatch(doClearPrevUserState());
 
@@ -241,6 +250,7 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
 };
 
 export const doOnNewUserFormSubmit = (formValues) => async (dispatch) => {
+  if (!navigator.onLine) return;
   console.log(formValues);
 
   dispatch(doLoading(true));
@@ -250,7 +260,9 @@ export const doOnNewUserFormSubmit = (formValues) => async (dispatch) => {
 
 export const doCheckInOut =
   (checkInOutStatus) => async (dispatch, getState) => {
+    if (!navigator.onLine) return;
     dispatch(submitType(ON_CHECK_IN_OUT_SUBMIT));
+    dispatch(doCheckInOutStatus(checkInOutStatus));
     console.log(checkInOutStatus);
 
     dispatch(doLoading(true));
@@ -259,6 +271,7 @@ export const doCheckInOut =
       getState().app.valuesMatched;
 
     if (checkInOutStatus === 'CHECK_IN') {
+      /* CHECK_IN */
       console.log('Welcome CHECK_IN');
       if (rowNumber !== 'NOT_CHECKED_IN') {
         dispatch(doCheckedIn(true));
@@ -273,6 +286,7 @@ export const doCheckInOut =
         );
       }
     } else {
+      /* CHECK_OUT */
       console.log('Welcome CheckOut');
       const { checkedOut } = getState().app.valuesMatched;
       if (checkedOut === 'CHECK_OUT') {
@@ -291,6 +305,11 @@ export const doCheckInOut =
       }
     }
     dispatch(doLoading(false));
+    const { showMyModal } = getState().app;
+    if (showMyModal) {
+      await dispatch(doShowMyModal(false));
+    }
+    await dispatch(doShowMyModal(true));
   };
 
 /* 

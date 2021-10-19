@@ -3,6 +3,7 @@ const SHEET_ID = process.env.REACT_APP_SHEET_ID;
 
 export const executeValuesUpdate = async (val) => {
   try {
+    await axiosAuth();
     const googleSheetsAPI = await axiosAuth();
 
     const range = 'Clients!H2';
@@ -27,6 +28,7 @@ export const executeValuesUpdateAdminAuth = async (
   inputPassword
 ) => {
   try {
+    await axiosAuth();
     const googleSheetsAPI = await axiosAuth();
 
     const range = 'Auth!H2';
@@ -52,6 +54,7 @@ export const executeValuesUpdateAdminAuth = async (
 
 export const executeBatchUpdateAddSheet = async (sheetDate) => {
   try {
+    await axiosAuth();
     const googleSheetsAPI = await axiosAuth();
     const response = await googleSheetsAPI.post(`${SHEET_ID}:batchUpdate`, {
       requests: [
@@ -79,6 +82,7 @@ export const executeBatchUpdateAddSheet = async (sheetDate) => {
 
 export const executeBatchUpdateCutPaste = async (destSheetId) => {
   try {
+    await axiosAuth();
     const googleSheetsAPI = await axiosAuth();
     const response = await googleSheetsAPI.post(`${SHEET_ID}:batchUpdate`, {
       requests: [
@@ -103,6 +107,7 @@ export const executeBatchUpdateCutPaste = async (destSheetId) => {
 
 export const executeValuesAppendAddSheet = async () => {
   try {
+    await axiosAuth();
     const googleSheetsAPI = await axiosAuth();
 
     const range = 'Data!A1';
@@ -137,6 +142,7 @@ export const executeValuesAppendAddSheet = async () => {
 
 export const executeValuesAppendNewUserData = async (userData) => {
   try {
+    await axiosAuth();
     const googleSheetsAPI = await axiosAuth();
 
     const range = 'Clients!A3';
@@ -171,6 +177,7 @@ export const executeValuesAppendCheckIn = async (
   rowNumber
 ) => {
   try {
+    await axiosAuth();
     const googleSheetsAPI = await axiosAuth();
 
     const range = 'Data!A2';
@@ -203,6 +210,7 @@ export const executeValuesAppendCheckOut = async (
   membership
 ) => {
   try {
+    await axiosAuth();
     const googleSheetsAPI = await axiosAuth();
 
     const range = `Data!G${rowNumber}`;

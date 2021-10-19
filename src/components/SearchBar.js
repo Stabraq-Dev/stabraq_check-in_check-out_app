@@ -2,13 +2,16 @@ import React from 'react';
 
 import { checkForMobNum } from '../functions/validation';
 import { connect } from 'react-redux';
-import { searchMobileNumber, doSearchByMobile } from '../actions';
+import {
+  searchMobileNumber,
+  doSearchByMobile,
+  doShowMyModal,
+} from '../actions';
 import LoadingSpinner from './LoadingSpinner';
 import { axiosAuth } from '../api/googleSheetsAPI';
 
 class SearchBar extends React.Component {
   state = { mobileNumber: '', errorMessage: '' };
-
   componentDidMount() {
     this.mobile = new URLSearchParams(window.location.search).get('mobile');
     // http://localhost:3000/preferences/main/user/?mobile=01xxxxxxxxx
@@ -17,6 +20,11 @@ class SearchBar extends React.Component {
     if (this.mobile) {
       this.urlSearch();
     }
+  }
+
+  componentWillUnmount() {
+    this.setState({ mobileNumber: '' });
+    this.props.doShowMyModal(false);
   }
 
   onURLSearchSet = async (mobile) => {
@@ -120,4 +128,5 @@ const mapStateToProps = (state) => {
 export default connect(mapStateToProps, {
   searchMobileNumber,
   doSearchByMobile,
+  doShowMyModal,
 })(SearchBar);
