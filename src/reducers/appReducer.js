@@ -8,6 +8,7 @@ import {
   SHOW_MY_MODAL,
   SUBMIT_TYPE,
   SEARCH_BY_MOBILE,
+  ERROR,
 } from '../actions/types';
 
 const INITIAL_STATE = {
@@ -20,6 +21,7 @@ const INITIAL_STATE = {
   mobileNumber: '',
   showMyModal: false,
   submitType: '',
+  error: '',
 };
 
 /* eslint import/no-anonymous-default-export: [2, {"allowArrowFunction": true}] */
@@ -43,6 +45,8 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, showMyModal: action.payload };
     case SUBMIT_TYPE:
       return { ...state, submitType: action.payload };
+    case ERROR:
+      return { ...state, error: action.payload };
     default:
       return state;
   }

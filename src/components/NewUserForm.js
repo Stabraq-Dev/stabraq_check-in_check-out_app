@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Form, Field } from 'react-final-form';
 import { connect } from 'react-redux';
 
@@ -8,10 +8,19 @@ import {
   checkForEmail,
   checkForMembership,
 } from '../functions/validation';
-import { doOnNewUserFormSubmit } from '../actions';
+import { doOnNewUserFormSubmit, doShowMyModal } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
 
 const NewUserForm = (props) => {
+  useEffect(() => {
+    // Anything in here is fired on component mount.
+    return () => {
+      // Anything in here is fired on component unmount.
+      props.doShowMyModal(false);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const renderError = ({ error, touched }) => {
     if (touched && error) {
       return (
@@ -155,4 +164,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps, { doOnNewUserFormSubmit })(NewUserForm);
+export default connect(mapStateToProps, {
+  doOnNewUserFormSubmit,
+  doShowMyModal,
+})(NewUserForm);

@@ -1,5 +1,5 @@
 export const checkForMobNum = async (inputTerm) => {
-  console.log('::: Running checkForMobNum :::', inputTerm);
+  // console.log('::: Running checkForMobNum :::', inputTerm);
 
   function validMobNum(inputTerm) {
     let regexp = /^\+?01[0-9]{9}$/;
@@ -18,7 +18,7 @@ export const checkForMobNum = async (inputTerm) => {
 };
 
 export const checkForEmail = async (inputTerm) => {
-  console.log('::: Running checkForEmail :::', inputTerm);
+  // console.log('::: Running checkForEmail :::', inputTerm);
 
   function validEmail(inputTerm) {
     let regexp =
@@ -38,7 +38,7 @@ export const checkForEmail = async (inputTerm) => {
 };
 
 export const checkForUserName = async (inputTerm) => {
-  console.log('::: Running checkForUserName :::', inputTerm);
+  // console.log('::: Running checkForUserName :::', inputTerm);
 
   function validUserName(inputTerm) {
     let regexp =
@@ -58,7 +58,7 @@ export const checkForUserName = async (inputTerm) => {
 };
 
 export const checkForMembership = async (inputTerm) => {
-  console.log('::: Running checkForMembership :::', inputTerm);
+  // console.log('::: Running checkForMembership :::', inputTerm);
 
   function validMembership(inputTerm) {
     let regexp = /\w{1,}/;

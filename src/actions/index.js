@@ -22,6 +22,7 @@ import {
   CLEAR_PREV_USER_STATE,
   CALC_DURATION_COST,
   CHECK_IN_OUT_STATUS,
+  ERROR,
 } from './types';
 
 import {
@@ -221,6 +222,8 @@ export const doCreateNewSheet = () => async (dispatch) => {
 
 export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
   if (!navigator.onLine) return;
+  const { showMyModal } = getState().app;
+
   dispatch(submitType(ON_SEARCH_SUBMIT));
   dispatch(doClearPrevUserState());
 
@@ -231,7 +234,20 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
   dispatch(doLoading(true));
 
   // Search for the user by mobile number
-  await executeValuesUpdate(mobile);
+  const res = await executeValuesUpdate(mobile);
+
+  if (res.status !== 200) {
+    dispatch({ type: ERROR, payload: res });
+    dispatch(doLoading(false));
+    if (showMyModal) {
+      dispatch(doShowMyModal(false));
+    }
+    dispatch(doShowMyModal(true));
+    return;
+  } else {
+    dispatch({ type: ERROR, payload: '' });
+  }
+  
   const getSheetValuesNumberExistsRange = 'Clients!I2';
   const numberExists = await getSheetValues(getSheetValuesNumberExistsRange);
   dispatch({ type: NUMBER_EXISTS, payload: numberExists[0] });
@@ -242,21 +258,30 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
     dispatch({ type: VALUES_MATCHED, payload: valuesMatched });
   }
   dispatch(doLoading(false));
-  const { showMyModal } = getState().app;
+  dispatch(doShowCheckInOut(true));
   if (showMyModal) {
     dispatch(doShowMyModal(false));
   }
   dispatch(doShowMyModal(true));
 };
 
-export const doOnNewUserFormSubmit = (formValues) => async (dispatch) => {
-  if (!navigator.onLine) return;
-  console.log(formValues);
+export const doOnNewUserFormSubmit =
+  (formValues) => async (dispatch, getState) => {
+    if (!navigator.onLine) return;
+    dispatch(submitType(ON_NEW_USER_SUBMIT));
+    console.log(formValues);
 
-  dispatch(doLoading(true));
-
-  dispatch(doLoading(false));
-};
+    dispatch(doLoading(true));
+    await executeValuesAppendNewUserData(formValues);
+    dispatch(doLoading(false));
+    dispatch(doShowCheckInOut(true));
+    dispatch(searchMobileNumber(formValues.mobile));
+    const { showMyModal } = getState().app;
+    if (showMyModal) {
+      dispatch(doShowMyModal(false));
+    }
+    dispatch(doShowMyModal(true));
+  };
 
 export const doCheckInOut =
   (checkInOutStatus) => async (dispatch, getState) => {
@@ -281,8 +306,7 @@ export const doCheckInOut =
           mobileNumber,
           userName,
           eMailAddress,
-          membership,
-          rowNumber
+          membership
         );
       }
     } else {

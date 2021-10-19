@@ -6,7 +6,7 @@ import LoadingSpinner from './LoadingSpinner';
 
 class CheckInOut extends React.Component {
   componentDidMount() {
-    if (this.props.numberExists === '' && this.props.mobileNumber.length < 11) {
+    if (!this.props.showCheckInOut) {
       history.push('/preferences/main/user');
     }
   }
@@ -51,7 +51,7 @@ const mapStateToProps = (state) => {
   return {
     loading: state.app.loading,
     mobileNumber: state.app.mobileNumber,
-    numberExists: state.user.numberExists,
+    showCheckInOut: state.app.showCheckInOut,
   };
 };
 

@@ -19,6 +19,7 @@ export class MyModalUser extends Component {
       duration,
       approxDuration,
       cost,
+      error,
     } = this.props;
     switch (submitType) {
       case 'ON_SEARCH_SUBMIT':
@@ -32,6 +33,13 @@ export class MyModalUser extends Component {
               </h1>
             </div>
           );
+        } else if (error) {
+          return (
+            <div className='text-center'>
+              <p>{error.message}</p>
+              <p>Try Again</p>
+            </div>
+          );
         } else {
           return (
             <div className='text-center'>
@@ -39,8 +47,14 @@ export class MyModalUser extends Component {
             </div>
           );
         }
+
       case 'ON_NEW_USER_SUBMIT':
-        break;
+        return (
+          <div className='text-center'>
+            <h1>Form Submitted</h1>
+          </div>
+        );
+
       case 'ON_CHECK_IN_OUT_SUBMIT':
         if (checkInOutStatus === 'CHECK_IN') {
           /* CHECK_IN */
@@ -108,20 +122,30 @@ export class MyModalUser extends Component {
   }
 
   renderAction = () => {
-    const { submitType, numberExists, checkInOutStatus, checkedOut } =
-      this.props;
+    const {
+      submitType,
+      numberExists,
+      checkInOutStatus,
+      checkedOut,
+      mobileNumber,
+      error,
+    } = this.props;
     switch (submitType) {
       case 'ON_SEARCH_SUBMIT':
-        switch (numberExists) {
-          case 'EXISTS':
-            return history.push('/preferences/main/user/check-in-out');
-          case 'NOT_EXISTS':
-            return history.push('/preferences/main/new-user');
-          default:
-            return history.push('/');
+        if (error) {
+          return history.push('/preferences/main/user');
+        } else {
+          switch (numberExists) {
+            case 'EXISTS':
+              return history.push('/preferences/main/user/check-in-out');
+            case 'NOT_EXISTS':
+              return history.push('/preferences/main/new-user');
+            default:
+              return history.push('/');
+          }
         }
       case 'ON_NEW_USER_SUBMIT':
-        break;
+        return history.push(`/preferences/main/user/?mobile=${mobileNumber}`);
       case 'ON_CHECK_IN_OUT_SUBMIT':
         switch (checkInOutStatus) {
           case 'CHECK_IN':
@@ -157,6 +181,7 @@ const mapStateToProps = (state) => {
   return {
     showMyModal: state.app.showMyModal,
     submitType: state.app.submitType,
+    mobileNumber: state.app.mobileNumber,
     numberExists: state.user.numberExists,
     checkInOutStatus: state.user.checkInOutStatus,
     userName: state.user.valuesMatched.userName,
@@ -168,6 +193,7 @@ const mapStateToProps = (state) => {
     duration: state.user.durationCost.duration,
     approxDuration: state.user.durationCost.approxDuration,
     cost: state.user.durationCost.cost,
+    error: state.app.error,
   };
 };
 

@@ -18,8 +18,10 @@ export const executeValuesUpdate = async (val) => {
     );
 
     console.log('Response executeValuesUpdate', response);
+    return response;
   } catch (err) {
     console.error('Execute error', err);
+    return err;
   }
 };
 
@@ -140,7 +142,7 @@ export const executeValuesAppendAddSheet = async () => {
   }
 };
 
-export const executeValuesAppendNewUserData = async (userData) => {
+export const executeValuesAppendNewUserData = async (formValues) => {
   try {
     await axiosAuth();
     const googleSheetsAPI = await axiosAuth();
@@ -153,10 +155,10 @@ export const executeValuesAppendNewUserData = async (userData) => {
         majorDimension: 'COLUMNS',
         values: [
           // [new Date().toLocaleString()],
-          [userData.mobile],
-          [userData.userName],
-          [userData.email],
-          [userData.membership],
+          [formValues.mobile],
+          [formValues.username],
+          [formValues.email],
+          [formValues.membership],
         ],
       },
       { params: { valueInputOption: valueInputOption } }
@@ -173,8 +175,7 @@ export const executeValuesAppendCheckIn = async (
   mobileNumber,
   userName,
   eMailAddress,
-  membership,
-  rowNumber
+  membership
 ) => {
   try {
     await axiosAuth();
