@@ -51,7 +51,7 @@ const mapStateToProps = (state) => {
   return {
     loading: state.app.loading,
     mobileNumber: state.app.mobileNumber,
-    numberExists: state.app.numberExists,
+    numberExists: state.user.numberExists,
   };
 };
 

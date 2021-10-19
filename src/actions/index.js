@@ -268,7 +268,7 @@ export const doCheckInOut =
     dispatch(doLoading(true));
 
     const { mobileNumber, userName, eMailAddress, membership, rowNumber } =
-      getState().app.valuesMatched;
+      getState().user.valuesMatched;
 
     if (checkInOutStatus === 'CHECK_IN') {
       /* CHECK_IN */
@@ -288,7 +288,7 @@ export const doCheckInOut =
     } else {
       /* CHECK_OUT */
       console.log('Welcome CheckOut');
-      const { checkedOut } = getState().app.valuesMatched;
+      const { checkedOut } = getState().user.valuesMatched;
       if (checkedOut === 'CHECK_OUT') {
         dispatch(doCheckedOut(true));
       } else if (checkedOut === 'NOT_CHECKED_IN') {

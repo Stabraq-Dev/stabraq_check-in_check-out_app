@@ -157,17 +157,17 @@ const mapStateToProps = (state) => {
   return {
     showMyModal: state.app.showMyModal,
     submitType: state.app.submitType,
-    numberExists: state.app.numberExists,
-    checkInOutStatus: state.app.checkInOutStatus,
-    userName: state.app.valuesMatched.userName,
-    membership: state.app.valuesMatched.membership,
-    expiryDate: state.app.valuesMatched.expiryDate,
-    remainDays: state.app.valuesMatched.remainDays,
-    rowNumber: state.app.valuesMatched.rowNumber,
-    checkedOut: state.app.valuesMatched.checkedOut,
-    duration: state.app.durationCost.duration,
-    approxDuration: state.app.durationCost.approxDuration,
-    cost: state.app.durationCost.cost,
+    numberExists: state.user.numberExists,
+    checkInOutStatus: state.user.checkInOutStatus,
+    userName: state.user.valuesMatched.userName,
+    membership: state.user.valuesMatched.membership,
+    expiryDate: state.user.valuesMatched.expiryDate,
+    remainDays: state.user.valuesMatched.remainDays,
+    rowNumber: state.user.valuesMatched.rowNumber,
+    checkedOut: state.user.valuesMatched.checkedOut,
+    duration: state.user.durationCost.duration,
+    approxDuration: state.user.durationCost.approxDuration,
+    cost: state.user.durationCost.cost,
   };
 };
 
