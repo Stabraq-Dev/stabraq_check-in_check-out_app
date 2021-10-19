@@ -165,8 +165,10 @@ export const executeValuesAppendNewUserData = async (formValues) => {
     );
 
     console.log('Response executeValuesAppendNewUserData', response);
+    return response;
   } catch (err) {
     console.error('Execute error', err);
+    return err;
   }
 };
 

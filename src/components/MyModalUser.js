@@ -21,103 +21,112 @@ export class MyModalUser extends Component {
       cost,
       error,
     } = this.props;
-    switch (submitType) {
-      case 'ON_SEARCH_SUBMIT':
-        if (numberExists === 'EXISTS') {
-          return (
-            <div className='text-center'>
-              <h1>
-                {/[\u0600-\u06FF]/.test(userName) ? 'مرحبا' : 'Welcome Back'}
-                <br />
-                {userName}
-              </h1>
-            </div>
-          );
-        } else if (error) {
-          return (
-            <div className='text-center'>
-              <p>{error.message}</p>
-              <p>Try Again</p>
-            </div>
-          );
-        } else {
-          return (
-            <div className='text-center'>
-              <p>{numberExists}</p>
-            </div>
-          );
-        }
-
-      case 'ON_NEW_USER_SUBMIT':
-        return (
-          <div className='text-center'>
-            <h1>Form Submitted</h1>
-          </div>
-        );
-
-      case 'ON_CHECK_IN_OUT_SUBMIT':
-        if (checkInOutStatus === 'CHECK_IN') {
-          /* CHECK_IN */
-          console.log('Welcome CHECK_IN');
-          if (rowNumber !== 'NOT_CHECKED_IN') {
+    if (error) {
+      return (
+        <div className='text-center'>
+          <h1>{error.message}</h1>
+          <h1>Try Again</h1>
+        </div>
+      );
+    } else {
+      switch (submitType) {
+        case 'ON_SEARCH_SUBMIT':
+          if (numberExists === 'EXISTS') {
             return (
-              <div>
-                <h1>You already Checked In</h1>
-              </div>
-            );
-          } else {
-            const remainingDays = remainDays.includes('-')
-              ? `Expired ${remainDays}`
-              : ` ${remainDays} `;
-            return (
-              <div>
-                <h1>Checked In Successfully</h1>
-                {membership !== 'NOT_MEMBER' && expiryDate.includes('/') ? (
-                  <div>
-                    <h1>Expiry Date: {expiryDate}</h1>
-                    <h1>
-                      Remaining Days:
-                      {remainingDays}
-                      Days
-                    </h1>
-                  </div>
-                ) : null}
-              </div>
-            );
-          }
-        } else {
-          /* CHECK_OUT */
-          console.log('Welcome CheckOut');
-          if (checkedOut === 'CHECK_OUT') {
-            return (
-              <div>
-                <h1>You already Checked Out</h1>
-              </div>
-            );
-          } else if (checkedOut === 'NOT_CHECKED_IN') {
-            return (
-              <div>
-                <h1>{checkedOut}</h1>
+              <div className='text-center'>
+                <h1>
+                  {/[\u0600-\u06FF]/.test(userName) ? 'مرحبا' : 'Welcome Back'}
+                  <br />
+                  {userName}
+                </h1>
               </div>
             );
           } else {
             return (
-              <div>
-                {duration.includes('') ? (
-                  <div>
-                    <h1>Duration: {duration} Hr:Min</h1>
-                    <h1>Approx. Duration: {approxDuration} Hours</h1>
-                    {membership === 'NOT_MEMBER' ? (
-                      <h1>Cost: {cost} EGP</h1>
-                    ) : null}
-                  </div>
-                ) : null}
+              <div className='text-center'>
+                <h1>Not Exist</h1>
               </div>
             );
           }
-        }
-      default:
-        return null;
+
+        case 'ON_NEW_USER_SUBMIT':
+          if (numberExists === 'EXISTS') {
+            return (
+              <div className='text-center'>
+                <h1>EXISTS</h1>
+              </div>
+            );
+          }
+          return (
+            <div className='text-center'>
+              <h1>Form Submitted</h1>
+            </div>
+          );
+
+        case 'ON_CHECK_IN_OUT_SUBMIT':
+          if (checkInOutStatus === 'CHECK_IN') {
+            /* CHECK_IN */
+            console.log('Welcome CHECK_IN');
+            if (rowNumber !== 'NOT_CHECKED_IN') {
+              return (
+                <div>
+                  <h1>You already Checked In</h1>
+                </div>
+              );
+            } else {
+              const remainingDays = remainDays.includes('-')
+                ? `Expired ${remainDays}`
+                : ` ${remainDays} `;
+              return (
+                <div>
+                  <h1>Checked In Successfully</h1>
+                  {membership !== 'NOT_MEMBER' && expiryDate.includes('/') ? (
+                    <div>
+                      <h1>Expiry Date: {expiryDate}</h1>
+                      <h1>
+                        Remaining Days:
+                        {remainingDays}
+                        Days
+                      </h1>
+                    </div>
+                  ) : null}
+                </div>
+              );
+            }
+          } else {
+            /* CHECK_OUT */
+            console.log('Welcome CheckOut');
+            if (checkedOut === 'CHECK_OUT') {
+              return (
+                <div>
+                  <h1>You already Checked Out</h1>
+                </div>
+              );
+            } else if (checkedOut === 'NOT_CHECKED_IN') {
+              return (
+                <div>
+                  <h1>{checkedOut}</h1>
+                </div>
+              );
+            } else {
+              return (
+                <div>
+                  {duration.includes('') ? (
+                    <div>
+                      <h1>Duration: {duration} Hr:Min</h1>
+                      <h1>Approx. Duration: {approxDuration} Hours</h1>
+                      {membership === 'NOT_MEMBER' ? (
+                        <h1>Cost: {cost} EGP</h1>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            }
+          }
+        default:
+          return null;
+      }
     }
   }
 
@@ -145,8 +154,14 @@ export class MyModalUser extends Component {
           }
         }
       case 'ON_NEW_USER_SUBMIT':
+        if (error) {
+          return history.push('/preferences/main/new-user');
+        }
         return history.push(`/preferences/main/user/?mobile=${mobileNumber}`);
       case 'ON_CHECK_IN_OUT_SUBMIT':
+        if (error) {
+          return history.push('/preferences/main/user/check-in-out');
+        }
         switch (checkInOutStatus) {
           case 'CHECK_IN':
             return history.push('/preferences/main/user');

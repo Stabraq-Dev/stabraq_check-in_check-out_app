@@ -220,6 +220,28 @@ export const doCreateNewSheet = () => async (dispatch) => {
   }
 };
 
+export const doCheckResponse = (res) => async (dispatch, getState) => {
+  const { showMyModal } = getState().app;
+
+  if (res.status !== 200) {
+    dispatch({ type: ERROR, payload: res });
+    dispatch(doLoading(false));
+    if (showMyModal) {
+      dispatch(doShowMyModal(false));
+    }
+    dispatch(doShowMyModal(true));
+    return;
+  } else {
+    dispatch({ type: ERROR, payload: '' });
+  }
+};
+
+/**
+ *
+ * @o doSearchByMobile
+ *
+ */
+
 export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
   if (!navigator.onLine) return;
   const { showMyModal } = getState().app;
@@ -235,19 +257,8 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
 
   // Search for the user by mobile number
   const res = await executeValuesUpdate(mobile);
+  dispatch(doCheckResponse(res));
 
-  if (res.status !== 200) {
-    dispatch({ type: ERROR, payload: res });
-    dispatch(doLoading(false));
-    if (showMyModal) {
-      dispatch(doShowMyModal(false));
-    }
-    dispatch(doShowMyModal(true));
-    return;
-  } else {
-    dispatch({ type: ERROR, payload: '' });
-  }
-  
   const getSheetValuesNumberExistsRange = 'Clients!I2';
   const numberExists = await getSheetValues(getSheetValuesNumberExistsRange);
   dispatch({ type: NUMBER_EXISTS, payload: numberExists[0] });
@@ -257,6 +268,9 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
     const valuesMatched = await getSheetValues(getSheetValuesMatchedRange);
     dispatch({ type: VALUES_MATCHED, payload: valuesMatched });
   }
+
+  await executeValuesUpdate('');
+
   dispatch(doLoading(false));
   dispatch(doShowCheckInOut(true));
   if (showMyModal) {
@@ -265,23 +279,48 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
   dispatch(doShowMyModal(true));
 };
 
+/**
+ *
+ * @o doOnNewUserFormSubmit
+ *
+ */
+
 export const doOnNewUserFormSubmit =
   (formValues) => async (dispatch, getState) => {
     if (!navigator.onLine) return;
+    const { showMyModal } = getState().app;
     dispatch(submitType(ON_NEW_USER_SUBMIT));
-    console.log(formValues);
 
     dispatch(doLoading(true));
-    await executeValuesAppendNewUserData(formValues);
+
+    const resUpdate = await executeValuesUpdate(formValues.mobile);
+    dispatch(doCheckResponse(resUpdate));
+
+    const getSheetValuesNumberExistsRange = 'Clients!I2';
+    const numberExists = await getSheetValues(getSheetValuesNumberExistsRange);
+
+    if (numberExists[0] === 'NOT_EXISTS') {
+      const resAppend = await executeValuesAppendNewUserData(formValues);
+      dispatch(doCheckResponse(resAppend));
+    } else {
+      dispatch({ type: NUMBER_EXISTS, payload: numberExists[0] });
+    }
+
     dispatch(doLoading(false));
     dispatch(doShowCheckInOut(true));
     dispatch(searchMobileNumber(formValues.mobile));
-    const { showMyModal } = getState().app;
+
     if (showMyModal) {
       dispatch(doShowMyModal(false));
     }
     dispatch(doShowMyModal(true));
   };
+
+/**
+ *
+ * @o doCheckInOut
+ *
+ */
 
 export const doCheckInOut =
   (checkInOutStatus) => async (dispatch, getState) => {
