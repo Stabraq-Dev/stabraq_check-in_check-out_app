@@ -331,6 +331,9 @@ export const doCheckInOut =
 
     dispatch(doLoading(true));
 
+    // Check to Add new Sheet for new day
+    await dispatch(doCreateNewSheet());
+    
     const { mobileNumber, userName, eMailAddress, membership, rowNumber } =
       getState().user.valuesMatched;
 

@@ -10,7 +10,7 @@ import { axiosAuth } from '../api/googleSheetsAPI';
 import Splash from './Splash';
 import Preferences from './Preferences';
 import AdminLogInForm from './AdminLogInForm';
-import { doCheckSignedIn, doCreateNewSheet } from '../actions/index';
+import { doCheckSignedIn } from '../actions/index';
 import { connect } from 'react-redux';
 import MyAlert from './MyAlert';
 
@@ -26,8 +26,6 @@ const App = (props) => {
   const load = async () => {
     await axiosAuth();
     await props.doCheckSignedIn();
-    // Check to Add new Sheet for new day
-    await props.doCreateNewSheet();
   };
 
   // We are "offline".
@@ -71,4 +69,4 @@ const App = (props) => {
   );
 };
 
-export default connect(null, { doCheckSignedIn, doCreateNewSheet })(App);
+export default connect(null, { doCheckSignedIn })(App);
