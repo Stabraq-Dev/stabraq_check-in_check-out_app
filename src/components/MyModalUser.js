@@ -164,11 +164,11 @@ export class MyModalUser extends Component {
         }
         switch (checkInOutStatus) {
           case 'CHECK_IN':
-            return history.push('/preferences/main/user');
+            return history.push('/');
           case 'CHECK_OUT':
             switch (checkedOut) {
               case 'CHECK_OUT':
-                return history.push('/preferences/main');
+                return history.push('/');
               case 'NOT_CHECKED_IN':
                 return history.push('/preferences/main/user/check-in-out');
               default:
