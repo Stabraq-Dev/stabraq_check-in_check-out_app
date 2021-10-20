@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 export class MyAlert extends Component {
   render() {
     return (
-      <div className='text-center'>
+      <div className='ui container mt-3 text-center'>
         <svg xmlns='http://www.w3.org/2000/svg' style={{ display: 'none' }}>
           <symbol
             id='exclamation-triangle-fill'

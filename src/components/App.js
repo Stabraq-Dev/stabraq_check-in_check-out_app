@@ -50,19 +50,21 @@ const App = (props) => {
   // }
 
   return (
-    <div className='ui container mt-3'>
+    <div className='container-fluid'>
       {renderNoInternet()}
       <Router history={history}>
         <div>
           <Splash />
-          <Switch>
-            <Route path='/dashboard'>
-              <AdminLogInForm />
-            </Route>
-            <Route path='/preferences'>
-              <Preferences />
-            </Route>
-          </Switch>
+          <div className='ui container mt-3'>
+            <Switch>
+              <Route path='/dashboard'>
+                <AdminLogInForm />
+              </Route>
+              <Route path='/preferences'>
+                <Preferences />
+              </Route>
+            </Switch>
+          </div>
         </div>
       </Router>
     </div>

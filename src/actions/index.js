@@ -3,7 +3,7 @@ import {
   SIGN_OUT,
   SHRINK_LOGO,
   SHOW_CHECK_IN_OUT,
-  SHRINK_ICON,
+  REVEAL,
   SEARCH_BY_MOBILE,
   LOADING,
   SHEET_DATE,
@@ -23,6 +23,7 @@ import {
   CALC_DURATION_COST,
   CHECK_IN_OUT_STATUS,
   ERROR,
+  REVEAL_LOGO,
 } from './types';
 
 import {
@@ -151,10 +152,17 @@ export const doShrinkLogo = (shrinkStatus) => {
   };
 };
 
-export const doShrinkIcon = (shrinkStatus) => {
+export const doReveal = (revealStatus) => {
   return {
-    type: SHRINK_ICON,
-    payload: shrinkStatus,
+    type: REVEAL,
+    payload: revealStatus,
+  };
+};
+
+export const doRevealLogo = (revealLogoStatus) => {
+  return {
+    type: REVEAL_LOGO,
+    payload: revealLogoStatus,
   };
 };
 
@@ -333,7 +341,7 @@ export const doCheckInOut =
 
     // Check to Add new Sheet for new day
     await dispatch(doCreateNewSheet());
-    
+
     const { mobileNumber, userName, eMailAddress, membership, rowNumber } =
       getState().user.valuesMatched;
 

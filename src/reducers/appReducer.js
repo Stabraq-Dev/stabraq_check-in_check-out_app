@@ -1,7 +1,7 @@
 import {
   SHRINK_LOGO,
   SHOW_CHECK_IN_OUT,
-  SHRINK_ICON,
+  REVEAL,
   LOADING,
   SHEET_DATE,
   NEW_SHEET_ID,
@@ -9,11 +9,13 @@ import {
   SUBMIT_TYPE,
   SEARCH_BY_MOBILE,
   ERROR,
+  REVEAL_LOGO,
 } from '../actions/types';
 
 const INITIAL_STATE = {
   shrinkLogo: false,
-  shrinkIcon: false,
+  revealLogo: false,
+  reveal: [],
   showCheckInOut: false,
   loading: false,
   sheetDate: '',
@@ -29,8 +31,10 @@ export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case SHRINK_LOGO:
       return { ...state, shrinkLogo: action.payload };
-    case SHRINK_ICON:
-      return { ...state, shrinkIcon: action.payload };
+    case REVEAL_LOGO:
+      return { ...state, revealLogo: action.payload };
+    case REVEAL:
+      return { ...state, reveal: action.payload };
     case SHOW_CHECK_IN_OUT:
       return { ...state, showCheckInOut: action.payload };
     case LOADING:

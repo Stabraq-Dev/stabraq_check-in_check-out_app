@@ -1,7 +1,8 @@
 export const SIGN_IN = 'SIGN_IN';
 export const SIGN_OUT = 'SIGN_OUT';
 export const SHRINK_LOGO = 'SHRINK_LOGO';
-export const SHRINK_ICON = 'SHRINK_ICON';
+export const REVEAL = 'REVEAL';
+export const REVEAL_LOGO = 'REVEAL_LOGO';
 export const SHOW_CHECK_IN_OUT = 'SHOW_CHECK_IN_OUT';
 export const SEARCH_BY_MOBILE = 'SEARCH_BY_MOBILE';
 export const LOADING = 'LOADING';
