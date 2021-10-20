@@ -9,6 +9,7 @@ import {
   checkForMembership,
 } from '../functions/validation';
 import { doOnNewUserFormSubmit, doShowMyModal } from '../actions';
+import Fade from 'react-reveal/Fade';
 import LoadingSpinner from './LoadingSpinner';
 
 const NewUserForm = (props) => {
@@ -25,7 +26,9 @@ const NewUserForm = (props) => {
     if (touched && error) {
       return (
         <div className='ui error message'>
-          <div className='header'>{error}</div>
+          <Fade bottom collapse>
+            <h4 className='ui header'>{error}</h4>
+          </Fade>
         </div>
       );
     }

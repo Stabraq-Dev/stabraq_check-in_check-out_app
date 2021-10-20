@@ -7,6 +7,7 @@ import {
   doSearchByMobile,
   doShowMyModal,
 } from '../actions';
+import Fade from 'react-reveal/Fade';
 import LoadingSpinner from './LoadingSpinner';
 import { axiosAuth } from '../api/googleSheetsAPI';
 
@@ -44,7 +45,9 @@ class SearchBar extends React.Component {
     if (error) {
       return (
         <div className='ui error message'>
-          <div className='header'>{error}</div>
+          <Fade bottom collapse>
+            <h4 className='ui header'>{error}</h4>
+          </Fade>
         </div>
       );
     }

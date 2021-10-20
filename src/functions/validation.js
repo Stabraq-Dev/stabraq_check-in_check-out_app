@@ -7,14 +7,14 @@ export const checkForMobNum = async (inputTerm) => {
   }
 
   if (!inputTerm) {
-    return 'Please Enter Mobile Number';
+    return 'Please enter mobile number';
   }
 
   if (validMobNum(inputTerm)) {
     return '';
   }
 
-  return 'Please Enter Valid Mobile Number';
+  return 'Enter valid mobile number';
 };
 
 export const checkForEmail = async (inputTerm) => {
@@ -27,14 +27,14 @@ export const checkForEmail = async (inputTerm) => {
   }
 
   if (!inputTerm) {
-    return 'Please Enter E-Mail Address';
+    return 'Please enter e-mail';
   }
 
   if (validEmail(inputTerm)) {
     return '';
   }
 
-  return 'Please Enter Valid E-Mail Address';
+  return 'Please enter valid e-mail';
 };
 
 export const checkForUserName = async (inputTerm) => {
@@ -47,14 +47,14 @@ export const checkForUserName = async (inputTerm) => {
   }
 
   if (!inputTerm) {
-    return 'Please Enter User Name';
+    return 'Please enter user name';
   }
 
   if (validUserName(inputTerm)) {
     return '';
   }
 
-  return 'Please Enter Valid User Name';
+  return 'Please enter valid user name';
 };
 
 export const checkForMembership = async (inputTerm) => {
@@ -66,12 +66,12 @@ export const checkForMembership = async (inputTerm) => {
   }
 
   if (inputTerm === undefined) {
-    return 'Please Select Membership';
+    return 'Please select membership';
   }
 
   if (validMembership(inputTerm)) {
     return '';
   }
 
-  return 'Please Select Membership';
+  return 'Please select membership';
 };
