@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal } from 'bootstrap';
+import Bounce from 'react-reveal/Bounce';
 
 class MyModal extends React.Component {
   componentDidMount() {
@@ -8,6 +9,7 @@ class MyModal extends React.Component {
   }
 
   render() {
+    const { body, bodyBackground, closeAction } = this.props;
     return (
       <div>
         <div
@@ -20,9 +22,11 @@ class MyModal extends React.Component {
           <div className='modal-dialog modal-dialog-centered'>
             <div className='modal-content'>
               <div className='modal-header'>
-                {/* <h5 className='modal-title' id='exampleModalLabel'>
-                  Modal title
-                </h5> */}
+                <Bounce top cascade>
+                  <h5 className='modal-title' id='exampleModalLabel'>
+                    STABRAQ COMMUNITY SPACE
+                  </h5>
+                </Bounce>
                 <button
                   type='button'
                   className='btn-close'
@@ -30,17 +34,15 @@ class MyModal extends React.Component {
                   aria-label='Close'
                 ></button>
               </div>
-              <div
-                className={`modal-body text-center ${this.props.bodyBackground}`}
-              >
-                {this.props.body}
+              <div className={`modal-body text-center ${bodyBackground}`}>
+                {body}
               </div>
               <div className='modal-footer'>
                 <button
                   type='button'
                   className='btn btn-stabraq'
                   data-bs-dismiss='modal'
-                  onClick={this.props.closeAction}
+                  onClick={closeAction}
                 >
                   Close
                 </button>

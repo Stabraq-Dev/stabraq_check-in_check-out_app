@@ -8,14 +8,21 @@ import { doShrinkLogo, doRevealLogo, doReveal } from '../actions';
 
 const revealAll = ['HEADER-TEXT', 'USER-BTN', 'NEW-USER-BTN'];
 
-function Splash(props) {
+function Splash({
+  isSignedIn,
+  doShrinkLogo,
+  shrinkLogo,
+  doRevealLogo,
+  revealLogo,
+  doReveal,
+}) {
   useEffect(() => {
-    props.doShrinkLogo(false);
-    props.doRevealLogo(true);
+    doShrinkLogo(false);
+    doRevealLogo(true);
   });
 
-  const shrinkLogo =
-    props.shrinkLogo || history.location.pathname !== '/' ? 'shrink-logo' : '';
+  const shrinkLogoClass =
+    shrinkLogo || history.location.pathname !== '/' ? 'shrink-logo' : '';
 
   const redirectTo = () => {
     if (history.location.pathname === '/') {
@@ -28,24 +35,24 @@ function Splash(props) {
   };
 
   return (
-    <Link to={props.isSignedIn ? redirectTo : '/dashboard'}>
+    <Link to={isSignedIn ? redirectTo : '/dashboard'}>
       <div className='text-center'>
         <button
           className='btn me-2 no-btn-focus'
           type='button'
           onClick={async () => {
-            await props.doRevealLogo(false);
-            await props.doShrinkLogo(true);
-            await props.doRevealLogo(true);
+            await doRevealLogo(false);
+            await doShrinkLogo(true);
+            await doRevealLogo(true);
             if (history.location.pathname === '/preferences/main') {
-              await props.doReveal([]);
-              await props.doReveal(revealAll);
+              await doReveal([]);
+              await doReveal(revealAll);
             }
           }}
         >
-          <Flip right cascade when={props.revealLogo}>
+          <Flip right cascade when={revealLogo}>
             <img
-              className={`mx-auto d-block logo-img ${shrinkLogo}`}
+              className={`mx-auto d-block logo-img ${shrinkLogoClass}`}
               src='/logo.png'
               alt='Logo'
             />
@@ -57,10 +64,12 @@ function Splash(props) {
 }
 
 const mapStateToProps = (state) => {
+  const { isSignedIn } = state.auth;
+  const { shrinkLogo, revealLogo } = state.app;
   return {
-    isSignedIn: state.auth.isSignedIn,
-    shrinkLogo: state.app.shrinkLogo,
-    revealLogo: state.app.revealLogo,
+    isSignedIn,
+    shrinkLogo,
+    revealLogo,
   };
 };
 

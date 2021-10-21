@@ -123,8 +123,9 @@ class SearchBar extends React.Component {
 }
 
 const mapStateToProps = (state) => {
+  const { loading } = state.app;
   return {
-    loading: state.app.loading,
+    loading,
   };
 };
 

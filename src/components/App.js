@@ -14,7 +14,7 @@ import { doCheckSignedIn } from '../actions/index';
 import { connect } from 'react-redux';
 import MyAlert from './MyAlert';
 
-const App = (props) => {
+const App = ({ doCheckSignedIn }) => {
   const [online, setOnline] = useState(true);
   useEffect(() => {
     if (!navigator.onLine) {
@@ -25,7 +25,7 @@ const App = (props) => {
 
   const load = async () => {
     await axiosAuth();
-    await props.doCheckSignedIn();
+    await doCheckSignedIn();
   };
 
   // We are "offline".

@@ -7,7 +7,14 @@ import { doLogIn, doLogOut } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
 import history from '../history';
 
-const AdminLogInForm = (props) => {
+const AdminLogInForm = ({
+  initialValues,
+  loading,
+  wrongUserPass,
+  isSignedIn,
+  doLogIn,
+  doLogOut,
+}) => {
   const renderError = ({ error, touched }) => {
     if (touched && error) {
       return (
@@ -30,7 +37,7 @@ const AdminLogInForm = (props) => {
   };
 
   const renderSubmitButton = () => {
-    if (props.loading) {
+    if (loading) {
       return <LoadingSpinner />;
     }
     return (
@@ -42,7 +49,7 @@ const AdminLogInForm = (props) => {
   };
 
   const renderWrongUserPass = () => {
-    if (props.wrongUserPass && !props.loading) {
+    if (wrongUserPass && !loading) {
       return (
         <div className='alert alert-danger' role='alert'>
           Invalid username and/or password. Please try again
@@ -52,10 +59,10 @@ const AdminLogInForm = (props) => {
   };
 
   const onSubmit = (formValues) => {
-    props.doLogIn(formValues);
+    doLogIn(formValues);
   };
 
-  if (props.isSignedIn) {
+  if (isSignedIn) {
     return (
       <div className='ui segment text-center'>
         <h1>You already signed in</h1>
@@ -68,7 +75,7 @@ const AdminLogInForm = (props) => {
         </button>
         <button
           className='ui red button'
-          onClick={() => props.doLogOut()}
+          onClick={() => doLogOut()}
           type='submit'
         >
           Log out
@@ -79,7 +86,7 @@ const AdminLogInForm = (props) => {
 
   return (
     <Form
-      initialValues={props.initialValues}
+      initialValues={initialValues}
       onSubmit={onSubmit}
       validate={async (formValues) => {
         const errors = {};
@@ -115,10 +122,12 @@ const AdminLogInForm = (props) => {
 };
 
 const mapStateToProps = (state) => {
+  const { isSignedIn, wrongUserPass } = state.auth;
+  const { loading } = state.app;
   return {
-    loading: state.app.loading,
-    wrongUserPass: state.auth.wrongUserPass,
-    isSignedIn: state.auth.isSignedIn,
+    loading,
+    wrongUserPass,
+    isSignedIn,
   };
 };
 

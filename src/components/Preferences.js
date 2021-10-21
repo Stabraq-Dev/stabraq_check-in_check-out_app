@@ -10,8 +10,8 @@ import NewUserForm from './NewUserForm';
 import CheckInOut from './CheckInOut';
 import MyModalUser from './MyModalUser';
 
-function Preferences(props) {
-  if (props.isSignedIn) {
+function Preferences({ isSignedIn, doRedirectToSignIn }) {
+  if (isSignedIn) {
     return (
       <React.Fragment>
         <Router history={history}>
@@ -41,7 +41,7 @@ function Preferences(props) {
       </div>
       <button
         className='ui primary button stabraq-bg'
-        onClick={props.doRedirectToSignIn}
+        onClick={doRedirectToSignIn}
         type='submit'
       >
         <i className='sign-in icon' />
@@ -52,8 +52,9 @@ function Preferences(props) {
 }
 
 const mapStateToProps = (state) => {
+  const { isSignedIn } = state.auth;
   return {
-    isSignedIn: state.auth.isSignedIn,
+    isSignedIn,
   };
 };
 

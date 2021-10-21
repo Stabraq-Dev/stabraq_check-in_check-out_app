@@ -48,10 +48,11 @@ class CheckInOut extends React.Component {
 }
 
 const mapStateToProps = (state) => {
+  const { loading, mobileNumber, showCheckInOut } = state.app;
   return {
-    loading: state.app.loading,
-    mobileNumber: state.app.mobileNumber,
-    showCheckInOut: state.app.showCheckInOut,
+    loading,
+    mobileNumber,
+    showCheckInOut,
   };
 };
 

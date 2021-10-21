@@ -9,15 +9,19 @@ import {
   checkForMembership,
 } from '../functions/validation';
 import { doOnNewUserFormSubmit, doShowMyModal } from '../actions';
-import Fade from 'react-reveal/Fade';
 import LoadingSpinner from './LoadingSpinner';
 
-const NewUserForm = (props) => {
+const NewUserForm = ({
+  doShowMyModal,
+  loading,
+  doOnNewUserFormSubmit,
+  initialValues,
+}) => {
   useEffect(() => {
     // Anything in here is fired on component mount.
     return () => {
       // Anything in here is fired on component unmount.
-      props.doShowMyModal(false);
+      doShowMyModal(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -26,9 +30,7 @@ const NewUserForm = (props) => {
     if (touched && error) {
       return (
         <div className='ui error message'>
-          <Fade bottom collapse>
-            <h4 className='ui header'>{error}</h4>
-          </Fade>
+          <h4 className='ui header'>{error}</h4>
         </div>
       );
     }
@@ -71,7 +73,7 @@ const NewUserForm = (props) => {
   };
 
   const renderSubmitButton = () => {
-    if (props.loading) {
+    if (loading) {
       return <LoadingSpinner />;
     }
     return (
@@ -83,12 +85,12 @@ const NewUserForm = (props) => {
   };
 
   const onSubmit = (formValues) => {
-    props.doOnNewUserFormSubmit(formValues);
+    doOnNewUserFormSubmit(formValues);
   };
 
   return (
     <Form
-      initialValues={props.initialValues}
+      initialValues={initialValues}
       onSubmit={onSubmit}
       validate={async (formValues) => {
         const errors = {};
@@ -162,8 +164,9 @@ const NewUserForm = (props) => {
 };
 
 const mapStateToProps = (state) => {
+  const { loading } = state.app;
   return {
-    loading: state.app.loading,
+    loading,
   };
 };
 
