@@ -337,7 +337,6 @@ export const doCheckInOut =
     if (!navigator.onLine) return;
     dispatch(submitType(ON_CHECK_IN_OUT_SUBMIT));
     dispatch(doCheckInOutStatus(checkInOutStatus));
-    console.log(checkInOutStatus);
 
     dispatch(doLoading(true));
 
@@ -346,7 +345,6 @@ export const doCheckInOut =
 
     if (checkInOutStatus === 'CHECK_IN') {
       /* CHECK_IN */
-      console.log('Welcome CHECK_IN');
       if (rowNumber !== 'NOT_CHECKED_IN') {
         dispatch(doCheckedIn(true));
       } else {
@@ -360,18 +358,13 @@ export const doCheckInOut =
       }
     } else {
       /* CHECK_OUT */
-      console.log('Welcome CheckOut');
       const { checkedOut } = getState().user.valuesMatched;
-      if (checkedOut === 'CHECK_OUT') {
+      if (checkedOut === 'CHECKED_OUT') {
         dispatch(doCheckedOut(true));
       } else if (checkedOut === 'NOT_CHECKED_IN') {
         dispatch(doCheckedOut(false));
       } else {
-        await executeValuesAppendCheckOut(
-          checkInOutStatus,
-          rowNumber,
-          membership
-        );
+        await executeValuesAppendCheckOut(rowNumber, membership);
         const getSheetValuesDurationRange = `Data!H${rowNumber}:K${rowNumber}`;
         const resData = await getSheetValues(getSheetValuesDurationRange);
         dispatch(doCalcDurationCost(resData));
