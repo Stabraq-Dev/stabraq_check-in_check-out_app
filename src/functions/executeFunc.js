@@ -207,11 +207,7 @@ export const executeValuesAppendCheckIn = async (
   }
 };
 
-export const executeValuesAppendCheckOut = async (
-  checkInOut,
-  rowNumber,
-  membership
-) => {
+export const executeValuesAppendCheckOut = async (rowNumber, membership) => {
   try {
     await axiosAuth();
     const googleSheetsAPI = await axiosAuth();
@@ -231,7 +227,7 @@ export const executeValuesAppendCheckOut = async (
           membership === 'NOT_MEMBER'
             ? [`=IF(I${rowNumber}>=6,60,I${rowNumber}*10)`]
             : [''],
-          [checkInOut],
+          ['CHECKED_OUT'],
         ],
       },
       { params: { valueInputOption: valueInputOption } }
