@@ -38,6 +38,10 @@ footer {
   background-color: rgb(210, 235, 211);
 }
 
+.my-pre-wrap {
+  white-space: pre-wrap;
+}
+
 .user-img {
   width: 230px;
   height: 250px;
