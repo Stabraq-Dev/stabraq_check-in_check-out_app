@@ -26,8 +26,12 @@ footer {
   color: #3adb6b !important;
 }
 
-#exampleModal .modal-body {
+#exampleModal .modal-body.stabraq-bg {
   background-color: #3adb6b;
+}
+
+#exampleModal .modal-body.error-bg {
+  background-color: red;
 }
 
 .freebirdLightBackground {
