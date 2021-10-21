@@ -181,11 +181,22 @@ export class MyModalUser extends Component {
         return null;
     }
   };
-
+  renderBodyBackground() {
+    const { error } = this.props;
+    if (error) {
+      return 'error-bg';
+    } else {
+      return 'stabraq-bg';
+    }
+  }
   render() {
     if (this.props.showMyModal) {
       return (
-        <MyModal body={this.renderBody()} closeAction={this.renderAction} />
+        <MyModal
+          body={this.renderBody()}
+          closeAction={this.renderAction}
+          bodyBackground={this.renderBodyBackground()}
+        />
       );
     }
     return null;

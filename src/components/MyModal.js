@@ -30,7 +30,11 @@ class MyModal extends React.Component {
                   aria-label='Close'
                 ></button>
               </div>
-              <div className='modal-body text-center'>{this.props.body}</div>
+              <div
+                className={`modal-body text-center ${this.props.bodyBackground}`}
+              >
+                {this.props.body}
+              </div>
               <div className='modal-footer'>
                 <button
                   type='button'
