@@ -262,7 +262,8 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
   }
 
   dispatch(doLoading(true));
-
+  // Check to Add new Sheet for new day
+  await dispatch(doCreateNewSheet());
   // Search for the user by mobile number
   const res = await executeValuesUpdate(mobile);
   dispatch(doCheckResponse(res));
@@ -300,7 +301,8 @@ export const doOnNewUserFormSubmit =
     dispatch(submitType(ON_NEW_USER_SUBMIT));
 
     dispatch(doLoading(true));
-
+    // Check to Add new Sheet for new day
+    await dispatch(doCreateNewSheet());
     const resUpdate = await executeValuesUpdate(formValues.mobile);
     dispatch(doCheckResponse(resUpdate));
 
@@ -338,9 +340,6 @@ export const doCheckInOut =
     console.log(checkInOutStatus);
 
     dispatch(doLoading(true));
-
-    // Check to Add new Sheet for new day
-    await dispatch(doCreateNewSheet());
 
     const { mobileNumber, userName, eMailAddress, membership, rowNumber } =
       getState().user.valuesMatched;
