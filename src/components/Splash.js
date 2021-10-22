@@ -6,7 +6,12 @@ import Flip from 'react-reveal/Flip';
 import history from '../history';
 import { doShrinkLogo, doRevealLogo, doReveal } from '../actions';
 
-const revealAll = ['HEADER-TEXT', 'USER-BTN', 'NEW-USER-BTN'];
+const revealAll = [
+  'HEADER-TEXT',
+  'USER-BTN',
+  'NEW-USER-BTN',
+  'QR-CODE-GEN-BTN',
+];
 
 function Splash({
   isSignedIn,

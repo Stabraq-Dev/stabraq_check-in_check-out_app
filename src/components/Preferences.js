@@ -9,6 +9,7 @@ import SearchBar from './SearchBar';
 import NewUserForm from './NewUserForm';
 import CheckInOut from './CheckInOut';
 import MyModalUser from './MyModalUser';
+import QRCodeGenerator from './QRCodeGenerator';
 
 function Preferences({ isSignedIn, doRedirectToSignIn }) {
   if (isSignedIn) {
@@ -27,6 +28,10 @@ function Preferences({ isSignedIn, doRedirectToSignIn }) {
               path='/preferences/main/new-user'
               exact
               component={NewUserForm}
+            ></Route>
+            <Route
+              path='/preferences/main/qr-code-gen'
+              component={QRCodeGenerator}
             ></Route>
           </div>
         </Router>
