@@ -139,8 +139,16 @@ export class MyModalUser extends Component {
         if (error) {
           return goToNewUser;
         }
-        return () =>
-          history.push(`/preferences/main/user/?mobile=${mobileNumber}`);
+        switch (numberExists) {
+          case 'EXISTS':
+            return () =>
+              history.push(`/preferences/main/user/?mobile=${mobileNumber}`);
+          default:
+            return () =>
+              history.push(
+                `/preferences/main/qr-code-gen/?mobile=${mobileNumber}`
+              );
+        }
 
       case 'ON_CHECK_IN_OUT_SUBMIT':
         if (error) {

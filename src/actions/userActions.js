@@ -171,7 +171,8 @@ export const doOnNewUserFormSubmit =
     if (!navigator.onLine) return;
     const { showMyModal } = getState().app;
     dispatch(submitType(ON_NEW_USER_SUBMIT));
-
+    dispatch(doClearPrevUserState());
+    
     dispatch(doLoading(true));
     // Check to Add new Sheet for new day
     await dispatch(doCreateNewSheet());
