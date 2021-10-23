@@ -7,9 +7,10 @@ import {
   doSearchByMobile,
   doShowMyModal,
 } from '../actions';
-import Fade from 'react-reveal/Fade';
+
 import LoadingSpinner from './LoadingSpinner';
 import { axiosAuth } from '../api/googleSheetsAPI';
+import InputMobile from './InputMobile';
 
 class SearchBar extends React.Component {
   state = { mobileNumber: '', errorMessage: '' };
@@ -37,20 +38,6 @@ class SearchBar extends React.Component {
     await this.onURLSearchSet(this.mobile);
     await this.checkForErrors();
     await this.search();
-  };
-
-  renderError = () => {
-    const error = this.state.errorMessage;
-
-    if (error) {
-      return (
-        <div className='ui error message'>
-          <Fade bottom collapse>
-            <h4 className='ui header'>{error}</h4>
-          </Fade>
-        </div>
-      );
-    }
   };
 
   checkForErrors = async () => {
@@ -98,24 +85,16 @@ class SearchBar extends React.Component {
   }
 
   render() {
-    const className = `field ${this.state.errorMessage ? 'error' : ''}`;
     return (
       <div className='ui segment'>
         <form onSubmit={this.onFormSubmit} className='ui form error'>
-          <div className={className}>
-            <label>Search By Mobile Number</label>
-            <input
-              type='tel'
-              name='mobile'
-              value={this.state.mobileNumber}
-              onChange={this.onFormChange}
-              onBlur={this.onFormChange}
-              maxLength={11}
-              placeholder='01xxxxxxxxx'
-            />
-            {this.renderError()}
-            <div className='mt-3 text-center'>{this.renderSubmitButton()}</div>
-          </div>
+          <InputMobile
+            value={this.state.mobileNumber}
+            label='Search By Mobile Number'
+            onFormChange={this.onFormChange}
+            errorMessage={this.state.errorMessage}
+          />
+          <div className='mt-3 text-center'>{this.renderSubmitButton()}</div>
         </form>
       </div>
     );

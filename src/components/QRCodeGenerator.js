@@ -1,9 +1,22 @@
-import React, { useState } from 'react';
-import { InputField } from './InputField';
+import React, { useState, useEffect } from 'react';
 import { QRCode } from 'react-qrcode-logo';
 import html2canvas from 'html2canvas';
+import InputMobile from './InputMobile';
+import { checkForMobNum } from '../functions/validation';
 
 const QRCodeGenerator = () => {
+  useEffect(() => {
+    const mobile = new URLSearchParams(window.location.search).get('mobile');
+    if (mobile) {
+      onFormChangeSet(mobile);
+      checkForErrors(mobile);
+    }
+
+    return () => {
+      // Anything in here is fired on component unmount.
+    };
+  }, []);
+
   const [state, setState] = useState({
     // we init this cause is more practical with TS, but eyeRadius is an optional prop
     eyeRadius: [
@@ -28,21 +41,30 @@ const QRCodeGenerator = () => {
     logoImage: '/logo.png',
     logoWidth: 130,
     mobile: '',
+    errorMessage: '',
   });
-console.log(state);
-  const handleChange = ({ target }) => {
+
+  const onFormChangeSet = async (mobile) => {
     setState((prevState) => ({
       ...prevState,
-      [target.name]: target.value,
+      mobile: mobile,
+      value: `https://stabraq.netlify.app/preferences/main/user/?mobile=${mobile}`,
     }));
+  };
 
-    if (target.name === 'value') {
-      setState((prevState) => ({
-        ...prevState,
-        value: `https://stabraq.netlify.app/preferences/main/user/?mobile=${target.value}`,
-        mobile: target.value,
-      }));
-    }
+  const checkForErrors = async (mobile) => {
+    const error = await checkForMobNum(mobile);
+
+    setState((prevState) => ({
+      ...prevState,
+      errorMessage: error,
+    }));
+  };
+
+  const handleChange = async ({ target }) => {
+    const mobile = target.value;
+    await onFormChangeSet(mobile);
+    await checkForErrors(mobile);
   };
 
   const handleDownload = () => {
@@ -77,50 +99,80 @@ console.log(state);
     window.open(`https://wa.me/2${state.mobile}?text=QR-Code`);
   };
 
-  return (
-    <div className='ui container text-center'>
-      <div>
-        <InputField
-          name='value'
-          type='text'
-          label='Mobile Number'
-          maxLength={11}
-          handleChange={handleChange}
-        />
-        <div>
+  const renderQRCode = () => {
+    if (state.mobile && !state.errorMessage) {
+      return (
+        <div className='ui segment mb-3 mt-1'>
           <QRCode
             {...{
               ...state,
             }}
           />
         </div>
-      </div>
-      <div className='ui segment mb-3 mt-1'>
-        <button
-          className='ui primary button stabraq-bg'
-          onClick={handleDownload}
-          type='submit'
-        >
-          <i className='download icon me-1' />
-          Download QR Code
-        </button>
-        <button
-          className='ui primary button stabraq-bg'
-          onClick={shareQR}
-          type='submit'
-        >
-          <i className='share alternate icon me-1' />
-          Share QR Code
-        </button>
-        <button
-          className='ui primary button stabraq-bg'
-          onClick={whatsApp}
-          type='submit'
-        >
-          <i className='whatsapp icon me-1' />
-          Whatsapp
-        </button>
-      </div>
+      );
+    }
+    return null;
+  };
+
+  const buttonsData = [
+    {
+      id: 0,
+      onClick: handleDownload,
+      text: 'Download QR Code',
+      icon: 'download',
+    },
+    {
+      id: 1,
+      onClick: shareQR,
+      text: 'Share QR Code',
+      icon: 'share alternate',
+    },
+    {
+      id: 2,
+      onClick: whatsApp,
+      text: 'Whatsapp',
+      icon: 'whatsapp',
+    },
+  ];
+
+  const renderButtons = () => {
+    if (state.mobile && !state.errorMessage) {
+      return (
+        <div className='ui segment mb-3 mt-1'>
+          {buttonsData.map((item) => {
+            const { id, onClick, text, icon } = item;
+            return (
+              <button
+                key={id}
+                className='ui primary button stabraq-bg mb-3'
+                onClick={onClick}
+                type='submit'
+              >
+                <i className={`${icon} icon me-1`} />
+                {text}
+              </button>
+            );
+          })}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className='text-center'>
+      <form className='ui form error'>
+        <div className='ui segment'>
+          <InputMobile
+            value={state.mobile}
+            label='QR By Mobile Number'
+            onFormChange={handleChange}
+            errorMessage={state.errorMessage}
+          />
+        </div>
+      </form>
+      {renderQRCode()}
+      {renderButtons()}
     </div>
   );
 };
