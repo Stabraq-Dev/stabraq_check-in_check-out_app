@@ -41,8 +41,8 @@ const QRCodeGenerator = () => {
     logoImage: '/logo.png',
     logoWidth: 130,
     mobile: '',
-    errorMessage: '',
   });
+  const [errorMessage, setErrorMessage] = useState('');
 
   const onFormChangeSet = async (mobile) => {
     setState((prevState) => ({
@@ -53,12 +53,7 @@ const QRCodeGenerator = () => {
   };
 
   const checkForErrors = async (mobile) => {
-    const error = await checkForMobNum(mobile);
-
-    setState((prevState) => ({
-      ...prevState,
-      errorMessage: error,
-    }));
+    setErrorMessage(await checkForMobNum(mobile));
   };
 
   const handleChange = async ({ target }) => {
@@ -100,7 +95,7 @@ const QRCodeGenerator = () => {
   };
 
   const renderQRCode = () => {
-    if (state.mobile && !state.errorMessage) {
+    if (state.mobile && !errorMessage) {
       return (
         <div className='ui segment mb-3 mt-1'>
           <QRCode
@@ -136,7 +131,7 @@ const QRCodeGenerator = () => {
   ];
 
   const renderButtons = () => {
-    if (state.mobile && !state.errorMessage) {
+    if (state.mobile && !errorMessage) {
       return (
         <div className='ui segment mb-3 mt-1'>
           {buttonsData.map((item) => {
@@ -167,7 +162,7 @@ const QRCodeGenerator = () => {
             value={state.mobile}
             label='QR By Mobile Number'
             onFormChange={handleChange}
-            errorMessage={state.errorMessage}
+            errorMessage={errorMessage}
           />
         </div>
       </form>
