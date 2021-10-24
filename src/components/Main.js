@@ -94,7 +94,7 @@ class Main extends React.Component {
                 type='button'
                 onClick={this.onFormSubmitQRCodeGen}
               >
-                <i className='user plus icon' />
+                <i className='qrcode icon' />
                 QR Code
               </button>
             </Link>

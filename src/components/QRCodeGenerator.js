@@ -161,6 +161,7 @@ const QRCodeGenerator = () => {
           <InputMobile
             value={state.mobile}
             label='QR By Mobile Number'
+            icon='qrcode'
             onFormChange={handleChange}
             errorMessage={errorMessage}
           />

@@ -91,6 +91,7 @@ class SearchBar extends React.Component {
           <InputMobile
             value={this.state.mobileNumber}
             label='Search By Mobile Number'
+            icon='mobile alternate'
             onFormChange={this.onFormChange}
             errorMessage={this.state.errorMessage}
           />

@@ -14,11 +14,14 @@ export class InputMobile extends Component {
   };
 
   render() {
-    const { value, label, onFormChange, errorMessage } = this.props;
+    const { value, label, icon, onFormChange, errorMessage } = this.props;
     const className = `field ${errorMessage ? 'error' : ''}`;
     return (
       <div className={className}>
-        <label>{label}</label>
+        <label>
+          <i className={`${icon} icon`} />
+          {label}
+        </label>
         <input
           type='tel'
           name='mobile'
