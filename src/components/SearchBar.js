@@ -17,7 +17,7 @@ class SearchBar extends React.Component {
   componentDidMount() {
     this.mobile = new URLSearchParams(window.location.search).get('mobile');
     // http://localhost:3000/preferences/main/user/?mobile=01xxxxxxxxx
-    // https://stabraq.netlify.app/preferences/main/user/?mobile=01xxxxxxxxx
+    // https://stabraq-logbook.netlify.app/preferences/main/user/?mobile=01xxxxxxxxx
 
     if (this.mobile) {
       this.urlSearch();

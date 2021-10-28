@@ -3,6 +3,7 @@ import { QRCode } from 'react-qrcode-logo';
 import html2canvas from 'html2canvas';
 import InputMobile from './InputMobile';
 import { checkForMobNum } from '../functions/validation';
+import '../config';
 
 const QRCodeGenerator = () => {
   useEffect(() => {
@@ -35,7 +36,7 @@ const QRCodeGenerator = () => {
     ],
     fgColor: '#ff5500',
     size: '350',
-    value: 'https://stabraq.netlify.app/preferences/main/user/',
+    value: `${global.config.homepage}/preferences/main/user/`,
     ecLevel: 'Q',
     qrStyle: 'dots',
     logoImage: '/logo.png',
@@ -48,7 +49,7 @@ const QRCodeGenerator = () => {
     setState((prevState) => ({
       ...prevState,
       mobile: mobile,
-      value: `https://stabraq.netlify.app/preferences/main/user/?mobile=${mobile}`,
+      value: `${global.config.homepage}/preferences/main/user/?mobile=${mobile}`,
     }));
   };
 

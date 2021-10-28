@@ -1,4 +1,5 @@
 import { axiosAuth } from '../api/googleSheetsAPI';
+import '../config';
 const SHEET_ID = process.env.REACT_APP_SHEET_ID;
 
 export const executeValuesUpdate = async (val) => {
@@ -91,7 +92,7 @@ export const executeBatchUpdateCutPaste = async (destSheetId) => {
         {
           cutPaste: {
             source: {
-              sheetId: 1187395242,
+              sheetId: global.config.source.sheetId,
             },
             destination: {
               sheetId: destSheetId,
