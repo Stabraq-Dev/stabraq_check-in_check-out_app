@@ -57,7 +57,7 @@ class Main extends React.Component {
             STABRAQ COMMUNITY SPACE
           </Zoom>
         </h4>
-        <div className='col-md-6 col-xs-12 mt-3 text-center'>
+        <div className='col-md-3 col-sm-6 col-xs-12 mt-3 text-center'>
           <LightSpeed left when={reveal.includes('USER-BTN')}>
             <Link to='/preferences/main/user'>
               <button
@@ -72,7 +72,7 @@ class Main extends React.Component {
           </LightSpeed>
         </div>
 
-        <div className='col-md-6 col-xs-12 mt-3 text-center'>
+        <div className='col-md-3 col-sm-6 col-xs-12 mt-3 text-center'>
           <LightSpeed right when={reveal.includes('NEW-USER-BTN')}>
             <Link to='/preferences/main/new-user'>
               <button
@@ -86,7 +86,7 @@ class Main extends React.Component {
             </Link>
           </LightSpeed>
         </div>
-        <div className='col-md-12 col-xs-12 mt-3 text-center'>
+        <div className='col-md-3 col-sm-12 col-xs-12 mt-3 text-center'>
           <LightSpeed left when={reveal.includes('QR-CODE-GEN-BTN')}>
             <Link to='/preferences/main/qr-code-gen'>
               <button
@@ -101,7 +101,7 @@ class Main extends React.Component {
           </LightSpeed>
         </div>
         <Bounce bottom>
-          <div className='col-md-12 col-xs-12 mt-3 text-end align-self-center'>
+          <div className='col-md-3 col-sm-12 col-xs-12 mt-3 text-end align-self-center'>
             <button className='ui red button' onClick={() => doLogOut()}>
               <i className='sign-out icon' />
               Sign Out
