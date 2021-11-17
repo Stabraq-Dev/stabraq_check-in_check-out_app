@@ -7,7 +7,7 @@ export const executeValuesUpdate = async (val) => {
     await axiosAuth();
     const googleSheetsAPI = await axiosAuth();
 
-    const range = 'Func!A1';
+    const range = 'Func!A2';
     const valueInputOption = 'USER_ENTERED';
     const response = await googleSheetsAPI.put(
       `${SHEET_ID}/values/${range}`,
