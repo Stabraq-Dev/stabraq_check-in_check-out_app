@@ -99,7 +99,7 @@ const AdminLogInForm = ({
         }
 
         if (!password) {
-          errors.password = 'You Must Enter a Password';
+          errors.password = 'You must enter a password';
         }
 
         return errors;

@@ -140,12 +140,12 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
   const res = await executeValuesUpdate(mobile);
   dispatch(doCheckResponse(res));
 
-  const getSheetValuesNumberExistsRange = 'Clients!I2';
+  const getSheetValuesNumberExistsRange = 'Func!B2';
   const numberExists = await getSheetValues(getSheetValuesNumberExistsRange);
   dispatch({ type: NUMBER_EXISTS, payload: numberExists[0] });
 
   if (numberExists[0] === 'EXISTS') {
-    const getSheetValuesMatchedRange = 'Clients!J2:Q2';
+    const getSheetValuesMatchedRange = 'Func!C2:J2';
     const valuesMatched = await getSheetValues(getSheetValuesMatchedRange);
     dispatch({ type: VALUES_MATCHED, payload: valuesMatched });
   }
@@ -179,7 +179,7 @@ export const doOnNewUserFormSubmit =
     const resUpdate = await executeValuesUpdate(formValues.mobile);
     dispatch(doCheckResponse(resUpdate));
 
-    const getSheetValuesNumberExistsRange = 'Clients!I2';
+    const getSheetValuesNumberExistsRange = 'Func!B2';
     const numberExists = await getSheetValues(getSheetValuesNumberExistsRange);
 
     if (numberExists[0] === 'NOT_EXISTS') {
