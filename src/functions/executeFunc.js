@@ -1,7 +1,7 @@
 import { axiosAuth } from '../api/googleSheetsAPI';
 import '../config';
 const SHEET_ID = process.env.REACT_APP_SHEET_ID;
-console.log(global.config.debuggingMode);
+
 export const executeValuesUpdate = async (val) => {
   try {
     await axiosAuth();
@@ -18,7 +18,7 @@ export const executeValuesUpdate = async (val) => {
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode) {
+    if (global.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesUpdate', response);
     }
 
@@ -52,7 +52,7 @@ export const executeValuesUpdateAdminAuth = async (
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode) {
+    if (global.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesUpdate', response);
     }
 
@@ -79,7 +79,7 @@ export const executeBatchUpdateAddSheet = async (sheetDate) => {
       ],
     });
 
-    if (global.config.debuggingMode) {
+    if (global.config.debuggingMode === 'TRUE') {
       console.log(
         'Response executeBatchUpdateAddSheet',
         response.data.replies[0].addSheet.properties.sheetId
@@ -113,7 +113,7 @@ export const executeBatchUpdateCutPaste = async (destSheetId) => {
       ],
     });
 
-    if (global.config.debuggingMode) {
+    if (global.config.debuggingMode === 'TRUE') {
       console.log('Response executeBatchUpdateCutPaste', response);
     }
 
@@ -152,7 +152,7 @@ export const executeValuesAppendAddSheet = async () => {
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode) {
+    if (global.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesAppendAddSheet', response);
     }
 
@@ -184,7 +184,7 @@ export const executeValuesAppendNewUserData = async (formValues) => {
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode) {
+    if (global.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesAppendNewUserData', response);
     }
 
@@ -224,7 +224,7 @@ export const executeValuesAppendCheckIn = async (
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode) {
+    if (global.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesAppendCheckIn', response);
     }
 
@@ -260,7 +260,7 @@ export const executeValuesAppendCheckOut = async (rowNumber, membership) => {
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode) {
+    if (global.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesAppendCheckOut', response);
     }
 
@@ -276,7 +276,7 @@ export const getSheetValues = async (range) => {
 
     const response = await googleSheetsAPI.get(`${SHEET_ID}/values/${range}`);
 
-    if (global.config.debuggingMode) {
+    if (global.config.debuggingMode === 'TRUE') {
       console.log('Response getSheetValues', range, response.data.values[0]);
     }
 
