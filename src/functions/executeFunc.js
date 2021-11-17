@@ -18,7 +18,10 @@ export const executeValuesUpdate = async (val) => {
       { params: { valueInputOption: valueInputOption } }
     );
 
-    console.log('Response executeValuesUpdate', response);
+    if (global.config.debuggingMode) {
+      console.log('Response executeValuesUpdate', response);
+    }
+
     return response;
   } catch (err) {
     console.error('Execute error', err);
@@ -49,7 +52,11 @@ export const executeValuesUpdateAdminAuth = async (
       { params: { valueInputOption: valueInputOption } }
     );
 
-    console.log('Response executeValuesUpdate', response);
+    if (global.config.debuggingMode) {
+      console.log('Response executeValuesUpdate', response);
+    }
+
+    return response;
   } catch (err) {
     console.error('Execute error', err);
   }
@@ -72,10 +79,13 @@ export const executeBatchUpdateAddSheet = async (sheetDate) => {
       ],
     });
 
-    console.log(
-      'Response executeBatchUpdateAddSheet',
-      response.data.replies[0].addSheet.properties.sheetId
-    );
+    if (global.config.debuggingMode) {
+      console.log(
+        'Response executeBatchUpdateAddSheet',
+        response.data.replies[0].addSheet.properties.sheetId
+      );
+    }
+
     return response.data.replies[0].addSheet.properties.sheetId;
   } catch (err) {
     console.error('Execute error', err.data.error.message);
@@ -102,7 +112,12 @@ export const executeBatchUpdateCutPaste = async (destSheetId) => {
         },
       ],
     });
-    console.log('Response executeBatchUpdateCutPaste', response);
+
+    if (global.config.debuggingMode) {
+      console.log('Response executeBatchUpdateCutPaste', response);
+    }
+
+    return response;
   } catch (err) {
     console.error('Execute error', err);
   }
@@ -137,7 +152,11 @@ export const executeValuesAppendAddSheet = async () => {
       { params: { valueInputOption: valueInputOption } }
     );
 
-    console.log('Response executeValuesAppendAddSheet', response);
+    if (global.config.debuggingMode) {
+      console.log('Response executeValuesAppendAddSheet', response);
+    }
+
+    return response;
   } catch (err) {
     console.error('Execute error', err);
   }
@@ -165,7 +184,10 @@ export const executeValuesAppendNewUserData = async (formValues) => {
       { params: { valueInputOption: valueInputOption } }
     );
 
-    console.log('Response executeValuesAppendNewUserData', response);
+    if (global.config.debuggingMode) {
+      console.log('Response executeValuesAppendNewUserData', response);
+    }
+
     return response;
   } catch (err) {
     console.error('Execute error', err);
@@ -202,7 +224,11 @@ export const executeValuesAppendCheckIn = async (
       { params: { valueInputOption: valueInputOption } }
     );
 
-    console.log('Response executeValuesAppendCheckIn', response);
+    if (global.config.debuggingMode) {
+      console.log('Response executeValuesAppendCheckIn', response);
+    }
+
+    return response;
   } catch (err) {
     console.error('Execute error', err);
   }
@@ -234,7 +260,11 @@ export const executeValuesAppendCheckOut = async (rowNumber, membership) => {
       { params: { valueInputOption: valueInputOption } }
     );
 
-    console.log('Response executeValuesAppendCheckOut', response);
+    if (global.config.debuggingMode) {
+      console.log('Response executeValuesAppendCheckOut', response);
+    }
+
+    return response;
   } catch (err) {
     console.error('Execute error', err);
   }
@@ -246,7 +276,10 @@ export const getSheetValues = async (range) => {
 
     const response = await googleSheetsAPI.get(`${SHEET_ID}/values/${range}`);
 
-    console.log('Response getSheetValues', range, response.data.values[0]);
+    if (global.config.debuggingMode) {
+      console.log('Response getSheetValues', range, response.data.values[0]);
+    }
+
     return response.data.values[0];
   } catch (err) {
     console.error('Execute error', err);

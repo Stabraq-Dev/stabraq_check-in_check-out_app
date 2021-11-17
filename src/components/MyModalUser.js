@@ -77,7 +77,7 @@ export class MyModalUser extends Component {
             if (checkedOut === 'CHECKED_OUT') {
               return <DefaultBody message='You already Checked Out' />;
             } else if (checkedOut === 'NOT_CHECKED_IN') {
-              return <DefaultBody message={checkedOut} />;
+              return <DefaultBody message={'Not Checked in'} />;
             } else {
               const costMessage =
                 membership === 'NOT_MEMBER' ? `Cost: ${cost} EGP` : '';

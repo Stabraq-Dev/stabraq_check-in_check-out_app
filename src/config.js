@@ -3,4 +3,5 @@ export default global.config = {
   source: {
     sheetId: 541264310,
   },
+  debuggingMode: process.env.REACT_APP_DEBUGGING_MODE,
 };
