@@ -28,6 +28,8 @@ function Splash({
 
   const shrinkLogoClass =
     shrinkLogo || history.location.pathname !== '/' ? 'shrink-logo' : '';
+  const centerLogoClass =
+    history.location.pathname === '/' ? 'center-logo' : '';
 
   const redirectTo = () => {
     if (history.location.pathname === '/') {
@@ -41,7 +43,7 @@ function Splash({
 
   return (
     <Link to={isSignedIn ? redirectTo : '/dashboard'}>
-      <div className='text-center'>
+      <div className={`text-center ${centerLogoClass}`}>
         <button
           className='btn me-2 no-btn-focus'
           type='button'
