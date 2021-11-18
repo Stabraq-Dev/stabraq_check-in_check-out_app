@@ -14,6 +14,8 @@ import {
   CLEAR_PREV_USER_STATE,
   CALC_DURATION_COST,
   ERROR,
+  CALC_REMAINING_HOURS,
+  CALC_REMAINING_OF_TEN_DAYS,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -27,6 +29,7 @@ import {
   executeValuesAppendCheckIn,
   executeValuesAppendCheckOut,
   getSheetValues,
+  executeValuesUpdateCheckOut,
 } from '../functions/executeFunc';
 
 import history from '../history';
@@ -79,6 +82,20 @@ export const doCalcDurationCost = (resData) => {
   return {
     type: CALC_DURATION_COST,
     payload: resData,
+  };
+};
+
+export const doCalcRemainingHours = (remains) => {
+  return {
+    type: CALC_REMAINING_HOURS,
+    payload: remains,
+  };
+};
+
+export const doCalcRemainingOfTenDays = (remains) => {
+  return {
+    type: CALC_REMAINING_OF_TEN_DAYS,
+    payload: remains,
   };
 };
 
@@ -145,7 +162,7 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
   dispatch({ type: NUMBER_EXISTS, payload: numberExists[0] });
 
   if (numberExists[0] === 'EXISTS') {
-    const getSheetValuesMatchedRange = 'Func!C2:J2';
+    const getSheetValuesMatchedRange = 'Func!C2:O2';
     const valuesMatched = await getSheetValues(getSheetValuesMatchedRange);
     dispatch({ type: VALUES_MATCHED, payload: valuesMatched });
   }
@@ -172,7 +189,7 @@ export const doOnNewUserFormSubmit =
     const { showMyModal } = getState().app;
     dispatch(submitType(ON_NEW_USER_SUBMIT));
     dispatch(doClearPrevUserState());
-    
+
     dispatch(doLoading(true));
     // Check to Add new Sheet for new day
     await dispatch(doCreateNewSheet());
@@ -183,7 +200,14 @@ export const doOnNewUserFormSubmit =
     const numberExists = await getSheetValues(getSheetValuesNumberExistsRange);
 
     if (numberExists[0] === 'NOT_EXISTS') {
-      const resAppend = await executeValuesAppendNewUserData(formValues);
+      const getSheetValuesLastBlankRowRange = 'Func!A4';
+      const lastBlankRow = await getSheetValues(
+        getSheetValuesLastBlankRowRange
+      );
+      const resAppend = await executeValuesAppendNewUserData(
+        formValues,
+        lastBlankRow
+      );
       dispatch(doCheckResponse(resAppend));
     } else {
       dispatch({ type: NUMBER_EXISTS, payload: numberExists[0] });
@@ -231,7 +255,8 @@ export const doCheckInOut =
       }
     } else {
       /* CHECK_OUT */
-      const { checkedOut } = getState().user.valuesMatched;
+      const { checkedOut, membership, remainingHours, clientRowNumber } =
+        getState().user.valuesMatched;
       if (checkedOut === 'CHECKED_OUT') {
         dispatch(doCheckedOut(true));
       } else if (checkedOut === 'NOT_CHECKED_IN') {
@@ -241,6 +266,23 @@ export const doCheckInOut =
         const getSheetValuesDurationRange = `Data!H${rowNumber}:K${rowNumber}`;
         const resData = await getSheetValues(getSheetValuesDurationRange);
         dispatch(doCalcDurationCost(resData));
+        if (membership === 'HOURS_MEMBERSHIP') {
+          const { approxDuration } = getState().user.durationCost;
+          const remains = remainingHours - approxDuration;
+          await executeValuesUpdateCheckOut({
+            value: remains,
+            range: `Clients!I${clientRowNumber}`,
+          });
+          dispatch(doCalcRemainingHours(remains));
+        } else if (membership === '10_DAYS') {
+          const { remainingOfTenDays } = getState().user.valuesMatched;
+          const remains = remainingOfTenDays - 1;
+          await executeValuesUpdateCheckOut({
+            value: remains,
+            range: `Clients!J${clientRowNumber}`,
+          });
+          dispatch(doCalcRemainingOfTenDays(remains));
+        }
       }
     }
     dispatch(doLoading(false));

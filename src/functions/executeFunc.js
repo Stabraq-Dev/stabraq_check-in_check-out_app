@@ -29,6 +29,33 @@ export const executeValuesUpdate = async (val) => {
   }
 };
 
+export const executeValuesUpdateCheckOut = async (props) => {
+  try {
+    await axiosAuth();
+    const googleSheetsAPI = await axiosAuth();
+
+    const { value, range } = props;
+    const valueInputOption = 'USER_ENTERED';
+    const response = await googleSheetsAPI.put(
+      `${SHEET_ID}/values/${range}`,
+      {
+        // majorDimension: 'COLUMNS',
+        values: [[value]],
+      },
+      { params: { valueInputOption: valueInputOption } }
+    );
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log('Response executeValuesUpdateCheckOut', response);
+    }
+
+    return response;
+  } catch (err) {
+    console.error('Execute error', err);
+    return err;
+  }
+};
+
 export const executeValuesUpdateAdminAuth = async (
   inputUserName,
   inputPassword
@@ -162,23 +189,52 @@ export const executeValuesAppendAddSheet = async () => {
   }
 };
 
-export const executeValuesAppendNewUserData = async (formValues) => {
+export const executeValuesAppendNewUserData = async (
+  formValues,
+  lastBlankRow
+) => {
   try {
     await axiosAuth();
     const googleSheetsAPI = await axiosAuth();
 
+    const getExpiryDate = (days) => {
+      let expiry_date = new Date();
+      expiry_date.setDate(expiry_date.getDate() + days);
+      return expiry_date.toLocaleDateString();
+    };
+
     const range = 'Clients!A3';
-    const valueInputOption = 'RAW';
+    const valueInputOption = 'USER_ENTERED';
     const response = await googleSheetsAPI.post(
       `${SHEET_ID}/values/${range}:append`,
       {
         majorDimension: 'COLUMNS',
         values: [
           // [new Date().toLocaleString()],
-          [formValues.mobile],
+          [`'${formValues.mobile}`],
           [formValues.username],
           [formValues.email],
           [formValues.membership],
+          [
+            formValues.membership === 'HOURS_MEMBERSHIP'
+              ? getExpiryDate(90)
+              : formValues.membership === 'NOT_MEMBER'
+              ? ''
+              : getExpiryDate(30),
+          ],
+          [
+            formValues.membership === 'NOT_MEMBER'
+              ? ''
+              : `=IF(E${lastBlankRow}>TODAY(),DATEDIF(TODAY(),E${lastBlankRow},"d"),(-1*DATEDIF(E${lastBlankRow},TODAY(),"d")))`,
+          ],
+          [formValues.hoursPackages],
+          [new Date().toLocaleString()],
+          [
+            formValues.membership === 'HOURS_MEMBERSHIP'
+              ? formValues.hoursPackages
+              : '',
+          ],
+          [formValues.membership === '10_DAYS' ? 10 : ''],
         ],
       },
       { params: { valueInputOption: valueInputOption } }

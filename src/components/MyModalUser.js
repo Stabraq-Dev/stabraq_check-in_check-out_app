@@ -20,6 +20,8 @@ export class MyModalUser extends Component {
       remainDays,
       rowNumber,
       checkedOut,
+      remainingHours,
+      remainingOfTenDays,
       duration,
       approxDuration,
       cost,
@@ -67,9 +69,17 @@ export class MyModalUser extends Component {
                 : ` ${remainDays} `;
               const expRemMessage =
                 membership !== 'NOT_MEMBER' && expiryDate.includes('/')
-                  ? `Expiry Date: ${expiryDate}\nRemaining Days: ${remainingDays} Days`
+                  ? `\nExpiry Date: ${expiryDate}\nRemaining Days: ${remainingDays} Days`
                   : '';
-              const message = `Checked In Successfully\n${expRemMessage}`;
+              const remainingHoursMessage =
+                membership === 'HOURS_MEMBERSHIP'
+                  ? `\nRemaining Hours: ${remainingHours} Hrs`
+                  : '';
+              const remainingOfTenDaysMessage =
+                membership === '10_DAYS'
+                  ? `\nRemaining of Ten Days: ${remainingOfTenDays} Days`
+                  : '';
+              const message = `Checked In Successfully${expRemMessage}${remainingHoursMessage}${remainingOfTenDaysMessage}`;
               return <DefaultBody message={message} />;
             }
           } else {
@@ -80,8 +90,16 @@ export class MyModalUser extends Component {
               return <DefaultBody message={'Not Checked in'} />;
             } else {
               const costMessage =
-                membership === 'NOT_MEMBER' ? `Cost: ${cost} EGP` : '';
-              const message = `Duration: ${duration} Hr:Min\nApprox. Duration: ${approxDuration} Hours\n${costMessage}`;
+                membership === 'NOT_MEMBER' ? `\nCost: ${cost} EGP` : '';
+              const remainingHoursMessage =
+                membership === 'HOURS_MEMBERSHIP'
+                  ? `\nRemaining Hours: ${remainingHours} Hrs`
+                  : '';
+              const remainingOfTenDaysMessage =
+                membership === '10_DAYS'
+                  ? `\nRemaining Days: ${remainingOfTenDays} Days`
+                  : '';
+              const message = `Duration: ${duration} Hr:Min\nApprox. Duration: ${approxDuration} Hours${costMessage}${remainingHoursMessage}${remainingOfTenDaysMessage}`;
               return <DefaultBody message={message} />;
             }
           }
@@ -213,6 +231,8 @@ const mapStateToProps = (state) => {
     remainDays,
     rowNumber,
     checkedOut,
+    remainingHours,
+    remainingOfTenDays,
   } = state.user.valuesMatched;
   const { showMyModal, submitType, mobileNumber, error } = state.app;
   const { numberExists, checkInOutStatus } = state.user;
@@ -231,6 +251,8 @@ const mapStateToProps = (state) => {
     remainDays,
     rowNumber,
     checkedOut,
+    remainingHours,
+    remainingOfTenDays,
     duration,
     approxDuration,
     cost,

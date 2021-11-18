@@ -6,6 +6,8 @@ import {
   CLEAR_PREV_USER_STATE,
   CALC_DURATION_COST,
   CHECK_IN_OUT_STATUS,
+  CALC_REMAINING_HOURS,
+  CALC_REMAINING_OF_TEN_DAYS,
 } from '../actions/types';
 
 const INITIAL_STATE = {
@@ -19,6 +21,11 @@ const INITIAL_STATE = {
     remainDays: '',
     rowNumber: '',
     checkedOut: '',
+    hoursPackage: '',
+    registrationDateTime: '',
+    remainingHours: '',
+    remainingOfTenDays: '',
+    clientRowNumber: '',
   },
   checkInOutStatus: '',
   checkInOut: {
@@ -41,6 +48,11 @@ let valuesMatchedKeys = [
   'remainDays',
   'rowNumber',
   'checkedOut',
+  'hoursPackage',
+  'registrationDateTime',
+  'remainingHours',
+  'remainingOfTenDays',
+  'clientRowNumber',
 ];
 
 let durationCostKeys = ['duration', 'approxDuration', 'cost'];
@@ -67,12 +79,30 @@ export default (state = INITIAL_STATE, action) => {
     case CHECKED_IN_STATUS:
       return {
         ...state,
-        checkInOut: changeData(state, action.payload, 'checked_In'),
+        checkInOut: changeData(state.checkInOut, action.payload, 'checked_In'),
       };
     case CHECKED_OUT_STATUS:
       return {
         ...state,
-        checkInOut: changeData(state, action.payload, 'checked_Out'),
+        checkInOut: changeData(state.checkInOut, action.payload, 'checked_Out'),
+      };
+    case CALC_REMAINING_HOURS:
+      return {
+        ...state,
+        valuesMatched: changeData(
+          state.valuesMatched,
+          action.payload,
+          'remainingHours'
+        ),
+      };
+    case CALC_REMAINING_OF_TEN_DAYS:
+      return {
+        ...state,
+        valuesMatched: changeData(
+          state.valuesMatched,
+          action.payload,
+          'remainingOfTenDays'
+        ),
       };
     default:
       return state;
@@ -85,10 +115,10 @@ const mapArrayDataObject = (payload, keys) => {
   return result;
 };
 
-const changeData = (state, payload, checkInOrOut) => {
+const changeData = (state, payload, keyToChange) => {
   let result = {};
-  Object.entries(state.checkInOut).forEach(([key, value]) => {
-    if (key === checkInOrOut) {
+  Object.entries(state).forEach(([key, value]) => {
+    if (key === keyToChange) {
       result[key] = payload;
     } else {
       result[key] = value;

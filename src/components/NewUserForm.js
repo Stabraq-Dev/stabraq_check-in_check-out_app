@@ -94,12 +94,14 @@ const NewUserForm = ({
       onSubmit={onSubmit}
       validate={async (formValues) => {
         const errors = {};
-        const { username, mobile, email, membership } = formValues;
+        const { username, mobile, email, membership, hoursPackages } =
+          formValues;
 
         const validUserName = await checkForUserName(username);
         const validMobile = await checkForMobNum(mobile);
         const validEmail = await checkForEmail(email);
         const validMembership = await checkForMembership(membership);
+        const validHoursPackages = await checkForMembership(hoursPackages);
 
         if (validUserName) {
           errors.username = validUserName;
@@ -117,9 +119,13 @@ const NewUserForm = ({
           errors.membership = validMembership;
         }
 
+        if (validHoursPackages && membership === 'HOURS_MEMBERSHIP') {
+          errors.hoursPackages = 'Please select a package';
+        }
+
         return errors;
       }}
-      render={({ handleSubmit }) => (
+      render={({ values, handleSubmit }) => (
         <form onSubmit={handleSubmit} className='ui form segment error'>
           <Field
             name='username'
@@ -156,6 +162,22 @@ const NewUserForm = ({
               { key: 6, value: 'HOURS_MEMBERSHIP', text: 'Hours' },
             ]}
           ></Field>
+          {values.membership === 'HOURS_MEMBERSHIP' && (
+            <Field
+              name='hoursPackages'
+              component={renderSelect}
+              label='Hours Packages'
+              options={[
+                { key: 0, value: '', text: '...Select...' },
+                { key: 1, value: 50, text: '50 Hours' },
+                { key: 2, value: 100, text: '100 Hours' },
+                { key: 3, value: 150, text: '150 Hours' },
+                { key: 4, value: 250, text: '250 Hours' },
+                { key: 5, value: 500, text: '500 Hours' },
+              ]}
+            ></Field>
+          )}
+
           <div className='mt-3 text-center'>{renderSubmitButton()}</div>
         </form>
       )}
