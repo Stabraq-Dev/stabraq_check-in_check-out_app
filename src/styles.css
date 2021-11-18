@@ -71,7 +71,10 @@ footer {
 }
 
 .center-logo {
-  margin: 50% 0 50% 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 .no-btn-focus:focus {
