@@ -19,6 +19,11 @@
     }
   ],
   "start_url": ".",
+  "url_handlers": [
+    {
+      "origin": "https://stabraq-logbook.netlify.app/*"
+    }
+  ],
   "display": "standalone",
   "theme_color": "#000000",
   "background_color": "#d2ebd3"
