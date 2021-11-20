@@ -22,8 +22,32 @@ footer {
   background-color: #3adb6b;
 }
 
-.btn {
+/* .btn {
   color: white;
+} */
+
+.btn-outline-stabraq {
+  color: #3adb6b;
+  border-color: #3adb6b;
+}
+
+.btn-check:checked + .btn-outline-stabraq,
+.btn-outline-stabraq:hover,
+.btn-outline-stabraq:active {
+  color: #fff;
+  background-color: #3adb6b;
+  border-color: #3adb6b;
+  box-shadow: 0 0 0 0rem;
+}
+
+.form-check-input:checked {
+  background-color: #3adb6b;
+  border-color: #3adb6b;
+}
+
+.form-check-input:focus {
+  border-color: #7ff7a3;
+  box-shadow: 0 0 0 0rem;
 }
 
 .text-stabraq {

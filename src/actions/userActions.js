@@ -162,7 +162,7 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
   dispatch({ type: NUMBER_EXISTS, payload: numberExists[0] });
 
   if (numberExists[0] === 'EXISTS') {
-    const getSheetValuesMatchedRange = 'Func!C2:O2';
+    const getSheetValuesMatchedRange = 'Func!C2:R2';
     const valuesMatched = await getSheetValues(getSheetValuesMatchedRange);
     dispatch({ type: VALUES_MATCHED, payload: valuesMatched });
   }
@@ -230,7 +230,8 @@ export const doOnNewUserFormSubmit =
  */
 
 export const doCheckInOut =
-  (checkInOutStatus) => async (dispatch, getState) => {
+  (checkInOutStatus, girlsRoomChecked, privateRoomChecked) =>
+  async (dispatch, getState) => {
     if (!navigator.onLine) return;
     dispatch(submitType(ON_CHECK_IN_OUT_SUBMIT));
     dispatch(doCheckInOutStatus(checkInOutStatus));
@@ -250,19 +251,43 @@ export const doCheckInOut =
           mobileNumber,
           userName,
           eMailAddress,
-          membership
+          membership,
+          girlsRoomChecked,
+          privateRoomChecked
         );
       }
     } else {
       /* CHECK_OUT */
-      const { checkedOut, membership, remainingHours, clientRowNumber } =
-        getState().user.valuesMatched;
+      const {
+        checkedOut,
+        membership,
+        remainingHours,
+        clientRowNumber,
+        girlsRoom,
+        privateRoom,
+      } = getState().user.valuesMatched;
       if (checkedOut === 'CHECKED_OUT') {
         dispatch(doCheckedOut(true));
       } else if (checkedOut === 'NOT_CHECKED_IN') {
         dispatch(doCheckedOut(false));
       } else {
-        await executeValuesAppendCheckOut(rowNumber, membership);
+        const hrRate = girlsRoom === 'GIRLS_ROOM' ? 12 : 10;
+        const fullDayRate = girlsRoom === 'GIRLS_ROOM' ? 72 : 12;
+
+        const getSheetValuesPrivateRoomRate = 'Func!A6';
+        const privateRoomRate =
+          privateRoom === 'PRIVATE_ROOM'
+            ? await getSheetValues(getSheetValuesPrivateRoomRate)
+            : '';
+
+        await executeValuesAppendCheckOut(
+          rowNumber,
+          membership,
+          hrRate,
+          fullDayRate,
+          privateRoom,
+          privateRoomRate
+        );
         const getSheetValuesDurationRange = `Data!H${rowNumber}:K${rowNumber}`;
         const resData = await getSheetValues(getSheetValuesDurationRange);
         dispatch(doCalcDurationCost(resData));

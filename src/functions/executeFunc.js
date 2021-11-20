@@ -235,6 +235,7 @@ export const executeValuesAppendNewUserData = async (
               : '',
           ],
           [formValues.membership === '10_DAYS' ? 10 : ''],
+          [formValues.gender],
         ],
       },
       { params: { valueInputOption: valueInputOption } }
@@ -256,7 +257,9 @@ export const executeValuesAppendCheckIn = async (
   mobileNumber,
   userName,
   eMailAddress,
-  membership
+  membership,
+  girlsRoomChecked,
+  privateRoomChecked
 ) => {
   try {
     await axiosAuth();
@@ -275,6 +278,13 @@ export const executeValuesAppendCheckIn = async (
           [membership],
           [checkInOutStatus],
           [new Date().toLocaleTimeString('en-US')],
+          [''],
+          [''],
+          [''],
+          [''],
+          [''],
+          [girlsRoomChecked],
+          [privateRoomChecked],
         ],
       },
       { params: { valueInputOption: valueInputOption } }
@@ -290,7 +300,14 @@ export const executeValuesAppendCheckIn = async (
   }
 };
 
-export const executeValuesAppendCheckOut = async (rowNumber, membership) => {
+export const executeValuesAppendCheckOut = async (
+  rowNumber,
+  membership,
+  hrRate,
+  fullDayRate,
+  privateRoom,
+  privateRoomRate
+) => {
   try {
     await axiosAuth();
     const googleSheetsAPI = await axiosAuth();
@@ -307,8 +324,10 @@ export const executeValuesAppendCheckOut = async (rowNumber, membership) => {
           [
             `=IF(H${rowNumber}*24<1,1,IF(OR(AND(H${rowNumber}*24-INT(H${rowNumber}*24)<=0.1),AND(H${rowNumber}*24-INT(H${rowNumber}*24)>0.5,H${rowNumber}*24-INT(H${rowNumber}*24)<=0.59)),FLOOR(H${rowNumber},"00:30")*24,CEILING(H${rowNumber},"00:30")*24))`,
           ],
-          membership === 'NOT_MEMBER'
-            ? [`=IF(I${rowNumber}>=6,60,I${rowNumber}*10)`]
+          privateRoom === 'PRIVATE_ROOM'
+            ? [`=I${rowNumber}*${privateRoomRate}`]
+            : membership === 'NOT_MEMBER'
+            ? [`=IF(I${rowNumber}>=6,${fullDayRate},I${rowNumber}*${hrRate})`]
             : [''],
           ['CHECKED_OUT'],
         ],

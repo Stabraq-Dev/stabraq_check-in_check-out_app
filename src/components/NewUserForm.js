@@ -72,6 +72,41 @@ const NewUserForm = ({
     );
   };
 
+  const renderRadioOptions = (input, options, checked) => {
+    return (
+      <React.Fragment>
+        {options.map((o) => {
+          return (
+            <div className='form-check form-check-inline' key={o.key}>
+              <input
+                {...input}
+                checked={checked === o.value ? true : false}
+                value={o.value}
+                className='btn-check ms-1'
+                id={o.value}
+                autoComplete="off"
+              />
+              <label className='btn btn-outline-stabraq' htmlFor={o.value}>
+                {o.label}
+              </label>
+            </div>
+          );
+        })}
+      </React.Fragment>
+    );
+  };
+
+  const renderRadio = ({ input, label, meta, options, checked }) => {
+    const className = `field ${meta.error && meta.touched ? 'error' : ''}`;
+    return (
+      <div className={className}>
+        <label>{label}</label>
+        {renderRadioOptions(input, options, checked)}
+        {renderError(meta)}
+      </div>
+    );
+  };
+
   const renderSubmitButton = () => {
     if (loading) {
       return <LoadingSpinner />;
@@ -94,7 +129,7 @@ const NewUserForm = ({
       onSubmit={onSubmit}
       validate={async (formValues) => {
         const errors = {};
-        const { username, mobile, email, membership, hoursPackages } =
+        const { username, mobile, email, membership, hoursPackages, gender } =
           formValues;
 
         const validUserName = await checkForUserName(username);
@@ -102,6 +137,7 @@ const NewUserForm = ({
         const validEmail = await checkForEmail(email);
         const validMembership = await checkForMembership(membership);
         const validHoursPackages = await checkForMembership(hoursPackages);
+        const validGender = await checkForMembership(gender);
 
         if (validUserName) {
           errors.username = validUserName;
@@ -123,6 +159,10 @@ const NewUserForm = ({
           errors.hoursPackages = 'Please select a package';
         }
 
+        if (validGender) {
+          errors.gender = 'Please select a gender';
+        }
+
         return errors;
       }}
       render={({ values, handleSubmit }) => (
@@ -140,6 +180,17 @@ const NewUserForm = ({
             type='tel'
             placeholder='01xxxxxxxxx'
             maxLength={11}
+          />
+          <Field
+            name='gender'
+            component={renderRadio}
+            label='Gender'
+            type='radio'
+            checked={values.gender}
+            options={[
+              { key: 0, value: 'Male', label: 'Male' },
+              { key: 1, value: 'Female', label: 'Female' },
+            ]}
           />
           <Field
             name='email'

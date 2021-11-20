@@ -22,6 +22,7 @@ export class MyModalUser extends Component {
       checkedOut,
       remainingHours,
       remainingOfTenDays,
+      privateRoom,
       duration,
       approxDuration,
       cost,
@@ -90,7 +91,9 @@ export class MyModalUser extends Component {
               return <DefaultBody message={'Not Checked in'} />;
             } else {
               const costMessage =
-                membership === 'NOT_MEMBER' ? `\nCost: ${cost} EGP` : '';
+                privateRoom === 'PRIVATE_ROOM' || membership === 'NOT_MEMBER'
+                  ? `\nCost: ${cost} EGP`
+                  : '';
               const remainingHoursMessage =
                 membership === 'HOURS_MEMBERSHIP'
                   ? `\nRemaining Hours: ${remainingHours} Hrs`
@@ -233,6 +236,7 @@ const mapStateToProps = (state) => {
     checkedOut,
     remainingHours,
     remainingOfTenDays,
+    privateRoom,
   } = state.user.valuesMatched;
   const { showMyModal, submitType, mobileNumber, error } = state.app;
   const { numberExists, checkInOutStatus } = state.user;
@@ -253,6 +257,7 @@ const mapStateToProps = (state) => {
     checkedOut,
     remainingHours,
     remainingOfTenDays,
+    privateRoom,
     duration,
     approxDuration,
     cost,
