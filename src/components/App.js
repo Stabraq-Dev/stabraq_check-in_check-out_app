@@ -13,6 +13,7 @@ import AdminLogInForm from './AdminLogInForm';
 import { doCheckSignedIn } from '../actions/index';
 import { connect } from 'react-redux';
 import MyAlert from './MyAlert';
+import { loadAuth } from '../api/auth';
 
 const App = ({ doCheckSignedIn }) => {
   const [online, setOnline] = useState(true);
@@ -26,6 +27,7 @@ const App = ({ doCheckSignedIn }) => {
   const load = async () => {
     await axiosAuth();
     await doCheckSignedIn();
+    await loadAuth();
   };
 
   // We are "offline".

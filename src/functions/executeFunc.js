@@ -1,3 +1,4 @@
+import { authInstance, loadClient } from '../api/auth';
 import { axiosAuth } from '../api/googleSheetsAPI';
 import '../config';
 const SHEET_ID = process.env.REACT_APP_SHEET_ID;
@@ -358,5 +359,31 @@ export const getSheetValues = async (range) => {
     return response.data.values[0];
   } catch (err) {
     console.error('Execute error', err);
+  }
+};
+
+export const executeAddNewWorkSheet = async (title) => {
+  try {
+    await authInstance();
+    await loadClient();
+    const response = await window.gapi.client.sheets.spreadsheets.create({
+      resource: {
+        properties: {
+          title: title,
+        },
+      },
+    });
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log(
+        'Response executeAddNewWorkSheet',
+        response.result.spreadsheetId
+      );
+    }
+
+    return response.result.spreadsheetId;
+  } catch (err) {
+    console.error('Execute error', err);
+    return false;
   }
 };
