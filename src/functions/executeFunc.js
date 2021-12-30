@@ -1,5 +1,6 @@
 import { authInstance, loadClient } from '../api/auth';
 import { axiosAuth } from '../api/googleSheetsAPI';
+import { changeDateFormat } from '../functions/helperFunc';
 import '../config';
 const SHEET_ID = process.env.REACT_APP_SHEET_ID;
 
@@ -92,6 +93,7 @@ export const executeValuesUpdateAdminAuth = async (
 
 export const executeBatchUpdateAddSheet = async (sheetDate) => {
   try {
+    let sheetTitle = changeDateFormat(sheetDate);
     await axiosAuth();
     const googleSheetsAPI = await axiosAuth();
     const response = await googleSheetsAPI.post(`${SHEET_ID}:batchUpdate`, {
@@ -99,7 +101,7 @@ export const executeBatchUpdateAddSheet = async (sheetDate) => {
         {
           addSheet: {
             properties: {
-              title: sheetDate,
+              title: sheetTitle,
               rightToLeft: true,
             },
           },
