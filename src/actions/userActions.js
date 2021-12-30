@@ -30,9 +30,20 @@ import {
   executeValuesAppendCheckOut,
   getSheetValues,
   executeValuesUpdateCheckOut,
+  executeBatchUpdateCopyToWorksheet,
+  getWorkSheetData,
+  executeBatchUpdateDeleteSheet,
+  executeAddNewWorkSheet,
+  executeBatchUpdateSheetPropertiesRenameSheet,
 } from '../functions/executeFunc';
 
 import history from '../history';
+import {
+  changeYearMonthFormat,
+  checkDayDiff,
+  checkMonthDiff,
+  getByValue,
+} from '../functions/helperFunc';
 
 export const doCheckedIn = (checkedInStatus) => {
   return {
@@ -106,14 +117,44 @@ export const doCreateNewSheet = () => async (dispatch) => {
 
   const dateOne = sheetDate[0];
   const dateTwo = new Date().toLocaleDateString();
-  const diff = await checkDateToAddSheet(dateOne, dateTwo);
+  const diffDays = await checkDayDiff(dateOne, dateTwo);
 
-  if (diff >= 1) {
+  if (diffDays >= 1) {
     const newSheetId = await executeBatchUpdateAddSheet(sheetDate[0]);
     if (newSheetId === false) return;
     dispatch({ type: NEW_SHEET_ID, payload: newSheetId });
     await executeBatchUpdateCutPaste(newSheetId);
     await executeValuesAppendAddSheet();
+    const getSheetValuesCurrMonthWorkSheet = 'Func!A12';
+    const destWorkSheetId = await getSheetValues(
+      getSheetValuesCurrMonthWorkSheet
+    );
+    await executeBatchUpdateCopyToWorksheet(newSheetId, destWorkSheetId[0]);
+    await executeBatchUpdateDeleteSheet(newSheetId);
+
+    let worksheetSheetsData = await getWorkSheetData(destWorkSheetId[0]);
+    let sheetsIdsToRename = await getByValue(worksheetSheetsData, 'Copy of ');
+    if (sheetsIdsToRename !== null) {
+      sheetsIdsToRename.forEach(async (o) => {
+        let title = o.title.replaceAll('Copy of ', '');
+        await executeBatchUpdateSheetPropertiesRenameSheet(
+          destWorkSheetId[0],
+          o.id,
+          title
+        );
+      });
+    }
+  }
+
+  const diffMonths = await checkMonthDiff(dateOne, dateTwo);
+
+  if (diffMonths >= 1) {
+    const workSheetTitle = await changeYearMonthFormat(dateTwo);
+    const newWorkSheetId = await executeAddNewWorkSheet(workSheetTitle);
+    await executeValuesUpdateCheckOut({
+      value: newWorkSheetId,
+      range: 'Func!A12',
+    });
   }
 };
 
@@ -317,15 +358,3 @@ export const doCheckInOut =
     }
     await dispatch(doShowMyModal(true));
   };
-
-/* 
- @a Helper Functions 
- */
-const checkDateToAddSheet = async (dataDateOne, dataDateTwo) => {
-  const dateOne = new Date(dataDateOne);
-  const dateTwo = new Date(dataDateTwo);
-  const diffTime = Math.abs(dateTwo - dateOne);
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-  return diffDays;
-};

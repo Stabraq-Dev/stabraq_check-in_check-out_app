@@ -2,12 +2,14 @@ import { authInstance, loadClient } from '../api/auth';
 import { axiosAuth } from '../api/googleSheetsAPI';
 import { changeDateFormat } from '../functions/helperFunc';
 import '../config';
+
 const SHEET_ID = process.env.REACT_APP_SHEET_ID;
+const AUTH_SHEET_ID = process.env.REACT_APP_AUTH_SHEET_ID;
 
 export const executeValuesUpdate = async (val) => {
   try {
-    await axiosAuth();
-    const googleSheetsAPI = await axiosAuth();
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
     const range = 'Func!A2';
     const valueInputOption = 'USER_ENTERED';
@@ -33,8 +35,8 @@ export const executeValuesUpdate = async (val) => {
 
 export const executeValuesUpdateCheckOut = async (props) => {
   try {
-    await axiosAuth();
-    const googleSheetsAPI = await axiosAuth();
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
     const { value, range } = props;
     const valueInputOption = 'USER_ENTERED';
@@ -63,13 +65,13 @@ export const executeValuesUpdateAdminAuth = async (
   inputPassword
 ) => {
   try {
-    await axiosAuth();
-    const googleSheetsAPI = await axiosAuth();
+    await axiosAuth(AUTH_SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(AUTH_SHEET_ID);
 
     const range = 'Auth!H2';
     const valueInputOption = 'USER_ENTERED';
     const response = await googleSheetsAPI.put(
-      `${SHEET_ID}/values/${range}`,
+      `${AUTH_SHEET_ID}/values/${range}`,
       {
         majorDimension: 'COLUMNS',
         values: [
@@ -93,9 +95,9 @@ export const executeValuesUpdateAdminAuth = async (
 
 export const executeBatchUpdateAddSheet = async (sheetDate) => {
   try {
-    let sheetTitle = changeDateFormat(sheetDate);
-    await axiosAuth();
-    const googleSheetsAPI = await axiosAuth();
+    let sheetTitle = await changeDateFormat(sheetDate);
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
     const response = await googleSheetsAPI.post(`${SHEET_ID}:batchUpdate`, {
       requests: [
         {
@@ -123,10 +125,38 @@ export const executeBatchUpdateAddSheet = async (sheetDate) => {
   }
 };
 
+export const executeBatchUpdateDeleteSheet = async (sheetId) => {
+  try {
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
+    const response = await googleSheetsAPI.post(`${SHEET_ID}:batchUpdate`, {
+      requests: [
+        {
+          deleteSheet: {
+            sheetId: sheetId,
+          },
+        },
+      ],
+    });
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log(
+        'Response executeBatchUpdateDeleteSheet',
+        response.data.replies[0]
+      );
+    }
+
+    return response.data.replies[0];
+  } catch (err) {
+    console.error('Execute error', err.data.error.message);
+    return false;
+  }
+};
+
 export const executeBatchUpdateCutPaste = async (destSheetId) => {
   try {
-    await axiosAuth();
-    const googleSheetsAPI = await axiosAuth();
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
     const response = await googleSheetsAPI.post(`${SHEET_ID}:batchUpdate`, {
       requests: [
         {
@@ -153,10 +183,69 @@ export const executeBatchUpdateCutPaste = async (destSheetId) => {
   }
 };
 
+export const executeBatchUpdateSheetPropertiesRenameSheet = async (
+  worksheetID,
+  sheetId,
+  newSheetTitle
+) => {
+  try {
+    await axiosAuth(worksheetID);
+    const googleSheetsAPI = await axiosAuth(worksheetID);
+    const response = await googleSheetsAPI.post(`${worksheetID}:batchUpdate`, {
+      requests: [
+        {
+          updateSheetProperties: {
+            properties: {
+              sheetId: sheetId,
+              title: newSheetTitle,
+            },
+            fields: 'title',
+          },
+        },
+      ],
+    });
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log(
+        'Response executeBatchUpdateSheetPropertiesRenameSheet',
+        response
+      );
+    }
+
+    return response;
+  } catch (err) {
+    console.error('Execute error', err);
+  }
+};
+
+export const executeBatchUpdateCopyToWorksheet = async (
+  sourceSheetId,
+  destWorkSheetId
+) => {
+  try {
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
+    const response = await googleSheetsAPI.post(
+      `${SHEET_ID}/sheets/${sourceSheetId}:copyTo`,
+      {
+        destinationSpreadsheetId: destWorkSheetId,
+      }
+    );
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log('Response executeBatchUpdateCopyToWorksheet', response);
+    }
+
+    return response;
+  } catch (err) {
+    console.error('Execute error', err);
+  }
+};
+
 export const executeValuesAppendAddSheet = async () => {
   try {
-    await axiosAuth();
-    const googleSheetsAPI = await axiosAuth();
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
     const range = 'Data!A1';
     const valueInputOption = 'USER_ENTERED';
@@ -197,8 +286,8 @@ export const executeValuesAppendNewUserData = async (
   lastBlankRow
 ) => {
   try {
-    await axiosAuth();
-    const googleSheetsAPI = await axiosAuth();
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
     const getExpiryDate = (days) => {
       let expiry_date = new Date();
@@ -265,8 +354,8 @@ export const executeValuesAppendCheckIn = async (
   privateRoomChecked
 ) => {
   try {
-    await axiosAuth();
-    const googleSheetsAPI = await axiosAuth();
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
     const range = 'Data!A2';
     const valueInputOption = 'USER_ENTERED';
@@ -312,8 +401,8 @@ export const executeValuesAppendCheckOut = async (
   privateRoomRate
 ) => {
   try {
-    await axiosAuth();
-    const googleSheetsAPI = await axiosAuth();
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
     const range = `Data!G${rowNumber}`;
     const valueInputOption = 'USER_ENTERED';
@@ -350,7 +439,7 @@ export const executeValuesAppendCheckOut = async (
 
 export const getSheetValues = async (range) => {
   try {
-    const googleSheetsAPI = await axiosAuth();
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
     const response = await googleSheetsAPI.get(`${SHEET_ID}/values/${range}`);
 
@@ -359,6 +448,38 @@ export const getSheetValues = async (range) => {
     }
 
     return response.data.values[0];
+  } catch (err) {
+    console.error('Execute error', err);
+  }
+};
+
+export const getSheetValuesAdminAuth = async (range) => {
+  try {
+    const googleSheetsAPI = await axiosAuth(AUTH_SHEET_ID);
+
+    const response = await googleSheetsAPI.get(`${AUTH_SHEET_ID}/values/${range}`);
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log('Response getSheetValuesAdminAuth', range, response.data.values[0]);
+    }
+
+    return response.data.values[0];
+  } catch (err) {
+    console.error('Execute error', err);
+  }
+};
+
+export const getWorkSheetData = async (sheetID) => {
+  try {
+    const googleSheetsAPI = await axiosAuth(sheetID);
+
+    const response = await googleSheetsAPI.get(sheetID);
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log('Response getWorkSheetData', response.data.sheets);
+    }
+
+    return response.data.sheets;
   } catch (err) {
     console.error('Execute error', err);
   }
