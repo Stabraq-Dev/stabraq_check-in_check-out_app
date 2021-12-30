@@ -5,7 +5,7 @@ import { doLoading } from './appActions';
 
 import {
   executeValuesUpdateAdminAuth,
-  getSheetValues,
+  getSheetValuesAdminAuth,
 } from '../functions/executeFunc';
 
 export const signIn = (userId) => {
@@ -41,7 +41,7 @@ export const doLogIn = (formValues) => async (dispatch, getState) => {
   const { username, password } = formValues;
   await executeValuesUpdateAdminAuth(username, password);
   const getSheetValuesMatchedRange = 'Auth!G2';
-  const isSignedIn = await getSheetValues(getSheetValuesMatchedRange);
+  const isSignedIn = await getSheetValuesAdminAuth(getSheetValuesMatchedRange);
   await executeValuesUpdateAdminAuth('', '');
 
   switch (isSignedIn[0]) {

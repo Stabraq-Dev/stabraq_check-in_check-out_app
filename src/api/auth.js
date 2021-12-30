@@ -1,9 +1,7 @@
 import { GoogleSpreadsheet } from 'google-spreadsheet';
 
-const SHEET_ID = process.env.REACT_APP_SHEET_ID;
-const doc = new GoogleSpreadsheet(SHEET_ID);
-
-export const authenticate = async () => {
+export const authenticate = async (sheetID) => {
+  const doc = new GoogleSpreadsheet(sheetID);
   await doc.useServiceAccountAuth({
     private_key: process.env.REACT_APP_GOOGLE_PRIVATE_KEY.replace(
       /\\n/gm,
@@ -15,9 +13,9 @@ export const authenticate = async () => {
   return doc;
 };
 
-export const docOnly = async () => {
-  return doc;
-};
+// export const docOnly = async () => {
+//   return doc;
+// };
 
 export const loadAuth = async () => {
   try {

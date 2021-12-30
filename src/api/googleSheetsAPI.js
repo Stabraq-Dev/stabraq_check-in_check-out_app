@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { authenticate } from './auth';
 
-export const axiosAuth = async () => {
+export const axiosAuth = async (sheetID) => {
   try {
     const getNewToken = async () => {
-      const doc = await authenticate();
+      const doc = await authenticate(sheetID);
       const NEW_ACCESS_TOKEN = await doc.jwtClient.credentials.access_token;
       const new_expiry_date = await doc.jwtClient.credentials.expiry_date;
       // sessionStorage.clear();
