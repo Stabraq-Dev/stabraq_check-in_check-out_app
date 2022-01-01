@@ -1,10 +1,12 @@
-import { authInstance, loadClient } from '../api/auth';
+import { authInstance, loadClient, loadClientForDrive } from '../api/auth';
 import { axiosAuth } from '../api/googleSheetsAPI';
 import { changeDateFormat } from '../functions/helperFunc';
 import '../config';
 
 const SHEET_ID = process.env.REACT_APP_SHEET_ID;
 const AUTH_SHEET_ID = process.env.REACT_APP_AUTH_SHEET_ID;
+const GOOGLE_SERVICE_ACCOUNT_EMAIL =
+  process.env.REACT_APP_GOOGLE_SERVICE_ACCOUNT_EMAIL;
 
 export const executeValuesUpdate = async (val) => {
   try {
@@ -457,10 +459,16 @@ export const getSheetValuesAdminAuth = async (range) => {
   try {
     const googleSheetsAPI = await axiosAuth(AUTH_SHEET_ID);
 
-    const response = await googleSheetsAPI.get(`${AUTH_SHEET_ID}/values/${range}`);
+    const response = await googleSheetsAPI.get(
+      `${AUTH_SHEET_ID}/values/${range}`
+    );
 
     if (global.config.debuggingMode === 'TRUE') {
-      console.log('Response getSheetValuesAdminAuth', range, response.data.values[0]);
+      console.log(
+        'Response getSheetValuesAdminAuth',
+        range,
+        response.data.values[0]
+      );
     }
 
     return response.data.values[0];
@@ -500,6 +508,33 @@ export const executeAddNewWorkSheet = async (title) => {
     if (global.config.debuggingMode === 'TRUE') {
       console.log(
         'Response executeAddNewWorkSheet',
+        response.result.spreadsheetId
+      );
+    }
+
+    return response.result.spreadsheetId;
+  } catch (err) {
+    console.error('Execute error', err);
+    return false;
+  }
+};
+
+export const executeChangeWorkSheetPermission = async (fileId) => {
+  try {
+    await authInstance();
+    await loadClientForDrive();
+    const response = await window.gapi.client.drive.permissions.create({
+      fileId: fileId,
+      resource: {
+        role: 'writer',
+        type: 'user',
+        emailAddress: GOOGLE_SERVICE_ACCOUNT_EMAIL,
+      },
+    });
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log(
+        'Response executeChangeWorkSheetPermission',
         response.result.spreadsheetId
       );
     }

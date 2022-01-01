@@ -33,7 +33,8 @@ export const loadAuth = async () => {
 export const authInstance = async () => {
   try {
     const response = await window.gapi.auth2.getAuthInstance().signIn({
-      scope: 'https://www.googleapis.com/auth/spreadsheets',
+      scope:
+        'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file',
     });
     console.log('Sign-in successful');
     return response;
@@ -51,5 +52,17 @@ export const loadClient = async () => {
     console.log('GAPI client loaded for API');
   } catch (err) {
     console.error('Error loading GAPI client for API', err);
+  }
+};
+
+export const loadClientForDrive = async () => {
+  try {
+    await window.gapi.client.setApiKey(process.env.REACT_APP_API_KEY);
+    await window.gapi.client.load(
+      'https://content.googleapis.com/discovery/v1/apis/drive/v3/rest'
+    );
+    console.log('GAPI client loaded for API (Drive)');
+  } catch (err) {
+    console.error('Error loading GAPI client for API (Drive)', err);
   }
 };

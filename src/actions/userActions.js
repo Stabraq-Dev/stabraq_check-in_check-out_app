@@ -35,6 +35,7 @@ import {
   executeBatchUpdateDeleteSheet,
   executeAddNewWorkSheet,
   executeBatchUpdateSheetPropertiesRenameSheet,
+  executeChangeWorkSheetPermission,
 } from '../functions/executeFunc';
 
 import history from '../history';
@@ -151,6 +152,7 @@ export const doCreateNewSheet = () => async (dispatch) => {
   if (diffMonths >= 1) {
     const workSheetTitle = await changeYearMonthFormat(dateTwo);
     const newWorkSheetId = await executeAddNewWorkSheet(workSheetTitle);
+    await executeChangeWorkSheetPermission(newWorkSheetId);
     await executeValuesUpdateCheckOut({
       value: newWorkSheetId,
       range: 'Func!A12',
