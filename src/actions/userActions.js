@@ -130,7 +130,11 @@ export const doCreateNewSheet = () => async (dispatch) => {
     const destWorkSheetId = await getSheetValues(
       getSheetValuesCurrMonthWorkSheet
     );
-    await executeBatchUpdateCopyToWorksheet(newSheetId, destWorkSheetId[0]);
+    const resCopyToWorksheet = await executeBatchUpdateCopyToWorksheet(
+      newSheetId,
+      destWorkSheetId[0]
+    );
+    dispatch(doCheckResponse(resCopyToWorksheet));
     await executeBatchUpdateDeleteSheet(newSheetId);
 
     let worksheetSheetsData = await getWorkSheetData(destWorkSheetId[0]);
