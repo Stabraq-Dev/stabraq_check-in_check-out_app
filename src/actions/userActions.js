@@ -111,7 +111,7 @@ export const doCalcRemainingOfTenDays = (remains) => {
   };
 };
 
-export const doCreateNewSheet = () => async (dispatch) => {
+export const doCreateNewSheet = () => async (dispatch, getState) => {
   const getSheetValuesSheetDateRange = 'Data!L1';
   const sheetDate = await getSheetValues(getSheetValuesSheetDateRange);
   dispatch({ type: SHEET_DATE, payload: sheetDate[0] });
@@ -122,19 +122,25 @@ export const doCreateNewSheet = () => async (dispatch) => {
 
   if (diffDays >= 1) {
     const newSheetId = await executeBatchUpdateAddSheet(sheetDate[0]);
-    if (newSheetId === false) return;
-    dispatch({ type: NEW_SHEET_ID, payload: newSheetId });
+    await dispatch(doCheckResponse(newSheetId));
+    const errorNewSheetId = getState().app.error;
+    if (errorNewSheetId.code === 400) return;
+    await dispatch({ type: NEW_SHEET_ID, payload: newSheetId });
     await executeBatchUpdateCutPaste(newSheetId);
     await executeValuesAppendAddSheet();
     const getSheetValuesCurrMonthWorkSheet = 'Func!A12';
     const destWorkSheetId = await getSheetValues(
       getSheetValuesCurrMonthWorkSheet
     );
+
     const resCopyToWorksheet = await executeBatchUpdateCopyToWorksheet(
       newSheetId,
       destWorkSheetId[0]
     );
-    dispatch(doCheckResponse(resCopyToWorksheet));
+    await dispatch(doCheckResponse(resCopyToWorksheet));
+    const errorResCopyToWorksheet = getState().app.error;
+    if (errorResCopyToWorksheet.code === 500) return;
+
     await executeBatchUpdateDeleteSheet(newSheetId);
 
     let worksheetSheetsData = await getWorkSheetData(destWorkSheetId[0]);
@@ -167,7 +173,7 @@ export const doCreateNewSheet = () => async (dispatch) => {
 export const doCheckResponse = (res) => async (dispatch, getState) => {
   const { showMyModal } = getState().app;
 
-  if (res.status !== 200) {
+  if (res.status !== 200 && res.status !== undefined) {
     dispatch({ type: ERROR, payload: res });
     dispatch(doLoading(false));
     if (showMyModal) {
@@ -200,6 +206,8 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
   dispatch(doLoading(true));
   // Check to Add new Sheet for new day
   await dispatch(doCreateNewSheet());
+  const { error } = getState().app;
+  if (error.code === 400 || error.code === 500) return;
   // Search for the user by mobile number
   const res = await executeValuesUpdate(mobile);
   dispatch(doCheckResponse(res));

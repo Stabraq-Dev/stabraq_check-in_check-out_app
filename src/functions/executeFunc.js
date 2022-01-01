@@ -30,7 +30,7 @@ export const executeValuesUpdate = async (val) => {
 
     return response;
   } catch (err) {
-    console.error('Execute error', err);
+    console.error('Execute error executeValuesUpdate', err);
     return err;
   }
 };
@@ -57,7 +57,7 @@ export const executeValuesUpdateCheckOut = async (props) => {
 
     return response;
   } catch (err) {
-    console.error('Execute error', err);
+    console.error('Execute error executeValuesUpdateCheckOut', err);
     return err;
   }
 };
@@ -91,7 +91,7 @@ export const executeValuesUpdateAdminAuth = async (
 
     return response;
   } catch (err) {
-    console.error('Execute error', err);
+    console.error('Execute error executeValuesUpdate', err);
   }
 };
 
@@ -122,8 +122,11 @@ export const executeBatchUpdateAddSheet = async (sheetDate) => {
 
     return response.data.replies[0].addSheet.properties.sheetId;
   } catch (err) {
-    console.error('Execute error', err.data.error.message);
-    return false;
+    console.error(
+      'Execute error executeBatchUpdateAddSheet',
+      err.response.data.error
+    );
+    return err.response.data.error;
   }
 };
 
@@ -150,8 +153,11 @@ export const executeBatchUpdateDeleteSheet = async (sheetId) => {
 
     return response.data.replies[0];
   } catch (err) {
-    console.error('Execute error', err.data.error.message);
-    return false;
+    console.error(
+      'Execute error executeBatchUpdateDeleteSheet',
+      err.response.data.error
+    );
+    return err.response.data.error;
   }
 };
 
@@ -181,7 +187,7 @@ export const executeBatchUpdateCutPaste = async (destSheetId) => {
 
     return response;
   } catch (err) {
-    console.error('Execute error', err);
+    console.error('Execute error executeBatchUpdateCutPaste', err);
   }
 };
 
@@ -216,7 +222,10 @@ export const executeBatchUpdateSheetPropertiesRenameSheet = async (
 
     return response;
   } catch (err) {
-    console.error('Execute error', err);
+    console.error(
+      'Execute error executeBatchUpdateSheetPropertiesRenameSheet',
+      err
+    );
   }
 };
 
@@ -240,7 +249,11 @@ export const executeBatchUpdateCopyToWorksheet = async (
 
     return response;
   } catch (err) {
-    console.error('Execute error', err);
+    console.error(
+      'Execute error executeBatchUpdateCopyToWorksheet',
+      err.response.data.error
+    );
+    return err.response.data.error;
   }
 };
 
@@ -279,7 +292,7 @@ export const executeValuesAppendAddSheet = async () => {
 
     return response;
   } catch (err) {
-    console.error('Execute error', err);
+    console.error('Execute error executeValuesAppendAddSheet', err);
   }
 };
 
@@ -341,7 +354,7 @@ export const executeValuesAppendNewUserData = async (
 
     return response;
   } catch (err) {
-    console.error('Execute error', err);
+    console.error('Execute error executeValuesAppendNewUserData', err);
     return err;
   }
 };
@@ -390,7 +403,7 @@ export const executeValuesAppendCheckIn = async (
 
     return response;
   } catch (err) {
-    console.error('Execute error', err);
+    console.error('Execute error executeValuesAppendCheckIn', err);
   }
 };
 
@@ -435,7 +448,7 @@ export const executeValuesAppendCheckOut = async (
 
     return response;
   } catch (err) {
-    console.error('Execute error', err);
+    console.error('Execute error executeValuesAppendCheckOut', err);
   }
 };
 
@@ -451,7 +464,7 @@ export const getSheetValues = async (range) => {
 
     return response.data.values[0];
   } catch (err) {
-    console.error('Execute error', err);
+    console.error('Execute error getSheetValues', err);
   }
 };
 
@@ -473,7 +486,7 @@ export const getSheetValuesAdminAuth = async (range) => {
 
     return response.data.values[0];
   } catch (err) {
-    console.error('Execute error', err);
+    console.error('Execute error getSheetValuesAdminAuth', err);
   }
 };
 
@@ -489,7 +502,7 @@ export const getWorkSheetData = async (sheetID) => {
 
     return response.data.sheets;
   } catch (err) {
-    console.error('Execute error', err);
+    console.error('Execute error getWorkSheetData', err);
   }
 };
 
@@ -514,7 +527,7 @@ export const executeAddNewWorkSheet = async (title) => {
 
     return response.result.spreadsheetId;
   } catch (err) {
-    console.error('Execute error', err);
+    console.error('Execute error executeAddNewWorkSheet', err);
     return false;
   }
 };
@@ -533,15 +546,15 @@ export const executeChangeWorkSheetPermission = async (fileId) => {
     });
 
     if (global.config.debuggingMode === 'TRUE') {
-      console.log(
-        'Response executeChangeWorkSheetPermission',
-        response.result.spreadsheetId
-      );
+      console.log('Response executeChangeWorkSheetPermission', response);
     }
 
-    return response.result.spreadsheetId;
+    return response;
   } catch (err) {
-    console.error('Execute error', err);
-    return false;
+    console.error(
+      'Execute error executeChangeWorkSheetPermission',
+      err.response.data.error
+    );
+    return err.response.data.error;
   }
 };
