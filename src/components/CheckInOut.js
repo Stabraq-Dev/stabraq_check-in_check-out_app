@@ -5,7 +5,11 @@ import history from '../history';
 import LoadingSpinner from './LoadingSpinner';
 
 class CheckInOut extends React.Component {
-  state = { girlsRoomChecked: false, privateRoomChecked: false };
+  state = {
+    girlsRoomChecked: false,
+    privateRoomChecked: false,
+    trainingRoomChecked: false,
+  };
 
   componentDidMount() {
     if (!this.props.showCheckInOut) {
@@ -15,15 +19,15 @@ class CheckInOut extends React.Component {
 
   onCheckInOut = (event) => {
     event.preventDefault();
-    const girlsRoomChecked = !this.state.girlsRoomChecked ? '' : 'GIRLS_ROOM';
-    const privateRoomChecked = !this.state.privateRoomChecked
-      ? ''
-      : 'PRIVATE_ROOM';
-    this.props.doCheckInOut(
-      event.target.value,
-      girlsRoomChecked,
-      privateRoomChecked
-    );
+    const roomChecked = this.state.girlsRoomChecked
+      ? 'GIRLS_ROOM'
+      : this.state.privateRoomChecked
+      ? 'PRIVATE_ROOM'
+      : this.state.trainingRoomChecked
+      ? 'TRAINING_ROOM'
+      : '';
+
+    this.props.doCheckInOut(event.target.value, roomChecked);
   };
 
   onGirlsRoom = (event) => {
@@ -34,20 +38,51 @@ class CheckInOut extends React.Component {
     this.setState({ privateRoomChecked: event.target.checked });
   };
 
+  onTrainingRoom = (event) => {
+    this.setState({ trainingRoomChecked: event.target.checked });
+  };
+
   renderPrivateRoomButton = () => {
     if (this.props.checkedOut === 'NOT_CHECKED_IN')
       return (
-        <div>
+        <div className='col'>
           <div className='form-check form-check-inline mt-3 me-3'>
             <input
               className='form-check-input m-2 p-3'
               type='checkbox'
               id='private-room'
               onChange={this.onPrivateRoom}
-              disabled={this.state.girlsRoomChecked}
+              disabled={
+                this.state.girlsRoomChecked || this.state.trainingRoomChecked
+              }
             />
             <label className='form-check-label mt-1 p-2' htmlFor='private-room'>
               Private Room
+            </label>
+          </div>
+        </div>
+      );
+  };
+
+  renderTrainingRoomButton = () => {
+    if (this.props.checkedOut === 'NOT_CHECKED_IN')
+      return (
+        <div className='col'>
+          <div className='form-check form-check-inline mt-3 me-3'>
+            <input
+              className='form-check-input m-2 p-3'
+              type='checkbox'
+              id='training-room'
+              onChange={this.onTrainingRoom}
+              disabled={
+                this.state.girlsRoomChecked || this.state.privateRoomChecked
+              }
+            />
+            <label
+              className='form-check-label mt-1 p-2'
+              htmlFor='training-room'
+            >
+              Training Room
             </label>
           </div>
         </div>
@@ -61,17 +96,21 @@ class CheckInOut extends React.Component {
       this.props.membership === 'NOT_MEMBER'
     )
       return (
-        <div className='form-check form-check-inline mt-3 me-3'>
-          <input
-            className='form-check-input m-2 p-3'
-            type='checkbox'
-            id='girls-room'
-            onChange={this.onGirlsRoom}
-            disabled={this.state.privateRoomChecked}
-          />
-          <label className='form-check-label mt-1 p-2' htmlFor='girls-room'>
-            Girls Room
-          </label>
+        <div>
+          <div className='form-check form-check-inline mt-3 me-3'>
+            <input
+              className='form-check-input m-2 p-3'
+              type='checkbox'
+              id='girls-room'
+              onChange={this.onGirlsRoom}
+              disabled={
+                this.state.privateRoomChecked || this.state.trainingRoomChecked
+              }
+            />
+            <label className='form-check-label mt-1 p-2' htmlFor='girls-room'>
+              Girls Room
+            </label>
+          </div>
         </div>
       );
   };
@@ -84,7 +123,7 @@ class CheckInOut extends React.Component {
     return (
       <div className='ui segment text-center'>
         <button
-          className='ui primary button stabraq-bg me-3'
+          className='ui primary button stabraq-bg me-3 mt-1'
           name='checkIn'
           value='CHECK_IN'
           onClick={this.onCheckInOut}
@@ -94,7 +133,7 @@ class CheckInOut extends React.Component {
           Check In
         </button>
         <button
-          className='ui primary button stabraq-bg ms-3'
+          className='ui primary button stabraq-bg ms-3 mt-1'
           name='checkOut'
           value='CHECK_OUT'
           onClick={this.onCheckInOut}
@@ -103,8 +142,11 @@ class CheckInOut extends React.Component {
           <i className='left arrow icon me-1' />
           Check Out
         </button>
-        {this.renderPrivateRoomButton()}
-        {this.renderGirlsRoomButton()}
+        <div className='row'>
+          {this.renderPrivateRoomButton()}
+          {this.renderTrainingRoomButton()}
+          {this.renderGirlsRoomButton()}
+        </div>
       </div>
     );
   }

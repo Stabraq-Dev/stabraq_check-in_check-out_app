@@ -365,8 +365,7 @@ export const executeValuesAppendCheckIn = async (
   userName,
   eMailAddress,
   membership,
-  girlsRoomChecked,
-  privateRoomChecked
+  roomChecked
 ) => {
   try {
     await axiosAuth(SHEET_ID);
@@ -390,8 +389,7 @@ export const executeValuesAppendCheckIn = async (
           [''],
           [''],
           [''],
-          [girlsRoomChecked],
-          [privateRoomChecked],
+          [roomChecked],
         ],
       },
       { params: { valueInputOption: valueInputOption } }
@@ -412,8 +410,9 @@ export const executeValuesAppendCheckOut = async (
   membership,
   hrRate,
   fullDayRate,
-  privateRoom,
-  privateRoomRate
+  roomChecked,
+  privateRoomRate,
+  trainingRoomRate
 ) => {
   try {
     await axiosAuth(SHEET_ID);
@@ -429,13 +428,19 @@ export const executeValuesAppendCheckOut = async (
           [new Date().toLocaleTimeString('en-US')],
           [`=TEXT(G${rowNumber}-F${rowNumber},"h:mm")`],
           [
-            `=IF(H${rowNumber}*24<1,1,IF(OR(AND(H${rowNumber}*24-INT(H${rowNumber}*24)<=0.1),AND(H${rowNumber}*24-INT(H${rowNumber}*24)>0.5,H${rowNumber}*24-INT(H${rowNumber}*24)<=0.59)),FLOOR(H${rowNumber},"00:30")*24,CEILING(H${rowNumber},"00:30")*24))`,
+            roomChecked === 'PRIVATE_ROOM' || roomChecked === 'TRAINING_ROOM'
+              ? `=IF(OR(AND(H${rowNumber}*24-INT(H${rowNumber}*24)<=0.1),AND(H${rowNumber}*24-INT(H${rowNumber}*24)>0.5,H${rowNumber}*24-INT(H${rowNumber}*24)<=0.59)),FLOOR(H${rowNumber},"00:30")*24,CEILING(H${rowNumber},"00:30")*24)`
+              : `=IF(H${rowNumber}*24<1,1,IF(OR(AND(H${rowNumber}*24-INT(H${rowNumber}*24)<=0.1),AND(H${rowNumber}*24-INT(H${rowNumber}*24)>0.5,H${rowNumber}*24-INT(H${rowNumber}*24)<=0.59)),FLOOR(H${rowNumber},"00:30")*24,CEILING(H${rowNumber},"00:30")*24))`,
           ],
-          privateRoom === 'PRIVATE_ROOM'
-            ? [`=I${rowNumber}*${privateRoomRate}`]
-            : membership === 'NOT_MEMBER'
-            ? [`=IF(I${rowNumber}>=6,${fullDayRate},I${rowNumber}*${hrRate})`]
-            : [''],
+          [
+            roomChecked === 'PRIVATE_ROOM'
+              ? `=I${rowNumber}*${privateRoomRate}`
+              : roomChecked === 'TRAINING_ROOM'
+              ? `=I${rowNumber}*${trainingRoomRate}`
+              : membership === 'NOT_MEMBER'
+              ? `=IF(I${rowNumber}>=6,${fullDayRate},I${rowNumber}*${hrRate})`
+              : '',
+          ],
           ['CHECKED_OUT'],
         ],
       },

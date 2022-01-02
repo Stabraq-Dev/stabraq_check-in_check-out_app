@@ -27,8 +27,7 @@ const INITIAL_STATE = {
     remainingOfTenDays: '',
     clientRowNumber: '',
     gender: '',
-    girlsRoom: '',
-    privateRoom: '',
+    roomChecked: '',
   },
   checkInOutStatus: '',
   checkInOut: {
@@ -57,8 +56,7 @@ let valuesMatchedKeys = [
   'remainingOfTenDays',
   'clientRowNumber',
   'gender',
-  'girlsRoom',
-  'privateRoom',
+  'roomChecked',
 ];
 
 let durationCostKeys = ['duration', 'approxDuration', 'cost'];

@@ -217,7 +217,7 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
   dispatch({ type: NUMBER_EXISTS, payload: numberExists[0] });
 
   if (numberExists[0] === 'EXISTS') {
-    const getSheetValuesMatchedRange = 'Func!C2:R2';
+    const getSheetValuesMatchedRange = 'Func!C2:Q2';
     const valuesMatched = await getSheetValues(getSheetValuesMatchedRange);
     dispatch({ type: VALUES_MATCHED, payload: valuesMatched });
   }
@@ -285,8 +285,7 @@ export const doOnNewUserFormSubmit =
  */
 
 export const doCheckInOut =
-  (checkInOutStatus, girlsRoomChecked, privateRoomChecked) =>
-  async (dispatch, getState) => {
+  (checkInOutStatus, roomChecked) => async (dispatch, getState) => {
     if (!navigator.onLine) return;
     dispatch(submitType(ON_CHECK_IN_OUT_SUBMIT));
     dispatch(doCheckInOutStatus(checkInOutStatus));
@@ -307,8 +306,7 @@ export const doCheckInOut =
           userName,
           eMailAddress,
           membership,
-          girlsRoomChecked,
-          privateRoomChecked
+          roomChecked
         );
       }
     } else {
@@ -318,21 +316,25 @@ export const doCheckInOut =
         membership,
         remainingHours,
         clientRowNumber,
-        girlsRoom,
-        privateRoom,
+        roomChecked,
       } = getState().user.valuesMatched;
       if (checkedOut === 'CHECKED_OUT') {
         dispatch(doCheckedOut(true));
       } else if (checkedOut === 'NOT_CHECKED_IN') {
         dispatch(doCheckedOut(false));
       } else {
-        const hrRate = girlsRoom === 'GIRLS_ROOM' ? 12 : 10;
-        const fullDayRate = girlsRoom === 'GIRLS_ROOM' ? 72 : 12;
+        const hrRate = roomChecked === 'GIRLS_ROOM' ? 12 : 10;
+        const fullDayRate = roomChecked === 'GIRLS_ROOM' ? 72 : 12;
 
         const getSheetValuesPrivateRoomRate = 'Func!A6';
         const privateRoomRate =
-          privateRoom === 'PRIVATE_ROOM'
+          roomChecked === 'PRIVATE_ROOM'
             ? await getSheetValues(getSheetValuesPrivateRoomRate)
+            : '';
+        const getSheetValuesTrainingRoomRate = 'Func!A8';
+        const trainingRoomRate =
+          roomChecked === 'TRAINING_ROOM'
+            ? await getSheetValues(getSheetValuesTrainingRoomRate)
             : '';
 
         await executeValuesAppendCheckOut(
@@ -340,13 +342,14 @@ export const doCheckInOut =
           membership,
           hrRate,
           fullDayRate,
-          privateRoom,
-          privateRoomRate
+          roomChecked,
+          privateRoomRate,
+          trainingRoomRate
         );
         const getSheetValuesDurationRange = `Data!H${rowNumber}:K${rowNumber}`;
         const resData = await getSheetValues(getSheetValuesDurationRange);
         dispatch(doCalcDurationCost(resData));
-        if (membership === 'HOURS_MEMBERSHIP') {
+        if (membership === 'HOURS_MEMBERSHIP' && roomChecked === '') {
           const { approxDuration } = getState().user.durationCost;
           const remains = remainingHours - approxDuration;
           await executeValuesUpdateCheckOut({
@@ -354,7 +357,7 @@ export const doCheckInOut =
             range: `Clients!I${clientRowNumber}`,
           });
           dispatch(doCalcRemainingHours(remains));
-        } else if (membership === '10_DAYS') {
+        } else if (membership === '10_DAYS' && roomChecked === '') {
           const { remainingOfTenDays } = getState().user.valuesMatched;
           const remains = remainingOfTenDays - 1;
           await executeValuesUpdateCheckOut({
