@@ -1,7 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { doCheckInOut } from '../actions';
+import { doCheckInOut, doCheckByMobile } from '../actions';
+import { checkForMobNum } from '../functions/validation';
 import history from '../history';
+import InputMobile from './InputMobile';
 import LoadingSpinner from './LoadingSpinner';
 
 class CheckInOut extends React.Component {
@@ -9,6 +11,13 @@ class CheckInOut extends React.Component {
     girlsRoomChecked: false,
     privateRoomChecked: false,
     trainingRoomChecked: false,
+    invitationChecked: false,
+    invitationByMobile: '',
+    errorMessage: '',
+    inviteNumberExists: '',
+    inviteUserName: '',
+    invitationByMobileManual: '',
+    invitationByUserNameManual: '',
   };
 
   componentDidMount() {
@@ -27,11 +36,40 @@ class CheckInOut extends React.Component {
       ? 'TRAINING_ROOM'
       : '';
 
-    this.props.doCheckInOut(event.target.value, roomChecked);
+    const inviteNumberExists =
+      this.state.invitationChecked && this.state.inviteNumberExists
+        ? this.state.inviteNumberExists
+        : '';
+
+    const invitationByMobileUser = this.state.invitationChecked
+      ? this.state.inviteNumberExists === 'EXISTS'
+        ? {
+            inviteByMobile: this.state.invitationByMobile,
+            inviteByName: this.state.inviteUserName,
+          }
+        : {
+            inviteByMobile: this.state.invitationByMobileManual,
+            inviteByName: this.state.invitationByUserNameManual,
+          }
+      : {
+          inviteByMobile: '',
+          inviteByName: '',
+        };
+
+    this.props.doCheckInOut(
+      event.target.value,
+      roomChecked,
+      inviteNumberExists,
+      invitationByMobileUser
+    );
   };
 
   onGirlsRoom = (event) => {
     this.setState({ girlsRoomChecked: event.target.checked });
+  };
+
+  onInvitation = (event) => {
+    this.setState({ invitationChecked: event.target.checked });
   };
 
   onPrivateRoom = (event) => {
@@ -53,7 +91,9 @@ class CheckInOut extends React.Component {
               id='private-room'
               onChange={this.onPrivateRoom}
               disabled={
-                this.state.girlsRoomChecked || this.state.trainingRoomChecked
+                this.state.girlsRoomChecked ||
+                this.state.trainingRoomChecked ||
+                this.state.invitationChecked
               }
             />
             <label className='form-check-label mt-1 p-2' htmlFor='private-room'>
@@ -75,7 +115,9 @@ class CheckInOut extends React.Component {
               id='training-room'
               onChange={this.onTrainingRoom}
               disabled={
-                this.state.girlsRoomChecked || this.state.privateRoomChecked
+                this.state.girlsRoomChecked ||
+                this.state.privateRoomChecked ||
+                this.state.invitationChecked
               }
             />
             <label
@@ -104,7 +146,9 @@ class CheckInOut extends React.Component {
               id='girls-room'
               onChange={this.onGirlsRoom}
               disabled={
-                this.state.privateRoomChecked || this.state.trainingRoomChecked
+                this.state.privateRoomChecked ||
+                this.state.trainingRoomChecked ||
+                this.state.invitationChecked
               }
             />
             <label className='form-check-label mt-1 p-2' htmlFor='girls-room'>
@@ -115,6 +159,130 @@ class CheckInOut extends React.Component {
       );
   };
 
+  renderInvitationButton = () => {
+    if (
+      this.props.checkedOut === 'NOT_CHECKED_IN' &&
+      this.props.membership === 'NOT_MEMBER'
+    )
+      return (
+        <div>
+          <div className='form-check form-check-inline mt-3 me-3'>
+            <input
+              className='form-check-input m-2 p-3'
+              type='checkbox'
+              id='invitation'
+              onChange={this.onInvitation}
+              checked={this.state.invitationChecked}
+              disabled={
+                this.state.privateRoomChecked ||
+                this.state.trainingRoomChecked ||
+                this.state.girlsRoomChecked
+              }
+            />
+            <label className='form-check-label mt-1 p-2' htmlFor='invitation'>
+              Invitation
+            </label>
+          </div>
+        </div>
+      );
+  };
+
+  renderInvitationCheckByMobile = () => {
+    if (
+      this.props.checkedOut === 'NOT_CHECKED_IN' &&
+      this.props.membership === 'NOT_MEMBER' &&
+      this.state.invitationChecked
+    )
+      return (
+        <div className='text-center'>
+          <form className='ui form error'>
+            <div className='ui segment'>
+              <InputMobile
+                value={this.state.invitationByMobile}
+                label='Invitation By Mobile Number'
+                icon='mobile'
+                onFormChange={this.handleChange}
+                errorMessage={this.state.errorMessage}
+              />
+              <div>{this.state.inviteNumberExists}</div>
+              <div>{this.state.inviteUserName}</div>
+            </div>
+          </form>
+        </div>
+      );
+  };
+
+  renderInvitationByMobileManual = () => {
+    if (
+      this.props.checkedOut === 'NOT_CHECKED_IN' &&
+      this.props.membership === 'NOT_MEMBER' &&
+      this.state.invitationChecked &&
+      this.state.inviteNumberExists === 'NOT_EXISTS'
+    )
+      return (
+        <div className='text-center'>
+          <form className='ui form'>
+            <div className='field mt-3'>
+              <label>Provide Invitation by Mobile / Name</label>
+            </div>
+            <div className='row ui segment'>
+              <div className='col-sm-2 col-xs-12 fw-bold d-flex align-items-center'>
+                Mobile
+              </div>
+              <div className='col-sm-4 col-xs-12'>
+                <input
+                  type='tel'
+                  maxLength={11}
+                  placeholder='01xxxxxxxxx'
+                  value={this.state.invitationByMobileManual}
+                  onChange={this.handleChangeManual}
+                />
+              </div>
+              <div className='col-sm-2 col-xs-12 fw-bold d-flex align-items-center'>
+                Name
+              </div>
+              <div className='col-sm-4 col-xs-12'>
+                <input
+                  type='text'
+                  placeholder='يفضل باللغة العربية'
+                  value={this.state.invitationByUserNameManual}
+                  onChange={this.handleChangeUserNameManual}
+                />
+              </div>
+            </div>
+          </form>
+        </div>
+      );
+  };
+
+  checkForErrors = async (mobile) => {
+    this.setState({ errorMessage: await checkForMobNum(mobile) });
+  };
+
+  handleChange = async ({ target }) => {
+    const mobile = target.value;
+    await this.setState({ inviteNumberExists: '', inviteUserName: '' });
+    await this.setState({ invitationByMobile: mobile });
+    await this.checkForErrors(mobile);
+    if (mobile.length === 11 && this.state.errorMessage === '') {
+      await this.props.doCheckByMobile(mobile);
+      await this.setState({
+        inviteNumberExists: this.props.inviteNumberExists,
+        inviteUserName: this.props.userName,
+      });
+    }
+  };
+
+  handleChangeManual = async ({ target }) => {
+    const mobile = target.value;
+    await this.setState({ invitationByMobileManual: mobile });
+  };
+
+  handleChangeUserNameManual = async ({ target }) => {
+    const userName = target.value;
+    await this.setState({ invitationByUserNameManual: userName });
+  };
+
   render() {
     if (this.props.loading) {
       return <LoadingSpinner />;
@@ -122,6 +290,14 @@ class CheckInOut extends React.Component {
 
     return (
       <div className='ui segment text-center'>
+        <div className='row'>
+          {this.renderPrivateRoomButton()}
+          {this.renderTrainingRoomButton()}
+          {this.renderGirlsRoomButton()}
+          {this.renderInvitationButton()}
+          {this.renderInvitationCheckByMobile()}
+          {this.renderInvitationByMobileManual()}
+        </div>
         <button
           className='ui primary button stabraq-bg me-3 mt-1'
           name='checkIn'
@@ -142,11 +318,6 @@ class CheckInOut extends React.Component {
           <i className='left arrow icon me-1' />
           Check Out
         </button>
-        <div className='row'>
-          {this.renderPrivateRoomButton()}
-          {this.renderTrainingRoomButton()}
-          {this.renderGirlsRoomButton()}
-        </div>
       </div>
     );
   }
@@ -155,6 +326,8 @@ class CheckInOut extends React.Component {
 const mapStateToProps = (state) => {
   const { loading, mobileNumber, showCheckInOut } = state.app;
   const { gender, membership, checkedOut } = state.user.valuesMatched;
+  const { inviteNumberExists } = state.user;
+  const { userName } = state.user.inviteValuesMatched;
   return {
     loading,
     mobileNumber,
@@ -162,7 +335,11 @@ const mapStateToProps = (state) => {
     gender,
     membership,
     checkedOut,
+    inviteNumberExists,
+    userName,
   };
 };
 
-export default connect(mapStateToProps, { doCheckInOut })(CheckInOut);
+export default connect(mapStateToProps, { doCheckInOut, doCheckByMobile })(
+  CheckInOut
+);

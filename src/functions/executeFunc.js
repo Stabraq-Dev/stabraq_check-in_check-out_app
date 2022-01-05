@@ -281,6 +281,9 @@ export const executeValuesAppendAddSheet = async () => {
           ['Cost'],
           ['Check Out'],
           [new Date().toLocaleDateString()],
+          ['Invitation'],
+          ['Invite By Mobile'],
+          ['Invite By Name'],
         ],
       },
       { params: { valueInputOption: valueInputOption } }
@@ -309,7 +312,8 @@ export const executeValuesAppendNewUserData = async (
       expiry_date.setDate(expiry_date.getDate() + days);
       return expiry_date.toLocaleDateString();
     };
-
+    const { mobile, username, email, membership, hoursPackages, gender } =
+      formValues;
     const range = 'Clients!A3';
     const valueInputOption = 'USER_ENTERED';
     const response = await googleSheetsAPI.post(
@@ -318,31 +322,36 @@ export const executeValuesAppendNewUserData = async (
         majorDimension: 'COLUMNS',
         values: [
           // [new Date().toLocaleString()],
-          [`'${formValues.mobile}`],
-          [formValues.username],
-          [formValues.email],
-          [formValues.membership],
+          [`'${mobile}`],
+          [username],
+          [email],
+          [membership],
           [
-            formValues.membership === 'HOURS_MEMBERSHIP'
+            membership === 'HOURS_MEMBERSHIP'
               ? getExpiryDate(90)
-              : formValues.membership === 'NOT_MEMBER'
+              : membership === 'NOT_MEMBER'
               ? ''
               : getExpiryDate(30),
           ],
           [
-            formValues.membership === 'NOT_MEMBER'
+            membership === 'NOT_MEMBER'
               ? ''
               : `=IF(E${lastBlankRow}>TODAY(),DATEDIF(TODAY(),E${lastBlankRow},"d"),(-1*DATEDIF(E${lastBlankRow},TODAY(),"d")))`,
           ],
-          [formValues.hoursPackages],
+          [hoursPackages],
           [new Date().toLocaleString()],
+          [membership === 'HOURS_MEMBERSHIP' ? hoursPackages : ''],
+          [membership === '10_DAYS' ? 10 : ''],
+          [gender],
           [
-            formValues.membership === 'HOURS_MEMBERSHIP'
-              ? formValues.hoursPackages
+            membership === 'GREEN'
+              ? 3
+              : membership === 'ORANGE'
+              ? 5
+              : membership === 'BUSINESS'
+              ? 7
               : '',
           ],
-          [formValues.membership === '10_DAYS' ? 10 : ''],
-          [formValues.gender],
         ],
       },
       { params: { valueInputOption: valueInputOption } }
@@ -365,7 +374,9 @@ export const executeValuesAppendCheckIn = async (
   userName,
   eMailAddress,
   membership,
-  roomChecked
+  roomChecked,
+  inviteNumberExists,
+  invitationByMobileUser
 ) => {
   try {
     await axiosAuth(SHEET_ID);
@@ -390,6 +401,9 @@ export const executeValuesAppendCheckIn = async (
           [''],
           [''],
           [roomChecked],
+          [inviteNumberExists],
+          [`'${invitationByMobileUser.inviteByMobile}`],
+          [invitationByMobileUser.inviteByName],
         ],
       },
       { params: { valueInputOption: valueInputOption } }
@@ -412,7 +426,8 @@ export const executeValuesAppendCheckOut = async (
   fullDayRate,
   roomChecked,
   privateRoomRate,
-  trainingRoomRate
+  trainingRoomRate,
+  invite
 ) => {
   try {
     await axiosAuth(SHEET_ID);
@@ -437,8 +452,8 @@ export const executeValuesAppendCheckOut = async (
               ? `=I${rowNumber}*${privateRoomRate}`
               : roomChecked === 'TRAINING_ROOM'
               ? `=I${rowNumber}*${trainingRoomRate}`
-              : membership === 'NOT_MEMBER'
-              ? `=IF(I${rowNumber}>=6,${fullDayRate},I${rowNumber}*${hrRate})`
+              : membership === 'NOT_MEMBER' && invite === 'NO'
+              ? `=IF(I${rowNumber}>=7,${fullDayRate},I${rowNumber}*${hrRate})`
               : '',
           ],
           ['CHECKED_OUT'],

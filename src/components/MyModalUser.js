@@ -27,6 +27,7 @@ export class MyModalUser extends Component {
       approxDuration,
       cost,
       error,
+      invite,
     } = this.props;
 
     const DefaultBody = ({ message }) => {
@@ -43,14 +44,16 @@ export class MyModalUser extends Component {
     } else {
       switch (submitType) {
         case 'ON_SEARCH_SUBMIT':
-          if (numberExists === 'EXISTS') {
+          if (numberExists === 'EXISTS' && rowNumber === 'NOT_CHECKED_IN') {
             const welcome = /[\u0600-\u06FF]/.test(userName)
               ? 'مرحبا'
               : 'Welcome Back';
             const message = `${welcome}\n${userName}`;
             return <DefaultBody message={message} />;
-          } else {
+          } else if (numberExists === 'NOT_EXISTS') {
             return <DefaultBody message='Not Exist' />;
+          } else {
+            return <DefaultBody message='See you soon' />;
           }
 
         case 'ON_NEW_USER_SUBMIT':
@@ -93,7 +96,7 @@ export class MyModalUser extends Component {
               const costMessage =
                 roomChecked === 'PRIVATE_ROOM' ||
                 roomChecked === 'TRAINING_ROOM' ||
-                membership === 'NOT_MEMBER'
+                (membership === 'NOT_MEMBER' && invite === 'NO')
                   ? `\nCost: ${cost} EGP`
                   : '';
               const remainingHoursMessage =
@@ -239,6 +242,7 @@ const mapStateToProps = (state) => {
     remainingHours,
     remainingOfTenDays,
     roomChecked,
+    invite,
   } = state.user.valuesMatched;
   const { showMyModal, submitType, mobileNumber, error } = state.app;
   const { numberExists, checkInOutStatus } = state.user;
@@ -263,6 +267,7 @@ const mapStateToProps = (state) => {
     duration,
     approxDuration,
     cost,
+    invite,
   };
 };
 

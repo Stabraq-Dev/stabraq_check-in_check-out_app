@@ -16,6 +16,9 @@ import {
   ERROR,
   CALC_REMAINING_HOURS,
   CALC_REMAINING_OF_TEN_DAYS,
+  INVITE_VALUES_MATCHED,
+  INVITE_NUMBER_EXISTS,
+  CLEAR_PREV_INVITE_USER_STATE,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -87,6 +90,12 @@ export const searchMobileNumber = (mobile) => {
 export const doClearPrevUserState = () => {
   return {
     type: CLEAR_PREV_USER_STATE,
+  };
+};
+
+export const doClearPrevInviteUserState = () => {
+  return {
+    type: CLEAR_PREV_INVITE_USER_STATE,
   };
 };
 
@@ -217,7 +226,7 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
   dispatch({ type: NUMBER_EXISTS, payload: numberExists[0] });
 
   if (numberExists[0] === 'EXISTS') {
-    const getSheetValuesMatchedRange = 'Func!C2:Q2';
+    const getSheetValuesMatchedRange = 'Func!C2:U2';
     const valuesMatched = await getSheetValues(getSheetValuesMatchedRange);
     dispatch({ type: VALUES_MATCHED, payload: valuesMatched });
   }
@@ -230,6 +239,31 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
     dispatch(doShowMyModal(false));
   }
   dispatch(doShowMyModal(true));
+};
+
+export const doCheckByMobile = (mobile) => async (dispatch, getState) => {
+  if (!navigator.onLine) return;
+
+  dispatch(doClearPrevInviteUserState());
+  dispatch(doLoading(true));
+  // Search for the user by mobile number
+  const res = await executeValuesUpdate(mobile);
+  dispatch(doCheckResponse(res));
+
+  dispatch({ type: INVITE_NUMBER_EXISTS, payload: '' });
+  const getSheetValuesNumberExistsRange = 'Func!B2';
+  const numberExists = await getSheetValues(getSheetValuesNumberExistsRange);
+  dispatch({ type: INVITE_NUMBER_EXISTS, payload: numberExists[0] });
+
+  if (numberExists[0] === 'EXISTS') {
+    const getSheetValuesMatchedRange = 'Func!C2:U2';
+    const valuesMatched = await getSheetValues(getSheetValuesMatchedRange);
+    dispatch({ type: INVITE_VALUES_MATCHED, payload: valuesMatched });
+  }
+
+  await executeValuesUpdate('');
+
+  dispatch(doLoading(false));
 };
 
 /**
@@ -285,7 +319,8 @@ export const doOnNewUserFormSubmit =
  */
 
 export const doCheckInOut =
-  (checkInOutStatus, roomChecked) => async (dispatch, getState) => {
+  (checkInOutStatus, roomChecked, inviteNumberExists, invitationByMobileUser) =>
+  async (dispatch, getState) => {
     if (!navigator.onLine) return;
     dispatch(submitType(ON_CHECK_IN_OUT_SUBMIT));
     dispatch(doCheckInOutStatus(checkInOutStatus));
@@ -306,7 +341,9 @@ export const doCheckInOut =
           userName,
           eMailAddress,
           membership,
-          roomChecked
+          roomChecked,
+          inviteNumberExists,
+          invitationByMobileUser
         );
       }
     } else {
@@ -317,14 +354,16 @@ export const doCheckInOut =
         remainingHours,
         clientRowNumber,
         roomChecked,
+        invite,
+        inviteByMobile,
       } = getState().user.valuesMatched;
       if (checkedOut === 'CHECKED_OUT') {
         dispatch(doCheckedOut(true));
       } else if (checkedOut === 'NOT_CHECKED_IN') {
         dispatch(doCheckedOut(false));
       } else {
-        const hrRate = roomChecked === 'GIRLS_ROOM' ? 12 : 10;
-        const fullDayRate = roomChecked === 'GIRLS_ROOM' ? 72 : 12;
+        const hrRate = roomChecked === 'GIRLS_ROOM' ? 15 : 10;
+        const fullDayRate = roomChecked === 'GIRLS_ROOM' ? 105 : 70;
 
         const getSheetValuesPrivateRoomRate = 'Func!A6';
         const privateRoomRate =
@@ -344,12 +383,13 @@ export const doCheckInOut =
           fullDayRate,
           roomChecked,
           privateRoomRate,
-          trainingRoomRate
+          trainingRoomRate,
+          invite
         );
         const getSheetValuesDurationRange = `Data!H${rowNumber}:K${rowNumber}`;
         const resData = await getSheetValues(getSheetValuesDurationRange);
         dispatch(doCalcDurationCost(resData));
-        if (membership === 'HOURS_MEMBERSHIP' && roomChecked === '') {
+        if (membership === 'HOURS_MEMBERSHIP' && roomChecked === 'NO') {
           const { approxDuration } = getState().user.durationCost;
           const remains = remainingHours - approxDuration;
           await executeValuesUpdateCheckOut({
@@ -357,7 +397,7 @@ export const doCheckInOut =
             range: `Clients!I${clientRowNumber}`,
           });
           dispatch(doCalcRemainingHours(remains));
-        } else if (membership === '10_DAYS' && roomChecked === '') {
+        } else if (membership === '10_DAYS' && roomChecked === 'NO') {
           const { remainingOfTenDays } = getState().user.valuesMatched;
           const remains = remainingOfTenDays - 1;
           await executeValuesUpdateCheckOut({
@@ -365,6 +405,25 @@ export const doCheckInOut =
             range: `Clients!J${clientRowNumber}`,
           });
           dispatch(doCalcRemainingOfTenDays(remains));
+        } else if (invite === 'EXISTS' && roomChecked === 'NO') {
+          await executeValuesUpdate(inviteByMobile);
+          const getSheetValuesMatchedRange = 'Func!C2:U2';
+          const valuesMatched = await getSheetValues(
+            getSheetValuesMatchedRange
+          );
+          dispatch({ type: INVITE_VALUES_MATCHED, payload: valuesMatched });
+          await executeValuesUpdate('');
+
+          const { invitations, clientRowNumber } =
+            getState().user.inviteValuesMatched;
+
+          const remains = invitations - 1;
+          await executeValuesUpdateCheckOut({
+            value: remains,
+            range: `Clients!L${clientRowNumber}`,
+          });
+
+          dispatch(doClearPrevInviteUserState());
         }
       }
     }

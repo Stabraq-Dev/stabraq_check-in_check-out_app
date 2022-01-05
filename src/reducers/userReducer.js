@@ -8,6 +8,9 @@ import {
   CHECK_IN_OUT_STATUS,
   CALC_REMAINING_HOURS,
   CALC_REMAINING_OF_TEN_DAYS,
+  INVITE_VALUES_MATCHED,
+  INVITE_NUMBER_EXISTS,
+  CLEAR_PREV_INVITE_USER_STATE,
 } from '../actions/types';
 
 const INITIAL_STATE = {
@@ -27,7 +30,33 @@ const INITIAL_STATE = {
     remainingOfTenDays: '',
     clientRowNumber: '',
     gender: '',
+    invitations: '',
     roomChecked: '',
+    invite: '',
+    inviteByMobile: '',
+    inviteByName: '',
+  },
+  inviteNumberExists: '',
+  inviteValuesMatched: {
+    mobileNumber: '',
+    userName: '',
+    eMailAddress: '',
+    membership: '',
+    expiryDate: '',
+    remainDays: '',
+    rowNumber: '',
+    checkedOut: '',
+    hoursPackage: '',
+    registrationDateTime: '',
+    remainingHours: '',
+    remainingOfTenDays: '',
+    clientRowNumber: '',
+    gender: '',
+    invitations: '',
+    roomChecked: '',
+    invite: '',
+    inviteByMobile: '',
+    inviteByName: '',
   },
   checkInOutStatus: '',
   checkInOut: {
@@ -56,7 +85,11 @@ let valuesMatchedKeys = [
   'remainingOfTenDays',
   'clientRowNumber',
   'gender',
+  'invitations',
   'roomChecked',
+  'invite',
+  'inviteByMobile',
+  'inviteByName',
 ];
 
 let durationCostKeys = ['duration', 'approxDuration', 'cost'];
@@ -71,8 +104,23 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         valuesMatched: mapArrayDataObject(action.payload, valuesMatchedKeys),
       };
+    case INVITE_NUMBER_EXISTS:
+      return { ...state, inviteNumberExists: action.payload };
+    case INVITE_VALUES_MATCHED:
+      return {
+        ...state,
+        inviteValuesMatched: mapArrayDataObject(
+          action.payload,
+          valuesMatchedKeys
+        ),
+      };
     case CLEAR_PREV_USER_STATE:
       return INITIAL_STATE;
+    case CLEAR_PREV_INVITE_USER_STATE:
+      return {
+        ...state,
+        inviteValuesMatched: INITIAL_STATE.inviteValuesMatched,
+      };
     case CALC_DURATION_COST:
       return {
         ...state,
