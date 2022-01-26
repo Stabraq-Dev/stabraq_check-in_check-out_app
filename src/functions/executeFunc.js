@@ -161,14 +161,14 @@ export const executeBatchUpdateDeleteSheet = async (sheetId) => {
   }
 };
 
-export const executeBatchUpdateCutPaste = async (destSheetId) => {
+export const executeBatchUpdateCopyPaste = async (destSheetId) => {
   try {
     await axiosAuth(SHEET_ID);
     const googleSheetsAPI = await axiosAuth(SHEET_ID);
     const response = await googleSheetsAPI.post(`${SHEET_ID}:batchUpdate`, {
       requests: [
         {
-          cutPaste: {
+          copyPaste: {
             source: {
               sheetId: global.config.source.sheetId,
             },
@@ -182,12 +182,12 @@ export const executeBatchUpdateCutPaste = async (destSheetId) => {
     });
 
     if (global.config.debuggingMode === 'TRUE') {
-      console.log('Response executeBatchUpdateCutPaste', response);
+      console.log('Response executeBatchUpdateCopyPaste', response);
     }
 
     return response;
   } catch (err) {
-    console.error('Execute error executeBatchUpdateCutPaste', err);
+    console.error('Execute error executeBatchUpdateCopyPaste', err);
   }
 };
 
@@ -257,33 +257,50 @@ export const executeBatchUpdateCopyToWorksheet = async (
   }
 };
 
+export const executeValuesBatchClear = async () => {
+  try {
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
+
+    const response = await googleSheetsAPI.post(
+      `${SHEET_ID}/values:batchClear`,
+      {
+        ranges: ['Data!A2:O2', 'Data!A4:O'],
+      }
+    );
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log('Response executeValuesBatchClear', response);
+    }
+
+    return response;
+  } catch (err) {
+    console.error('Execute error executeValuesBatchClear', err);
+  }
+};
+
 export const executeValuesAppendAddSheet = async () => {
   try {
     await axiosAuth(SHEET_ID);
     const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
-    const range = 'Data!A1';
+    const range = 'Data!A2';
     const valueInputOption = 'USER_ENTERED';
     const response = await googleSheetsAPI.post(
       `${SHEET_ID}/values/${range}:append`,
       {
         majorDimension: 'COLUMNS',
         values: [
-          ['Name'],
-          ['Mobile No.'],
-          ['E-Mail'],
-          ['Membership'],
-          ['Check In'],
-          ['CheckIn Time'],
-          ['CheckOut Time'],
-          ['Duration'],
-          ['Approx. Duration'],
-          ['Cost'],
-          ['Check Out'],
           [new Date().toLocaleDateString()],
-          ['Invitation'],
-          ['Invite By Mobile'],
-          ['Invite By Name'],
+          [''],
+          [''],
+          [''],
+          [''],
+          [''],
+          [''],
+          [''],
+          [''],
+          ['=SUM(J4:J)'],
         ],
       },
       { params: { valueInputOption: valueInputOption } }
@@ -382,7 +399,7 @@ export const executeValuesAppendCheckIn = async (
     await axiosAuth(SHEET_ID);
     const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
-    const range = 'Data!A2';
+    const range = 'Data!A4';
     const valueInputOption = 'USER_ENTERED';
     const response = await googleSheetsAPI.post(
       `${SHEET_ID}/values/${range}:append`,

@@ -26,7 +26,8 @@ import { doLoading, doShowMyModal, submitType } from './appActions';
 import {
   executeValuesUpdate,
   executeBatchUpdateAddSheet,
-  executeBatchUpdateCutPaste,
+  executeBatchUpdateCopyPaste,
+  executeValuesBatchClear,
   executeValuesAppendAddSheet,
   executeValuesAppendNewUserData,
   executeValuesAppendCheckIn,
@@ -121,7 +122,7 @@ export const doCalcRemainingOfTenDays = (remains) => {
 };
 
 export const doCreateNewSheet = () => async (dispatch, getState) => {
-  const getSheetValuesSheetDateRange = 'Data!L1';
+  const getSheetValuesSheetDateRange = 'Data!A2';
   const sheetDate = await getSheetValues(getSheetValuesSheetDateRange);
   dispatch({ type: SHEET_DATE, payload: sheetDate[0] });
 
@@ -135,7 +136,8 @@ export const doCreateNewSheet = () => async (dispatch, getState) => {
     const errorNewSheetId = getState().app.error;
     if (errorNewSheetId.code === 400) return;
     await dispatch({ type: NEW_SHEET_ID, payload: newSheetId });
-    await executeBatchUpdateCutPaste(newSheetId);
+    await executeBatchUpdateCopyPaste(newSheetId);
+    await executeValuesBatchClear();
     await executeValuesAppendAddSheet();
     const getSheetValuesCurrMonthWorkSheet = 'Func!A12';
     const destWorkSheetId = await getSheetValues(
