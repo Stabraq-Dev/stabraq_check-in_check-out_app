@@ -69,3 +69,17 @@ export const getByValue = async (arr, value) => {
 
   return result ? result : null; // or undefined
 };
+
+export const getData = async (arr, keyToGet) => {
+  let result = [];
+
+  arr.forEach((element) => {
+    Object.entries(element).forEach(([key, value]) => {
+      if (key === keyToGet) {
+        result.push(value);
+      }
+    });
+  });
+
+  return result.flat().map((item) => (item.length <= 0 ? '' : item)).flat();
+};

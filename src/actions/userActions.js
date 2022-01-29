@@ -40,6 +40,7 @@ import {
   executeAddNewWorkSheet,
   executeBatchUpdateSheetPropertiesRenameSheet,
   executeChangeWorkSheetPermission,
+  getSheetValuesBatchGet,
 } from '../functions/executeFunc';
 
 import history from '../history';
@@ -49,6 +50,16 @@ import {
   checkMonthDiff,
   getByValue,
 } from '../functions/helperFunc';
+
+import {
+  CURR_MONTH_WORKSHEET_RANGE,
+  DATA_SHEET_DATE_RANGE,
+  LAST_BLANK_ROW_RANGE,
+  NUMBER_EXISTS_RANGE,
+  PRIVATE_ROOM_RATE_RANGE,
+  TRAINING_ROOM_RATE_RANGE,
+  VALUES_MATCHED_RANGES,
+} from '../ranges';
 
 export const doCheckedIn = (checkedInStatus) => {
   return {
@@ -122,8 +133,7 @@ export const doCalcRemainingOfTenDays = (remains) => {
 };
 
 export const doCreateNewSheet = () => async (dispatch, getState) => {
-  const getSheetValuesSheetDateRange = 'Data!A2';
-  const sheetDate = await getSheetValues(getSheetValuesSheetDateRange);
+  const sheetDate = await getSheetValues(DATA_SHEET_DATE_RANGE);
   dispatch({ type: SHEET_DATE, payload: sheetDate[0] });
 
   const dateOne = sheetDate[0];
@@ -139,10 +149,8 @@ export const doCreateNewSheet = () => async (dispatch, getState) => {
     await executeBatchUpdateCopyPaste(newSheetId);
     await executeValuesBatchClear();
     await executeValuesAppendAddSheet();
-    const getSheetValuesCurrMonthWorkSheet = 'Func!A12';
-    const destWorkSheetId = await getSheetValues(
-      getSheetValuesCurrMonthWorkSheet
-    );
+
+    const destWorkSheetId = await getSheetValues(CURR_MONTH_WORKSHEET_RANGE);
 
     const resCopyToWorksheet = await executeBatchUpdateCopyToWorksheet(
       newSheetId,
@@ -176,7 +184,7 @@ export const doCreateNewSheet = () => async (dispatch, getState) => {
     await executeChangeWorkSheetPermission(newWorkSheetId);
     await executeValuesUpdateCheckOut({
       value: newWorkSheetId,
-      range: 'Func!A12',
+      range: CURR_MONTH_WORKSHEET_RANGE,
     });
   }
 };
@@ -223,13 +231,11 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
   const res = await executeValuesUpdate(mobile);
   dispatch(doCheckResponse(res));
 
-  const getSheetValuesNumberExistsRange = 'Func!B2';
-  const numberExists = await getSheetValues(getSheetValuesNumberExistsRange);
+  const numberExists = await getSheetValues(NUMBER_EXISTS_RANGE);
   dispatch({ type: NUMBER_EXISTS, payload: numberExists[0] });
 
   if (numberExists[0] === 'EXISTS') {
-    const getSheetValuesMatchedRange = 'Func!C2:U2';
-    const valuesMatched = await getSheetValues(getSheetValuesMatchedRange);
+    const valuesMatched = await getSheetValuesBatchGet(VALUES_MATCHED_RANGES);
     dispatch({ type: VALUES_MATCHED, payload: valuesMatched });
   }
 
@@ -253,13 +259,11 @@ export const doCheckByMobile = (mobile) => async (dispatch, getState) => {
   dispatch(doCheckResponse(res));
 
   dispatch({ type: INVITE_NUMBER_EXISTS, payload: '' });
-  const getSheetValuesNumberExistsRange = 'Func!B2';
-  const numberExists = await getSheetValues(getSheetValuesNumberExistsRange);
+  const numberExists = await getSheetValues(NUMBER_EXISTS_RANGE);
   dispatch({ type: INVITE_NUMBER_EXISTS, payload: numberExists[0] });
 
   if (numberExists[0] === 'EXISTS') {
-    const getSheetValuesMatchedRange = 'Func!C2:U2';
-    const valuesMatched = await getSheetValues(getSheetValuesMatchedRange);
+    const valuesMatched = await getSheetValuesBatchGet(VALUES_MATCHED_RANGES);
     dispatch({ type: INVITE_VALUES_MATCHED, payload: valuesMatched });
   }
 
@@ -287,14 +291,10 @@ export const doOnNewUserFormSubmit =
     const resUpdate = await executeValuesUpdate(formValues.mobile);
     dispatch(doCheckResponse(resUpdate));
 
-    const getSheetValuesNumberExistsRange = 'Func!B2';
-    const numberExists = await getSheetValues(getSheetValuesNumberExistsRange);
+    const numberExists = await getSheetValues(NUMBER_EXISTS_RANGE);
 
     if (numberExists[0] === 'NOT_EXISTS') {
-      const getSheetValuesLastBlankRowRange = 'Func!A4';
-      const lastBlankRow = await getSheetValues(
-        getSheetValuesLastBlankRowRange
-      );
+      const lastBlankRow = await getSheetValues(LAST_BLANK_ROW_RANGE);
       const resAppend = await executeValuesAppendNewUserData(
         formValues,
         lastBlankRow
@@ -367,15 +367,14 @@ export const doCheckInOut =
         const hrRate = roomChecked === 'GIRLS_ROOM' ? 15 : 10;
         const fullDayRate = roomChecked === 'GIRLS_ROOM' ? 105 : 70;
 
-        const getSheetValuesPrivateRoomRate = 'Func!A6';
         const privateRoomRate =
           roomChecked === 'PRIVATE_ROOM'
-            ? await getSheetValues(getSheetValuesPrivateRoomRate)
+            ? await getSheetValues(PRIVATE_ROOM_RATE_RANGE)
             : '';
-        const getSheetValuesTrainingRoomRate = 'Func!A8';
+
         const trainingRoomRate =
           roomChecked === 'TRAINING_ROOM'
-            ? await getSheetValues(getSheetValuesTrainingRoomRate)
+            ? await getSheetValues(TRAINING_ROOM_RATE_RANGE)
             : '';
 
         await executeValuesAppendCheckOut(
@@ -409,9 +408,8 @@ export const doCheckInOut =
           dispatch(doCalcRemainingOfTenDays(remains));
         } else if (invite === 'EXISTS' && roomChecked === 'NO') {
           await executeValuesUpdate(inviteByMobile);
-          const getSheetValuesMatchedRange = 'Func!C2:U2';
-          const valuesMatched = await getSheetValues(
-            getSheetValuesMatchedRange
+          const valuesMatched = await getSheetValuesBatchGet(
+            VALUES_MATCHED_RANGES
           );
           dispatch({ type: INVITE_VALUES_MATCHED, payload: valuesMatched });
           await executeValuesUpdate('');

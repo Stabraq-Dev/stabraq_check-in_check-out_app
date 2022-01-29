@@ -1,7 +1,14 @@
 import { authInstance, loadClient, loadClientForDrive } from '../api/auth';
 import { axiosAuth } from '../api/googleSheetsAPI';
-import { changeDateFormat } from '../functions/helperFunc';
+import { changeDateFormat, getData } from '../functions/helperFunc';
 import '../config';
+import qs from 'qs';
+import {
+  CLIENTS_SHEET_APPEND_RANGE,
+  DATA_SHEET_APPEND_RANGE,
+  DATA_SHEET_BATCH_CLEAR_RANGES,
+  DATA_SHEET_DATE_RANGE,
+} from '../ranges';
 
 const SHEET_ID = process.env.REACT_APP_SHEET_ID;
 const AUTH_SHEET_ID = process.env.REACT_APP_AUTH_SHEET_ID;
@@ -265,7 +272,7 @@ export const executeValuesBatchClear = async () => {
     const response = await googleSheetsAPI.post(
       `${SHEET_ID}/values:batchClear`,
       {
-        ranges: ['Data!A2:O2', 'Data!A4:O'],
+        ranges: DATA_SHEET_BATCH_CLEAR_RANGES,
       }
     );
 
@@ -284,7 +291,7 @@ export const executeValuesAppendAddSheet = async () => {
     await axiosAuth(SHEET_ID);
     const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
-    const range = 'Data!A2';
+    const range = DATA_SHEET_DATE_RANGE;
     const valueInputOption = 'USER_ENTERED';
     const response = await googleSheetsAPI.post(
       `${SHEET_ID}/values/${range}:append`,
@@ -331,7 +338,7 @@ export const executeValuesAppendNewUserData = async (
     };
     const { mobile, username, email, membership, hoursPackages, gender } =
       formValues;
-    const range = 'Clients!A3';
+    const range = CLIENTS_SHEET_APPEND_RANGE;
     const valueInputOption = 'USER_ENTERED';
     const response = await googleSheetsAPI.post(
       `${SHEET_ID}/values/${range}:append`,
@@ -359,7 +366,6 @@ export const executeValuesAppendNewUserData = async (
           [new Date().toLocaleString()],
           [membership === 'HOURS_MEMBERSHIP' ? hoursPackages : ''],
           [membership === '10_DAYS' ? 10 : ''],
-          [gender],
           [
             membership === 'GREEN'
               ? 3
@@ -369,6 +375,7 @@ export const executeValuesAppendNewUserData = async (
               ? 7
               : '',
           ],
+          [gender],
         ],
       },
       { params: { valueInputOption: valueInputOption } }
@@ -399,7 +406,7 @@ export const executeValuesAppendCheckIn = async (
     await axiosAuth(SHEET_ID);
     const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
-    const range = 'Data!A4';
+    const range = DATA_SHEET_APPEND_RANGE;
     const valueInputOption = 'USER_ENTERED';
     const response = await googleSheetsAPI.post(
       `${SHEET_ID}/values/${range}:append`,
@@ -502,6 +509,31 @@ export const getSheetValues = async (range) => {
     return response.data.values[0];
   } catch (err) {
     console.error('Execute error getSheetValues', err);
+  }
+};
+
+export const getSheetValuesBatchGet = async (ranges) => {
+  try {
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
+
+    const response = await googleSheetsAPI.get(`${SHEET_ID}/values:batchGet`, {
+      params: {
+        majorDimension: 'COLUMNS',
+        ranges: ranges,
+      },
+      paramsSerializer: (params) =>
+        qs.stringify(params, { arrayFormat: 'repeat' }),
+    });
+
+    const finalRes = await getData(response.data.valueRanges, 'values');
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log('Response getSheetValuesBatchGet', ranges, finalRes);
+    }
+
+    return finalRes;
+  } catch (err) {
+    console.error('Execute error getSheetValuesBatchGet', err);
   }
 };
 
