@@ -375,6 +375,7 @@ export const executeValuesAppendNewUserData = async (
               ? 7
               : '',
           ],
+          [],
           [gender],
         ],
       },

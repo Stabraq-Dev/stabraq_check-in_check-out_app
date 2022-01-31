@@ -325,7 +325,13 @@ export const doOnNewUserFormSubmit =
  */
 
 export const doCheckInOut =
-  (checkInOutStatus, roomChecked, inviteNumberExists, invitationByMobileUser) =>
+  (
+    checkInOutStatus,
+    roomChecked,
+    inviteNumberExists,
+    invitationByMobileUser,
+    ratingValue
+  ) =>
   async (dispatch, getState) => {
     if (!navigator.onLine) return;
     dispatch(submitType(ON_CHECK_IN_OUT_SUBMIT));
@@ -371,10 +377,14 @@ export const doCheckInOut =
         const hrRate =
           roomChecked === 'GIRLS_ROOM'
             ? await getSheetValues(GIRLS_HR_RATE_RANGE)
+            : roomChecked === 'PRIVATE_ROOM' || roomChecked === 'TRAINING_ROOM'
+            ? ''
             : await getSheetValues(SHARED_HR_RATE_RANGE);
         const fullDayRate =
           roomChecked === 'GIRLS_ROOM'
             ? await getSheetValues(GIRLS_FULL_DAY_RATE_RANGE)
+            : roomChecked === 'PRIVATE_ROOM' || roomChecked === 'TRAINING_ROOM'
+            ? ''
             : await getSheetValues(SHARED_FULL_DAY_RATE_RANGE);
 
         const privateRoomRate =
@@ -430,11 +440,16 @@ export const doCheckInOut =
           const remains = invitations - 1;
           await executeValuesUpdateCheckOut({
             value: remains,
-            range: `Clients!L${clientRowNumber}`,
+            range: `Clients!K${clientRowNumber}`,
           });
 
           dispatch(doClearPrevInviteUserState());
         }
+
+        await executeValuesUpdateCheckOut({
+          value: ratingValue,
+          range: `Clients!L${clientRowNumber}`,
+        });
       }
     }
     dispatch(doLoading(false));

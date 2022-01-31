@@ -5,6 +5,22 @@ import { checkForMobNum } from '../functions/validation';
 import history from '../history';
 import InputMobile from './InputMobile';
 import LoadingSpinner from './LoadingSpinner';
+import { Rating } from 'react-simple-star-rating';
+import {
+  MdSentimentVeryDissatisfied,
+  MdSentimentDissatisfied,
+  MdSentimentNeutral,
+  MdSentimentSatisfiedAlt,
+  MdSentimentVerySatisfied,
+} from 'react-icons/md';
+
+const customIcons = [
+  { icon: <MdSentimentVeryDissatisfied size={50} /> },
+  { icon: <MdSentimentDissatisfied size={50} /> },
+  { icon: <MdSentimentNeutral size={50} /> },
+  { icon: <MdSentimentSatisfiedAlt size={50} /> },
+  { icon: <MdSentimentVerySatisfied size={50} /> },
+];
 
 class CheckInOut extends React.Component {
   state = {
@@ -18,6 +34,7 @@ class CheckInOut extends React.Component {
     inviteUserName: '',
     invitationByMobileManual: '',
     invitationByUserNameManual: '',
+    ratingValue: 0,
   };
 
   componentDidMount() {
@@ -56,11 +73,17 @@ class CheckInOut extends React.Component {
           inviteByName: '',
         };
 
+    const ratingValue =
+      this.state.ratingValue === 0 && this.props.rating > 0
+        ? this.props.rating
+        : this.state.ratingValue;
+
     this.props.doCheckInOut(
       event.target.value,
       roomChecked,
       inviteNumberExists,
-      invitationByMobileUser
+      invitationByMobileUser,
+      ratingValue
     );
   };
 
@@ -255,6 +278,26 @@ class CheckInOut extends React.Component {
       );
   };
 
+  handleRating = (rate) => {
+    this.setState({ ratingValue: rate / 20 });
+  };
+
+  renderRating = () => {
+    if (this.props.checkedOut === 'NOT_CHECKED_OUT')
+      return (
+        <div className='text-center'>
+          <Rating
+            customIcons={customIcons}
+            onClick={this.handleRating}
+            showTooltip
+            fillColor='#3adb6b'
+            ratingValue={this.state.ratingValue * 20}
+            initialValue={this.props.rating}
+          />
+        </div>
+      );
+  };
+
   checkForErrors = async (mobile) => {
     this.setState({ errorMessage: await checkForMobNum(mobile) });
   };
@@ -297,6 +340,7 @@ class CheckInOut extends React.Component {
           {this.renderInvitationButton()}
           {this.renderInvitationCheckByMobile()}
           {this.renderInvitationByMobileManual()}
+          {this.renderRating()}
         </div>
         <button
           className='ui primary button stabraq-bg me-3 mt-1'
@@ -325,7 +369,7 @@ class CheckInOut extends React.Component {
 
 const mapStateToProps = (state) => {
   const { loading, mobileNumber, showCheckInOut } = state.app;
-  const { gender, membership, checkedOut } = state.user.valuesMatched;
+  const { gender, membership, checkedOut, rating } = state.user.valuesMatched;
   const { inviteNumberExists } = state.user;
   const { userName } = state.user.inviteValuesMatched;
   return {
@@ -335,6 +379,7 @@ const mapStateToProps = (state) => {
     gender,
     membership,
     checkedOut,
+    rating,
     inviteNumberExists,
     userName,
   };
