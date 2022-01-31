@@ -54,9 +54,13 @@ import {
 import {
   CURR_MONTH_WORKSHEET_RANGE,
   DATA_SHEET_DATE_RANGE,
+  GIRLS_FULL_DAY_RATE_RANGE,
+  GIRLS_HR_RATE_RANGE,
   LAST_BLANK_ROW_RANGE,
   NUMBER_EXISTS_RANGE,
   PRIVATE_ROOM_RATE_RANGE,
+  SHARED_FULL_DAY_RATE_RANGE,
+  SHARED_HR_RATE_RANGE,
   TRAINING_ROOM_RATE_RANGE,
   VALUES_MATCHED_RANGES,
 } from '../ranges';
@@ -364,8 +368,14 @@ export const doCheckInOut =
       } else if (checkedOut === 'NOT_CHECKED_IN') {
         dispatch(doCheckedOut(false));
       } else {
-        const hrRate = roomChecked === 'GIRLS_ROOM' ? 15 : 10;
-        const fullDayRate = roomChecked === 'GIRLS_ROOM' ? 105 : 70;
+        const hrRate =
+          roomChecked === 'GIRLS_ROOM'
+            ? await getSheetValues(GIRLS_HR_RATE_RANGE)
+            : await getSheetValues(SHARED_HR_RATE_RANGE);
+        const fullDayRate =
+          roomChecked === 'GIRLS_ROOM'
+            ? await getSheetValues(GIRLS_FULL_DAY_RATE_RANGE)
+            : await getSheetValues(SHARED_FULL_DAY_RATE_RANGE);
 
         const privateRoomRate =
           roomChecked === 'PRIVATE_ROOM'
