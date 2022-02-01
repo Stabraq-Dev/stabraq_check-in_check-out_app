@@ -413,7 +413,8 @@ export const executeValuesAppendNewUserData = async (
 export const executeValuesAppendUserComment = async (
   mobile,
   username,
-  comment
+  comment,
+  ratingValue
 ) => {
   try {
     await axiosAuth(SHEET_ID);
@@ -430,6 +431,7 @@ export const executeValuesAppendUserComment = async (
           [username],
           [new Date().toLocaleDateString('en-US')],
           [comment],
+          [ratingValue],
         ],
       },
       { params: { valueInputOption: valueInputOption } }

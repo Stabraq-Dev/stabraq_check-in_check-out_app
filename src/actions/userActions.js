@@ -456,7 +456,8 @@ export const doCheckInOut =
           await executeValuesAppendUserComment(
             mobileNumber,
             userName,
-            commentText
+            commentText,
+            ratingValue
           );
         }
       }
