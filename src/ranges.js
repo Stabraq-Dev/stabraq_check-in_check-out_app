@@ -14,3 +14,6 @@ export const CURR_MONTH_WORKSHEET_RANGE = 'Func!A12';
 
 /* CLIENTS */
 export const CLIENTS_SHEET_APPEND_RANGE = 'Clients!A3';
+
+/* COMMENTS */
+export const COMMENTS_SHEET_APPEND_RANGE = 'Comments!A2';

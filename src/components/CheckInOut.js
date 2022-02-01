@@ -35,6 +35,7 @@ class CheckInOut extends React.Component {
     invitationByMobileManual: '',
     invitationByUserNameManual: '',
     ratingValue: 0,
+    commentText: '',
   };
 
   componentDidMount() {
@@ -83,7 +84,8 @@ class CheckInOut extends React.Component {
       roomChecked,
       inviteNumberExists,
       invitationByMobileUser,
-      ratingValue
+      ratingValue,
+      this.state.commentText
     );
   };
 
@@ -305,6 +307,22 @@ class CheckInOut extends React.Component {
       );
   };
 
+  renderCommentSection = () => {
+    if (this.props.checkedOut === 'NOT_CHECKED_OUT')
+      return (
+        <div className='text-center'>
+          <textarea
+            name='comment'
+            id='comment'
+            cols='60'
+            rows='3'
+            placeholder='Write comment'
+            onChange={this.handleChangeComment}
+          ></textarea>
+        </div>
+      );
+  };
+
   checkForErrors = async (mobile) => {
     this.setState({ errorMessage: await checkForMobNum(mobile) });
   };
@@ -333,6 +351,11 @@ class CheckInOut extends React.Component {
     await this.setState({ invitationByUserNameManual: userName });
   };
 
+  handleChangeComment = async ({ target }) => {
+    const comment = target.value;
+    this.setState({ commentText: comment });
+  };
+
   render() {
     if (this.props.loading) {
       return <LoadingSpinner />;
@@ -348,6 +371,7 @@ class CheckInOut extends React.Component {
           {this.renderInvitationCheckByMobile()}
           {this.renderInvitationByMobileManual()}
           {this.renderRating()}
+          {this.renderCommentSection()}
         </div>
         <button
           className='ui primary button stabraq-bg me-3 mt-1'

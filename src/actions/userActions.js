@@ -42,6 +42,7 @@ import {
   executeBatchUpdateSheetPropertiesRenameSheet,
   executeChangeWorkSheetPermission,
   getSheetValuesBatchGet,
+  executeValuesAppendUserComment,
 } from '../functions/executeFunc';
 
 import history from '../history';
@@ -332,7 +333,8 @@ export const doCheckInOut =
     roomChecked,
     inviteNumberExists,
     invitationByMobileUser,
-    ratingValue
+    ratingValue,
+    commentText
   ) =>
   async (dispatch, getState) => {
     if (!navigator.onLine) return;
@@ -448,6 +450,15 @@ export const doCheckInOut =
           value: ratingValue,
           range: `Clients!L${clientRowNumber}`,
         });
+
+        if (commentText) {
+          const { mobileNumber } = getState().user.valuesMatched;
+          await executeValuesAppendUserComment(
+            mobileNumber,
+            userName,
+            commentText
+          );
+        }
       }
     }
     dispatch(doLoading(false));

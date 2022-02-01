@@ -5,6 +5,7 @@ import '../config';
 import qs from 'qs';
 import {
   CLIENTS_SHEET_APPEND_RANGE,
+  COMMENTS_SHEET_APPEND_RANGE,
   DATA_SHEET_APPEND_RANGE,
   DATA_SHEET_BATCH_CLEAR_RANGES,
   DATA_SHEET_DATE_RANGE,
@@ -389,6 +390,42 @@ export const executeValuesAppendNewUserData = async (
     return response;
   } catch (err) {
     console.error('Execute error executeValuesAppendNewUserData', err);
+    return err;
+  }
+};
+
+export const executeValuesAppendUserComment = async (
+  mobile,
+  username,
+  comment
+) => {
+  try {
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
+
+    const range = COMMENTS_SHEET_APPEND_RANGE;
+    const valueInputOption = 'USER_ENTERED';
+    const response = await googleSheetsAPI.post(
+      `${SHEET_ID}/values/${range}:append`,
+      {
+        majorDimension: 'COLUMNS',
+        values: [
+          [`'${mobile}`],
+          [username],
+          [new Date().toLocaleDateString('en-US')],
+          [comment],
+        ],
+      },
+      { params: { valueInputOption: valueInputOption } }
+    );
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log('Response executeValuesAppendUserComment', response);
+    }
+
+    return response;
+  } catch (err) {
+    console.error('Execute error executeValuesAppendUserComment', err);
     return err;
   }
 };
