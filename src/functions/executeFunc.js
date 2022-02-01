@@ -26,7 +26,6 @@ export const executeValuesUpdate = async (val) => {
     const response = await googleSheetsAPI.put(
       `${SHEET_ID}/values/${range}`,
       {
-        // majorDimension: 'COLUMNS',
         values: [[`'${val}`]],
       },
       { params: { valueInputOption: valueInputOption } }
@@ -87,7 +86,7 @@ export const executeValuesUpdateAdminAuth = async (
         values: [
           [inputUserName],
           [inputPassword],
-          [new Date().toLocaleString().replace(',', '')],
+          [new Date().toLocaleString('en-US').replace(',', '')],
         ],
       },
       { params: { valueInputOption: valueInputOption } }
@@ -299,7 +298,7 @@ export const executeValuesAppendAddSheet = async () => {
       {
         majorDimension: 'COLUMNS',
         values: [
-          [new Date().toLocaleDateString()],
+          [new Date().toLocaleDateString('en-US')],
           [''],
           [''],
           [''],
@@ -335,10 +334,45 @@ export const executeValuesAppendNewUserData = async (
     const getExpiryDate = (days) => {
       let expiry_date = new Date();
       expiry_date.setDate(expiry_date.getDate() + days);
-      return expiry_date.toLocaleDateString();
+      return expiry_date.toLocaleDateString('en-US');
     };
-    const { mobile, username, email, membership, hoursPackages, gender } =
-      formValues;
+
+    const {
+      mobile,
+      username,
+      email,
+      membership,
+      hoursPackages,
+      gender,
+      offers,
+    } = formValues;
+
+    const expiryDate =
+      membership === 'HOURS_MEMBERSHIP'
+        ? getExpiryDate(90)
+        : membership === 'NOT_MEMBER'
+        ? ''
+        : getExpiryDate(30);
+
+    const remainDays =
+      membership === 'NOT_MEMBER'
+        ? ''
+        : `=IF(E${lastBlankRow}>TODAY(),DATEDIF(TODAY(),E${lastBlankRow},"d"),(-1*DATEDIF(E${lastBlankRow},TODAY(),"d")))`;
+
+    const remainingHours =
+      membership === 'HOURS_MEMBERSHIP' ? hoursPackages : '';
+
+    const remainingOfTenDays = membership === '10_DAYS' ? 10 : '';
+
+    const invitations =
+      membership === 'GREEN'
+        ? 3
+        : membership === 'ORANGE'
+        ? 5
+        : membership === 'BUSINESS'
+        ? 7
+        : '';
+
     const range = CLIENTS_SHEET_APPEND_RANGE;
     const valueInputOption = 'USER_ENTERED';
     const response = await googleSheetsAPI.post(
@@ -346,38 +380,20 @@ export const executeValuesAppendNewUserData = async (
       {
         majorDimension: 'COLUMNS',
         values: [
-          // [new Date().toLocaleString()],
           [`'${mobile}`],
           [username],
           [email],
           [membership],
-          [
-            membership === 'HOURS_MEMBERSHIP'
-              ? getExpiryDate(90)
-              : membership === 'NOT_MEMBER'
-              ? ''
-              : getExpiryDate(30),
-          ],
-          [
-            membership === 'NOT_MEMBER'
-              ? ''
-              : `=IF(E${lastBlankRow}>TODAY(),DATEDIF(TODAY(),E${lastBlankRow},"d"),(-1*DATEDIF(E${lastBlankRow},TODAY(),"d")))`,
-          ],
+          [expiryDate],
+          [remainDays],
           [hoursPackages],
-          [new Date().toLocaleString()],
-          [membership === 'HOURS_MEMBERSHIP' ? hoursPackages : ''],
-          [membership === '10_DAYS' ? 10 : ''],
-          [
-            membership === 'GREEN'
-              ? 3
-              : membership === 'ORANGE'
-              ? 5
-              : membership === 'BUSINESS'
-              ? 7
-              : '',
-          ],
+          [new Date().toLocaleString('en-US')],
+          [remainingHours],
+          [remainingOfTenDays],
+          [invitations],
           [],
           [gender],
+          [offers],
         ],
       },
       { params: { valueInputOption: valueInputOption } }
@@ -495,6 +511,22 @@ export const executeValuesAppendCheckOut = async (
     await axiosAuth(SHEET_ID);
     const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
+    const duration = `=TEXT(G${rowNumber}-F${rowNumber},"h:mm")`;
+
+    const approxDuration =
+      roomChecked === 'PRIVATE_ROOM' || roomChecked === 'TRAINING_ROOM'
+        ? `=IF(OR(AND(H${rowNumber}*24-INT(H${rowNumber}*24)<=0.1),AND(H${rowNumber}*24-INT(H${rowNumber}*24)>0.5,H${rowNumber}*24-INT(H${rowNumber}*24)<=0.59)),FLOOR(H${rowNumber},"00:30")*24,CEILING(H${rowNumber},"00:30")*24)`
+        : `=IF(H${rowNumber}*24<1,1,IF(OR(AND(H${rowNumber}*24-INT(H${rowNumber}*24)<=0.1),AND(H${rowNumber}*24-INT(H${rowNumber}*24)>0.5,H${rowNumber}*24-INT(H${rowNumber}*24)<=0.59)),FLOOR(H${rowNumber},"00:30")*24,CEILING(H${rowNumber},"00:30")*24))`;
+
+    const cost =
+      roomChecked === 'PRIVATE_ROOM'
+        ? `=I${rowNumber}*${privateRoomRate}`
+        : roomChecked === 'TRAINING_ROOM'
+        ? `=I${rowNumber}*${trainingRoomRate}`
+        : membership === 'NOT_MEMBER' && invite === 'NO'
+        ? `=IF(I${rowNumber}>=7,${fullDayRate},I${rowNumber}*${hrRate})`
+        : '';
+
     const range = `Data!G${rowNumber}`;
     const valueInputOption = 'USER_ENTERED';
     const response = await googleSheetsAPI.post(
@@ -503,21 +535,9 @@ export const executeValuesAppendCheckOut = async (
         majorDimension: 'COLUMNS',
         values: [
           [new Date().toLocaleTimeString('en-US')],
-          [`=TEXT(G${rowNumber}-F${rowNumber},"h:mm")`],
-          [
-            roomChecked === 'PRIVATE_ROOM' || roomChecked === 'TRAINING_ROOM'
-              ? `=IF(OR(AND(H${rowNumber}*24-INT(H${rowNumber}*24)<=0.1),AND(H${rowNumber}*24-INT(H${rowNumber}*24)>0.5,H${rowNumber}*24-INT(H${rowNumber}*24)<=0.59)),FLOOR(H${rowNumber},"00:30")*24,CEILING(H${rowNumber},"00:30")*24)`
-              : `=IF(H${rowNumber}*24<1,1,IF(OR(AND(H${rowNumber}*24-INT(H${rowNumber}*24)<=0.1),AND(H${rowNumber}*24-INT(H${rowNumber}*24)>0.5,H${rowNumber}*24-INT(H${rowNumber}*24)<=0.59)),FLOOR(H${rowNumber},"00:30")*24,CEILING(H${rowNumber},"00:30")*24))`,
-          ],
-          [
-            roomChecked === 'PRIVATE_ROOM'
-              ? `=I${rowNumber}*${privateRoomRate}`
-              : roomChecked === 'TRAINING_ROOM'
-              ? `=I${rowNumber}*${trainingRoomRate}`
-              : membership === 'NOT_MEMBER' && invite === 'NO'
-              ? `=IF(I${rowNumber}>=7,${fullDayRate},I${rowNumber}*${hrRate})`
-              : '',
-          ],
+          [duration],
+          [approxDuration],
+          [cost],
           ['CHECKED_OUT'],
         ],
       },

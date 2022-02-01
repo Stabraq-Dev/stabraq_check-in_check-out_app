@@ -84,7 +84,7 @@ const NewUserForm = ({
                 value={o.value}
                 className='btn-check ms-1'
                 id={o.value}
-                autoComplete="off"
+                autoComplete='off'
               />
               <label className='btn btn-outline-stabraq' htmlFor={o.value}>
                 {o.label}
@@ -116,6 +116,15 @@ const NewUserForm = ({
         <i className='chevron circle right icon me-1' />
         Submit
       </button>
+    );
+  };
+
+  const renderOffersCheckbox = ({ input, label }) => {
+    return (
+      <div className='form-check form-check-inline me-3'>
+        <input className='form-check-input m-2 p-3' {...input} />
+        <label className='form-check-label mt-1 p-2'>{label}</label>
+      </div>
     );
   };
 
@@ -228,7 +237,12 @@ const NewUserForm = ({
               ]}
             ></Field>
           )}
-
+          <Field
+            name='offers'
+            label='Yes, I wish to receive offers from Stabraq'
+            type='checkbox'
+            component={renderOffersCheckbox}
+          />
           <div className='mt-3 text-center'>{renderSubmitButton()}</div>
         </form>
       )}
