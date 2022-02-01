@@ -11,6 +11,7 @@ import {
   INVITE_VALUES_MATCHED,
   INVITE_NUMBER_EXISTS,
   CLEAR_PREV_INVITE_USER_STATE,
+  HOURS_DAILY_RATES,
 } from '../actions/types';
 
 const valuesMatchedObj = {
@@ -51,6 +52,14 @@ const INITIAL_STATE = {
     approxDuration: '',
     cost: '',
   },
+  hoursDailyRates: {
+    trainingRoomRate: '',
+    privateRoomRate: '',
+    sharedHourRate: '',
+    sharedFullDayRate: '',
+    girlsHourRate: '',
+    girlsFullDayRate: '',
+  },
 };
 
 let valuesMatchedKeys = [
@@ -77,6 +86,14 @@ let valuesMatchedKeys = [
 ];
 
 let durationCostKeys = ['duration', 'approxDuration', 'cost'];
+let hoursDailyRatesKeys = [
+  'trainingRoomRate',
+  'privateRoomRate',
+  'sharedHourRate',
+  'sharedFullDayRate',
+  'girlsHourRate',
+  'girlsFullDayRate',
+];
 
 /* eslint import/no-anonymous-default-export: [2, {"allowArrowFunction": true}] */
 export default (state = INITIAL_STATE, action) => {
@@ -138,6 +155,14 @@ export default (state = INITIAL_STATE, action) => {
           state.valuesMatched,
           action.payload,
           'remainingOfTenDays'
+        ),
+      };
+    case HOURS_DAILY_RATES:
+      return {
+        ...state,
+        hoursDailyRates: mapArrayDataObject(
+          action.payload,
+          hoursDailyRatesKeys
         ),
       };
     default:

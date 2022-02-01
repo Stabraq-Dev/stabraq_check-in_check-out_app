@@ -19,6 +19,7 @@ import {
   INVITE_VALUES_MATCHED,
   INVITE_NUMBER_EXISTS,
   CLEAR_PREV_INVITE_USER_STATE,
+  HOURS_DAILY_RATES,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -54,14 +55,9 @@ import {
 import {
   CURR_MONTH_WORKSHEET_RANGE,
   DATA_SHEET_DATE_RANGE,
-  GIRLS_FULL_DAY_RATE_RANGE,
-  GIRLS_HR_RATE_RANGE,
+  HOURS_DAILY_RATES_RANGE,
   LAST_BLANK_ROW_RANGE,
   NUMBER_EXISTS_RANGE,
-  PRIVATE_ROOM_RATE_RANGE,
-  SHARED_FULL_DAY_RATE_RANGE,
-  SHARED_HR_RATE_RANGE,
-  TRAINING_ROOM_RATE_RANGE,
   VALUES_MATCHED_RANGES,
 } from '../ranges';
 
@@ -134,6 +130,10 @@ export const doCalcRemainingOfTenDays = (remains) => {
     type: CALC_REMAINING_OF_TEN_DAYS,
     payload: remains,
   };
+};
+export const doGetHoursDailyRates = () => async (dispatch) => {
+  const hoursDailyRates = await getSheetValues(HOURS_DAILY_RATES_RANGE);
+  dispatch({ type: HOURS_DAILY_RATES, payload: hoursDailyRates });
 };
 
 export const doCreateNewSheet = () => async (dispatch, getState) => {
@@ -244,6 +244,8 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
   }
 
   await executeValuesUpdate('');
+
+  await dispatch(doGetHoursDailyRates());
 
   dispatch(doLoading(false));
   dispatch(doShowCheckInOut(true));
@@ -369,33 +371,29 @@ export const doCheckInOut =
         invite,
         inviteByMobile,
       } = getState().user.valuesMatched;
+      const {
+        trainingRoomRate,
+        privateRoomRate,
+        sharedHourRate,
+        sharedFullDayRate,
+        girlsHourRate,
+        girlsFullDayRate,
+      } = getState().user.hoursDailyRates;
       if (checkedOut === 'CHECKED_OUT') {
         dispatch(doCheckedOut(true));
       } else if (checkedOut === 'NOT_CHECKED_IN') {
         dispatch(doCheckedOut(false));
       } else {
         const hrRate =
-          roomChecked === 'GIRLS_ROOM'
-            ? await getSheetValues(GIRLS_HR_RATE_RANGE)
-            : roomChecked === 'PRIVATE_ROOM' || roomChecked === 'TRAINING_ROOM'
-            ? ''
-            : await getSheetValues(SHARED_HR_RATE_RANGE);
+          roomChecked === 'GIRLS_ROOM' ? girlsHourRate : sharedHourRate;
         const fullDayRate =
-          roomChecked === 'GIRLS_ROOM'
-            ? await getSheetValues(GIRLS_FULL_DAY_RATE_RANGE)
-            : roomChecked === 'PRIVATE_ROOM' || roomChecked === 'TRAINING_ROOM'
-            ? ''
-            : await getSheetValues(SHARED_FULL_DAY_RATE_RANGE);
+          roomChecked === 'GIRLS_ROOM' ? girlsFullDayRate : sharedFullDayRate;
 
-        const privateRoomRate =
-          roomChecked === 'PRIVATE_ROOM'
-            ? await getSheetValues(PRIVATE_ROOM_RATE_RANGE)
-            : '';
+        const privateRoomRateFinal =
+          roomChecked === 'PRIVATE_ROOM' ? privateRoomRate : '';
 
-        const trainingRoomRate =
-          roomChecked === 'TRAINING_ROOM'
-            ? await getSheetValues(TRAINING_ROOM_RATE_RANGE)
-            : '';
+        const trainingRoomRateFinal =
+          roomChecked === 'TRAINING_ROOM' ? trainingRoomRate : '';
 
         await executeValuesAppendCheckOut(
           rowNumber,
@@ -403,8 +401,8 @@ export const doCheckInOut =
           hrRate,
           fullDayRate,
           roomChecked,
-          privateRoomRate,
-          trainingRoomRate,
+          privateRoomRateFinal,
+          trainingRoomRateFinal,
           invite
         );
         const getSheetValuesDurationRange = `Data!H${rowNumber}:K${rowNumber}`;

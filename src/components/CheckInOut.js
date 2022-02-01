@@ -120,7 +120,7 @@ class CheckInOut extends React.Component {
               }
             />
             <label className='form-check-label mt-1 p-2' htmlFor='private-room'>
-              Private Room
+              Private Room ({this.props.privateRoomRate}/hr)
             </label>
           </div>
         </div>
@@ -147,7 +147,7 @@ class CheckInOut extends React.Component {
               className='form-check-label mt-1 p-2'
               htmlFor='training-room'
             >
-              Training Room
+              Training Room ({this.props.trainingRoomRate}/hr)
             </label>
           </div>
         </div>
@@ -175,7 +175,7 @@ class CheckInOut extends React.Component {
               }
             />
             <label className='form-check-label mt-1 p-2' htmlFor='girls-room'>
-              Girls Room
+              Girls Room ({this.props.girlsHourRate}/hr)
             </label>
           </div>
         </div>
@@ -370,6 +370,8 @@ class CheckInOut extends React.Component {
 const mapStateToProps = (state) => {
   const { loading, mobileNumber, showCheckInOut } = state.app;
   const { gender, membership, checkedOut, rating } = state.user.valuesMatched;
+  const { trainingRoomRate, privateRoomRate, sharedHourRate, girlsHourRate } =
+    state.user.hoursDailyRates;
   const { inviteNumberExists } = state.user;
   const { userName } = state.user.inviteValuesMatched;
   return {
@@ -380,6 +382,10 @@ const mapStateToProps = (state) => {
     membership,
     checkedOut,
     rating,
+    trainingRoomRate,
+    privateRoomRate,
+    sharedHourRate,
+    girlsHourRate,
     inviteNumberExists,
     userName,
   };
