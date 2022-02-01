@@ -290,7 +290,14 @@ class CheckInOut extends React.Component {
             customIcons={customIcons}
             onClick={this.handleRating}
             showTooltip
-            fillColor='#3adb6b'
+            // fillColor='#ff5500'
+            fillColorArray={[
+              '#e12025',
+              '#f47950',
+              '#fcb040',
+              '#91ca61',
+              '#3ab54a',
+            ]}
             ratingValue={this.state.ratingValue * 20}
             initialValue={this.props.rating}
           />
