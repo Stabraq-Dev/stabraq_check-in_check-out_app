@@ -4,11 +4,18 @@ import { changeDateFormat, getData } from '../functions/helperFunc';
 import '../config';
 import qs from 'qs';
 import {
+  APPEND_CHECKOUT_RANGE,
+  APPROX_DURATION_EXCEL_FORMULA,
   CLIENTS_SHEET_APPEND_RANGE,
   COMMENTS_SHEET_APPEND_RANGE,
+  COST_EXCEL_FORMULA,
   DATA_SHEET_APPEND_RANGE,
   DATA_SHEET_BATCH_CLEAR_RANGES,
   DATA_SHEET_DATE_RANGE,
+  DURATION_EXCEL_FORMULA,
+  NUMBER_TO_CHECK_EXISTS_RANGE,
+  REMAIN_DAYS_EXCEL_FORMULA,
+  TOTAL_COST_EXCEL_FORMULA,
 } from '../ranges';
 
 const SHEET_ID = process.env.REACT_APP_SHEET_ID;
@@ -21,7 +28,7 @@ export const executeValuesUpdate = async (val) => {
     await axiosAuth(SHEET_ID);
     const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
-    const range = 'Func!A2';
+    const range = NUMBER_TO_CHECK_EXISTS_RANGE;
     const valueInputOption = 'USER_ENTERED';
     const response = await googleSheetsAPI.put(
       `${SHEET_ID}/values/${range}`,
@@ -307,7 +314,7 @@ export const executeValuesAppendAddSheet = async () => {
           [''],
           [''],
           [''],
-          ['=SUM(J4:J)'],
+          [TOTAL_COST_EXCEL_FORMULA],
         ],
       },
       { params: { valueInputOption: valueInputOption } }
@@ -357,7 +364,7 @@ export const executeValuesAppendNewUserData = async (
     const remainDays =
       membership === 'NOT_MEMBER'
         ? ''
-        : `=IF(E${lastBlankRow}>TODAY(),DATEDIF(TODAY(),E${lastBlankRow},"d"),(-1*DATEDIF(E${lastBlankRow},TODAY(),"d")))`;
+        : REMAIN_DAYS_EXCEL_FORMULA(lastBlankRow);
 
     const remainingHours =
       membership === 'HOURS_MEMBERSHIP' ? hoursPackages : '';
@@ -391,7 +398,7 @@ export const executeValuesAppendNewUserData = async (
           [remainingHours],
           [remainingOfTenDays],
           [invitations],
-          [],
+          [0],
           [gender],
           [offers],
         ],
@@ -513,23 +520,25 @@ export const executeValuesAppendCheckOut = async (
     await axiosAuth(SHEET_ID);
     const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
-    const duration = `=TEXT(G${rowNumber}-F${rowNumber},"h:mm")`;
+    const duration = DURATION_EXCEL_FORMULA(rowNumber);
 
-    const approxDuration =
-      roomChecked === 'PRIVATE_ROOM' || roomChecked === 'TRAINING_ROOM'
-        ? `=IF(OR(AND(H${rowNumber}*24-INT(H${rowNumber}*24)<=0.1),AND(H${rowNumber}*24-INT(H${rowNumber}*24)>0.5,H${rowNumber}*24-INT(H${rowNumber}*24)<=0.59)),FLOOR(H${rowNumber},"00:30")*24,CEILING(H${rowNumber},"00:30")*24)`
-        : `=IF(H${rowNumber}*24<1,1,IF(OR(AND(H${rowNumber}*24-INT(H${rowNumber}*24)<=0.1),AND(H${rowNumber}*24-INT(H${rowNumber}*24)>0.5,H${rowNumber}*24-INT(H${rowNumber}*24)<=0.59)),FLOOR(H${rowNumber},"00:30")*24,CEILING(H${rowNumber},"00:30")*24))`;
+    const approxDuration = APPROX_DURATION_EXCEL_FORMULA(
+      roomChecked,
+      rowNumber
+    );
 
-    const cost =
-      roomChecked === 'PRIVATE_ROOM'
-        ? `=I${rowNumber}*${privateRoomRate}`
-        : roomChecked === 'TRAINING_ROOM'
-        ? `=I${rowNumber}*${trainingRoomRate}`
-        : membership === 'NOT_MEMBER' && invite === 'NO'
-        ? `=IF(I${rowNumber}>=7,${fullDayRate},I${rowNumber}*${hrRate})`
-        : '';
+    const cost = COST_EXCEL_FORMULA(
+      roomChecked,
+      rowNumber,
+      membership,
+      privateRoomRate,
+      trainingRoomRate,
+      invite,
+      fullDayRate,
+      hrRate
+    );
 
-    const range = `Data!G${rowNumber}`;
+    const range = APPEND_CHECKOUT_RANGE(rowNumber);
     const valueInputOption = 'USER_ENTERED';
     const response = await googleSheetsAPI.post(
       `${SHEET_ID}/values/${range}:append`,

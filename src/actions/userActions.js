@@ -56,9 +56,14 @@ import {
 import {
   CURR_MONTH_WORKSHEET_RANGE,
   DATA_SHEET_DATE_RANGE,
+  DURATION_RANGE,
   HOURS_DAILY_RATES_RANGE,
+  INVITATIONS_RANGE,
   LAST_BLANK_ROW_RANGE,
   NUMBER_EXISTS_RANGE,
+  RATING_RANGE,
+  REMAINING_HOURS_RANGE,
+  REMAINING_OF_TEN_DAYS_RANGE,
   VALUES_MATCHED_RANGES,
 } from '../ranges';
 
@@ -311,6 +316,8 @@ export const doOnNewUserFormSubmit =
       dispatch({ type: NUMBER_EXISTS, payload: numberExists[0] });
     }
 
+    await executeValuesUpdate('');
+
     dispatch(doLoading(false));
     dispatch(doShowCheckInOut(true));
     dispatch(searchMobileNumber(formValues.mobile));
@@ -407,15 +414,16 @@ export const doCheckInOut =
           trainingRoomRateFinal,
           invite
         );
-        const getSheetValuesDurationRange = `Data!H${rowNumber}:K${rowNumber}`;
-        const resData = await getSheetValues(getSheetValuesDurationRange);
+
+        const range = DURATION_RANGE(rowNumber);
+        const resData = await getSheetValues(range);
         dispatch(doCalcDurationCost(resData));
         if (membership === 'HOURS_MEMBERSHIP' && roomChecked === 'NO') {
           const { approxDuration } = getState().user.durationCost;
           const remains = remainingHours - approxDuration;
           await executeValuesUpdateCheckOut({
             value: remains,
-            range: `Clients!I${clientRowNumber}`,
+            range: REMAINING_HOURS_RANGE(clientRowNumber),
           });
           dispatch(doCalcRemainingHours(remains));
         } else if (membership === '10_DAYS' && roomChecked === 'NO') {
@@ -423,7 +431,7 @@ export const doCheckInOut =
           const remains = remainingOfTenDays - 1;
           await executeValuesUpdateCheckOut({
             value: remains,
-            range: `Clients!J${clientRowNumber}`,
+            range: REMAINING_OF_TEN_DAYS_RANGE(clientRowNumber),
           });
           dispatch(doCalcRemainingOfTenDays(remains));
         } else if (invite === 'EXISTS' && roomChecked === 'NO') {
@@ -440,7 +448,7 @@ export const doCheckInOut =
           const remains = invitations - 1;
           await executeValuesUpdateCheckOut({
             value: remains,
-            range: `Clients!K${clientRowNumber}`,
+            range: INVITATIONS_RANGE(clientRowNumber),
           });
 
           dispatch(doClearPrevInviteUserState());
@@ -448,7 +456,7 @@ export const doCheckInOut =
 
         await executeValuesUpdateCheckOut({
           value: ratingValue,
-          range: `Clients!L${clientRowNumber}`,
+          range: RATING_RANGE(clientRowNumber),
         });
 
         if (commentText) {
