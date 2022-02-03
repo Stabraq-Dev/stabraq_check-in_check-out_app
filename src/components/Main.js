@@ -17,6 +17,7 @@ const revealAll = [
   'USER-BTN',
   'NEW-USER-BTN',
   'QR-CODE-GEN-BTN',
+  'ACTIVE-USERS-BTN',
 ];
 
 class Main extends React.Component {
@@ -31,20 +32,25 @@ class Main extends React.Component {
   onFormSubmitUser = async () => {
     const { doClearPrevUserState, doReveal, doShowCheckInOut } = this.props;
     await doClearPrevUserState();
-    await doReveal(['NEW-USER-BTN', 'QR-CODE-GEN-BTN']);
+    await doReveal(['NEW-USER-BTN', 'QR-CODE-GEN-BTN', 'ACTIVE-USERS-BTN']);
     await doReveal(revealAll);
     await doShowCheckInOut(true);
   };
 
   onFormSubmitNewUser = async () => {
     const { doReveal, doShowCheckInOut } = this.props;
-    await doReveal(['USER-BTN', 'QR-CODE-GEN-BTN']);
+    await doReveal(['USER-BTN', 'QR-CODE-GEN-BTN', 'ACTIVE-USERS-BTN']);
     await doReveal(revealAll);
     await doShowCheckInOut(false);
   };
   onFormSubmitQRCodeGen = async () => {
     const { doReveal } = this.props;
-    await doReveal(['USER-BTN', 'NEW-USER-BTN']);
+    await doReveal(['USER-BTN', 'NEW-USER-BTN', 'ACTIVE-USERS-BTN']);
+    await doReveal(revealAll);
+  };
+  onFormSubmitActiveUsers = async () => {
+    const { doReveal } = this.props;
+    await doReveal(['USER-BTN', 'NEW-USER-BTN', 'QR-CODE-GEN-BTN']);
     await doReveal(revealAll);
   };
 
@@ -86,7 +92,7 @@ class Main extends React.Component {
             </Link>
           </LightSpeed>
         </div>
-        <div className='col-md-3 col-sm-12 col-xs-12 mt-3 text-center'>
+        <div className='col-md-3 col-sm-4 col-xs-12 mt-3 text-center'>
           <LightSpeed left when={reveal.includes('QR-CODE-GEN-BTN')}>
             <Link to='/preferences/main/qr-code-gen'>
               <button
@@ -100,8 +106,22 @@ class Main extends React.Component {
             </Link>
           </LightSpeed>
         </div>
+        <div className='col-md-3 col-sm-4 col-xs-12 mt-3 text-center'>
+          <LightSpeed right when={reveal.includes('ACTIVE-USERS-BTN')}>
+            <Link to='/preferences/main/active-sheet'>
+              <button
+                className='ui text-stabraq button bg-dark'
+                type='button'
+                onClick={this.onFormSubmitActiveUsers}
+              >
+                <i className='user circle icon' />
+                Active
+              </button>
+            </Link>
+          </LightSpeed>
+        </div>
         <Bounce bottom>
-          <div className='col-md-3 col-sm-12 col-xs-12 mt-3 text-end align-self-center'>
+          <div className='col-md-12 col-sm-4 col-xs-12 mt-3 text-end align-self-center'>
             <button className='ui red button' onClick={() => doLogOut()}>
               <i className='sign-out icon' />
               Sign Out

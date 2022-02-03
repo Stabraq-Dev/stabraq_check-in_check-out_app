@@ -8,6 +8,7 @@ export const DURATION_RANGE = (rowNumber) => {
 export const APPEND_CHECKOUT_RANGE = (rowNumber) => {
   return `Data!G${rowNumber}`;
 };
+export const DATA_SHEET_ACTIVE_RANGE = 'Data!A4:G';
 
 /* FUNC */
 export const NUMBER_TO_CHECK_EXISTS_RANGE = 'Func!A2';

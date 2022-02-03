@@ -10,6 +10,7 @@ import NewUserForm from './NewUserForm';
 import CheckInOut from './CheckInOut';
 import MyModalUser from './MyModalUser';
 import QRCodeGenerator from './QRCodeGenerator';
+import ActiveSheet from './ActiveSheet';
 
 function Preferences({ isSignedIn, doRedirectToSignIn }) {
   if (isSignedIn) {
@@ -32,6 +33,10 @@ function Preferences({ isSignedIn, doRedirectToSignIn }) {
             <Route
               path='/preferences/main/qr-code-gen'
               component={QRCodeGenerator}
+            ></Route>
+            <Route
+              path='/preferences/main/active-sheet'
+              component={ActiveSheet}
             ></Route>
           </div>
         </Router>

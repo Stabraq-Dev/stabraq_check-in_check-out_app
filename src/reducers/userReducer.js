@@ -12,6 +12,7 @@ import {
   INVITE_NUMBER_EXISTS,
   CLEAR_PREV_INVITE_USER_STATE,
   HOURS_DAILY_RATES,
+  ACTIVE_USERS_LIST,
 } from '../actions/types';
 
 const valuesMatchedObj = {
@@ -60,6 +61,7 @@ const INITIAL_STATE = {
     girlsHourRate: '',
     girlsFullDayRate: '',
   },
+  activeUsersList: [],
 };
 
 let valuesMatchedKeys = [
@@ -164,6 +166,11 @@ export default (state = INITIAL_STATE, action) => {
           action.payload,
           hoursDailyRatesKeys
         ),
+      };
+    case ACTIVE_USERS_LIST:
+      return {
+        ...state,
+        activeUsersList: action.payload,
       };
     default:
       return state;

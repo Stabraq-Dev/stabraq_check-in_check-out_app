@@ -20,6 +20,7 @@ import {
   INVITE_NUMBER_EXISTS,
   CLEAR_PREV_INVITE_USER_STATE,
   HOURS_DAILY_RATES,
+  ACTIVE_USERS_LIST,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -55,6 +56,7 @@ import {
 
 import {
   CURR_MONTH_WORKSHEET_RANGE,
+  DATA_SHEET_ACTIVE_RANGE,
   DATA_SHEET_DATE_RANGE,
   DURATION_RANGE,
   HOURS_DAILY_RATES_RANGE,
@@ -213,6 +215,12 @@ export const doCheckResponse = (res) => async (dispatch, getState) => {
   } else {
     dispatch({ type: ERROR, payload: '' });
   }
+};
+
+export const doGetActiveUsersList = () => async (dispatch, getState) => {
+  const allCheckedInUsers = await getSheetValues(DATA_SHEET_ACTIVE_RANGE);
+  const activeUsers = allCheckedInUsers.filter((value) => value.length <= 6);
+  await dispatch({ type: ACTIVE_USERS_LIST, payload: activeUsers });
 };
 
 /**
