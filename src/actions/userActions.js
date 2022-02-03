@@ -139,19 +139,19 @@ export const doCalcRemainingOfTenDays = (remains) => {
 };
 export const doGetHoursDailyRates = () => async (dispatch) => {
   const hoursDailyRates = await getSheetValues(HOURS_DAILY_RATES_RANGE);
-  dispatch({ type: HOURS_DAILY_RATES, payload: hoursDailyRates });
+  dispatch({ type: HOURS_DAILY_RATES, payload: hoursDailyRates[0] });
 };
 
 export const doCreateNewSheet = () => async (dispatch, getState) => {
   const sheetDate = await getSheetValues(DATA_SHEET_DATE_RANGE);
-  dispatch({ type: SHEET_DATE, payload: sheetDate[0] });
+  dispatch({ type: SHEET_DATE, payload: sheetDate[0][0] });
 
-  const dateOne = sheetDate[0];
+  const dateOne = sheetDate[0][0];
   const dateTwo = new Date().toLocaleDateString();
   const diffDays = await checkDayDiff(dateOne, dateTwo);
 
   if (diffDays >= 1) {
-    const newSheetId = await executeBatchUpdateAddSheet(sheetDate[0]);
+    const newSheetId = await executeBatchUpdateAddSheet(sheetDate[0][0]);
     await dispatch(doCheckResponse(newSheetId));
     const errorNewSheetId = getState().app.error;
     if (errorNewSheetId.code === 400) return;
@@ -164,7 +164,7 @@ export const doCreateNewSheet = () => async (dispatch, getState) => {
 
     const resCopyToWorksheet = await executeBatchUpdateCopyToWorksheet(
       newSheetId,
-      destWorkSheetId[0]
+      destWorkSheetId[0][0]
     );
     await dispatch(doCheckResponse(resCopyToWorksheet));
     const errorResCopyToWorksheet = getState().app.error;
@@ -172,13 +172,13 @@ export const doCreateNewSheet = () => async (dispatch, getState) => {
 
     await executeBatchUpdateDeleteSheet(newSheetId);
 
-    let worksheetSheetsData = await getWorkSheetData(destWorkSheetId[0]);
+    let worksheetSheetsData = await getWorkSheetData(destWorkSheetId[0][0]);
     let sheetsIdsToRename = await getByValue(worksheetSheetsData, 'Copy of ');
     if (sheetsIdsToRename !== null) {
       sheetsIdsToRename.forEach(async (o) => {
         let title = o.title.replaceAll('Copy of ', '');
         await executeBatchUpdateSheetPropertiesRenameSheet(
-          destWorkSheetId[0],
+          destWorkSheetId[0][0],
           o.id,
           title
         );
@@ -242,9 +242,9 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
   dispatch(doCheckResponse(res));
 
   const numberExists = await getSheetValues(NUMBER_EXISTS_RANGE);
-  dispatch({ type: NUMBER_EXISTS, payload: numberExists[0] });
+  dispatch({ type: NUMBER_EXISTS, payload: numberExists[0][0] });
 
-  if (numberExists[0] === 'EXISTS') {
+  if (numberExists[0][0] === 'EXISTS') {
     const valuesMatched = await getSheetValuesBatchGet(VALUES_MATCHED_RANGES);
     dispatch({ type: VALUES_MATCHED, payload: valuesMatched });
   }
@@ -272,9 +272,9 @@ export const doCheckByMobile = (mobile) => async (dispatch, getState) => {
 
   dispatch({ type: INVITE_NUMBER_EXISTS, payload: '' });
   const numberExists = await getSheetValues(NUMBER_EXISTS_RANGE);
-  dispatch({ type: INVITE_NUMBER_EXISTS, payload: numberExists[0] });
+  dispatch({ type: INVITE_NUMBER_EXISTS, payload: numberExists[0][0] });
 
-  if (numberExists[0] === 'EXISTS') {
+  if (numberExists[0][0] === 'EXISTS') {
     const valuesMatched = await getSheetValuesBatchGet(VALUES_MATCHED_RANGES);
     dispatch({ type: INVITE_VALUES_MATCHED, payload: valuesMatched });
   }
@@ -305,15 +305,15 @@ export const doOnNewUserFormSubmit =
 
     const numberExists = await getSheetValues(NUMBER_EXISTS_RANGE);
 
-    if (numberExists[0] === 'NOT_EXISTS') {
+    if (numberExists[0][0] === 'NOT_EXISTS') {
       const lastBlankRow = await getSheetValues(LAST_BLANK_ROW_RANGE);
       const resAppend = await executeValuesAppendNewUserData(
         formValues,
-        lastBlankRow
+        lastBlankRow[0]
       );
       dispatch(doCheckResponse(resAppend));
     } else {
-      dispatch({ type: NUMBER_EXISTS, payload: numberExists[0] });
+      dispatch({ type: NUMBER_EXISTS, payload: numberExists[0][0] });
     }
 
     await executeValuesUpdate('');
@@ -417,7 +417,7 @@ export const doCheckInOut =
 
         const range = DURATION_RANGE(rowNumber);
         const resData = await getSheetValues(range);
-        dispatch(doCalcDurationCost(resData));
+        dispatch(doCalcDurationCost(resData[0]));
         if (membership === 'HOURS_MEMBERSHIP' && roomChecked === 'NO') {
           const { approxDuration } = getState().user.durationCost;
           const remains = remainingHours - approxDuration;

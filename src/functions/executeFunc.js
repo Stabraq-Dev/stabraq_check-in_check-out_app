@@ -572,10 +572,10 @@ export const getSheetValues = async (range) => {
     const response = await googleSheetsAPI.get(`${SHEET_ID}/values/${range}`);
 
     if (global.config.debuggingMode === 'TRUE') {
-      console.log('Response getSheetValues', range, response.data.values[0]);
+      console.log('Response getSheetValues', range, response.data.values);
     }
 
-    return response.data.values[0];
+    return response.data.values;
   } catch (err) {
     console.error('Execute error getSheetValues', err);
   }
