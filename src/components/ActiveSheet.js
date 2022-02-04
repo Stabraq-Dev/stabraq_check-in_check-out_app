@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { doGetActiveUsersList } from '../actions';
+import { doGetActiveUsersList, doSortActiveUsersList } from '../actions';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from './LoadingSpinner';
 
 export class ActiveSheet extends Component {
+  state = { sortedBy: 'Time' };
+
   componentDidMount() {
     this.props.doGetActiveUsersList();
   }
@@ -60,6 +62,57 @@ export class ActiveSheet extends Component {
     );
   }
 
+  sortActiveUserList = async (event, index) => {
+    await this.props.doSortActiveUsersList(index);
+    this.setState({
+      sortedBy: event.target.value,
+    });
+  };
+
+  renderSortButtons = () => {
+    const { sortedBy } = this.state;
+    const membership = sortedBy === 'Membership' ? 'bg-dark' : 'stabraq-bg';
+    const name = sortedBy === 'Name' ? 'bg-dark' : 'stabraq-bg';
+    const time = sortedBy === 'Time' ? 'bg-dark' : 'stabraq-bg';
+    return (
+      <div className='ui segment text-center'>
+        <button
+          className={`ui primary button ${membership} me-3 mt-1`}
+          name='sortByMembership'
+          onClick={(e) => {
+            this.sortActiveUserList(e, 3);
+          }}
+          type='submit'
+          value='Membership'
+        >
+          Sort by Membership
+        </button>
+        <button
+          className={`ui primary button ${name} me-3 mt-1`}
+          name='sortByName'
+          onClick={(e) => {
+            this.sortActiveUserList(e, 0);
+          }}
+          type='submit'
+          value='Name'
+        >
+          Sort by Name
+        </button>
+        <button
+          className={`ui primary button ${time} me-3 mt-1`}
+          name='sortByTime'
+          onClick={(e) => {
+            this.sortActiveUserList(e, 5);
+          }}
+          type='submit'
+          value='Time'
+        >
+          Sort by Time
+        </button>
+      </div>
+    );
+  };
+
   render() {
     if (this.props.loading) {
       return <LoadingSpinner />;
@@ -67,6 +120,7 @@ export class ActiveSheet extends Component {
     return (
       <>
         {this.renderCountActiveUsers()}
+        {this.renderSortButtons()}
         <div className='ui celled list'>{this.renderList()}</div>
       </>
     );
@@ -82,4 +136,7 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps, { doGetActiveUsersList })(ActiveSheet);
+export default connect(mapStateToProps, {
+  doGetActiveUsersList,
+  doSortActiveUsersList,
+})(ActiveSheet);

@@ -225,6 +225,14 @@ export const doGetActiveUsersList = () => async (dispatch) => {
   dispatch(doLoading(false));
 };
 
+export const doSortActiveUsersList = (index) => async (dispatch, getState) => {
+  const { activeUsersList } = getState().user;
+  const activeUsersSorted = activeUsersList.sort((a, b) =>
+    a[index].localeCompare(b[index])
+  );
+  await dispatch({ type: ACTIVE_USERS_LIST, payload: activeUsersSorted });
+};
+
 /**
  *
  * @o doSearchByMobile
