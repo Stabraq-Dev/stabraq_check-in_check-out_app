@@ -71,46 +71,48 @@ export class ActiveSheet extends Component {
 
   renderSortButtons = () => {
     const { sortedBy } = this.state;
+    const { activeUsersList } = this.props;
     const membership = sortedBy === 'Membership' ? 'bg-dark' : 'stabraq-bg';
     const name = sortedBy === 'Name' ? 'bg-dark' : 'stabraq-bg';
     const time = sortedBy === 'Time' ? 'bg-dark' : 'stabraq-bg';
-    return (
-      <div className='ui segment text-center'>
-        <button
-          className={`ui primary button ${membership} me-3 mt-1`}
-          name='sortByMembership'
-          onClick={(e) => {
-            this.sortActiveUserList(e, 3);
-          }}
-          type='submit'
-          value='Membership'
-        >
-          Sort by Membership
-        </button>
-        <button
-          className={`ui primary button ${name} me-3 mt-1`}
-          name='sortByName'
-          onClick={(e) => {
-            this.sortActiveUserList(e, 0);
-          }}
-          type='submit'
-          value='Name'
-        >
-          Sort by Name
-        </button>
-        <button
-          className={`ui primary button ${time} me-3 mt-1`}
-          name='sortByTime'
-          onClick={(e) => {
-            this.sortActiveUserList(e, 5);
-          }}
-          type='submit'
-          value='Time'
-        >
-          Sort by Time
-        </button>
-      </div>
-    );
+    if (activeUsersList.length > 0)
+      return (
+        <div className='ui segment text-center'>
+          <button
+            className={`ui primary button ${membership} me-3 mt-1`}
+            name='sortByMembership'
+            onClick={(e) => {
+              this.sortActiveUserList(e, 3);
+            }}
+            type='submit'
+            value='Membership'
+          >
+            Sort by Membership
+          </button>
+          <button
+            className={`ui primary button ${name} me-3 mt-1`}
+            name='sortByName'
+            onClick={(e) => {
+              this.sortActiveUserList(e, 0);
+            }}
+            type='submit'
+            value='Name'
+          >
+            Sort by Name
+          </button>
+          <button
+            className={`ui primary button ${time} me-3 mt-1`}
+            name='sortByTime'
+            onClick={(e) => {
+              this.sortActiveUserList(e, 5);
+            }}
+            type='submit'
+            value='Time'
+          >
+            Sort by Time
+          </button>
+        </div>
+      );
   };
 
   render() {
