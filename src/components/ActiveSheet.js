@@ -9,6 +9,19 @@ export class ActiveSheet extends Component {
     this.props.doGetActiveUsersList();
   }
 
+  renderCountActiveUsers = () => {
+    const { activeUsersList } = this.props;
+    const usersText = activeUsersList.length === 1 ? 'User' : 'Users';
+    if (activeUsersList.length > 0)
+      return (
+        <div className='ui segment'>
+          <div className='ui center aligned header'>
+            Active {usersText}: {activeUsersList.length} {usersText}
+          </div>
+        </div>
+      );
+  };
+
   renderList = () => {
     if (this.props.activeUsersList.length === 0) {
       return (
@@ -17,10 +30,13 @@ export class ActiveSheet extends Component {
         </div>
       );
     }
-    return this.props.activeUsersList.map((active) => {
+    return this.props.activeUsersList.map((active, index) => {
       return (
-        <div className='item' key={active[0]}>
+        <div className='item' key={index}>
           {this.renderSearch(active[1])}
+          <i className='middle aligned icon'>
+            {(index + 1).toString().padStart(2, '0')}
+          </i>
           <i className='large middle aligned icon user circle'></i>
           <div className='content'>
             <div className='header'>{active[0]}</div>
@@ -48,7 +64,12 @@ export class ActiveSheet extends Component {
     if (this.props.loading) {
       return <LoadingSpinner />;
     }
-    return <div className='ui celled list'>{this.renderList()}</div>;
+    return (
+      <>
+        {this.renderCountActiveUsers()}
+        <div className='ui celled list'>{this.renderList()}</div>
+      </>
+    );
   }
 }
 
