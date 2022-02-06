@@ -6,6 +6,10 @@ div {
   overflow: hidden;
 }
 
+#comment {
+  width: 100%;
+}
+
 footer {
   position: absolute;
   bottom: 0;

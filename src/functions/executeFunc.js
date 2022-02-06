@@ -5,6 +5,7 @@ import '../config';
 import qs from 'qs';
 import {
   APPEND_CHECKOUT_RANGE,
+  APPEND_UPDATE_CHECK_IN_RANGE,
   APPROX_DURATION_EXCEL_FORMULA,
   CLIENTS_SHEET_APPEND_RANGE,
   COMMENTS_SHEET_APPEND_RANGE,
@@ -595,6 +596,42 @@ export const executeValuesAppendCheckOut = async (
     return response;
   } catch (err) {
     console.error('Execute error executeValuesAppendCheckOut', err);
+  }
+};
+
+export const executeValuesAppendUpdateCheckIn = async (
+  rowNumber,
+  roomChecked,
+  inviteNumberExists,
+  invitationByMobileUser
+) => {
+  try {
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
+
+    const range = APPEND_UPDATE_CHECK_IN_RANGE(rowNumber);
+    const valueInputOption = 'USER_ENTERED';
+    const response = await googleSheetsAPI.put(
+      `${SHEET_ID}/values/${range}`,
+      {
+        majorDimension: 'COLUMNS',
+        values: [
+          [roomChecked],
+          [inviteNumberExists],
+          [`'${invitationByMobileUser.inviteByMobile}`],
+          [invitationByMobileUser.inviteByName],
+        ],
+      },
+      { params: { valueInputOption: valueInputOption } }
+    );
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log('Response executeValuesAppendUpdateCheckIn', response);
+    }
+
+    return response;
+  } catch (err) {
+    console.error('Execute error executeValuesAppendUpdateCheckIn', err);
   }
 };
 

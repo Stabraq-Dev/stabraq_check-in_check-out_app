@@ -1,6 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { doCheckInOut, doCheckByMobile, doDeleteUserCheckIn } from '../actions';
+import {
+  doCheckInOut,
+  doCheckByMobile,
+  doConfirmDeleteUserCheckIn,
+  doUpdateCheckIn,
+} from '../actions';
 import { checkForMobNum } from '../functions/validation';
 import history from '../history';
 import InputMobile from './InputMobile';
@@ -36,6 +41,7 @@ class CheckInOut extends React.Component {
     invitationByUserNameManual: '',
     ratingValue: 0,
     commentText: '',
+    editCheckIn: false,
   };
 
   componentDidMount() {
@@ -45,11 +51,42 @@ class CheckInOut extends React.Component {
   }
 
   onDeleteCheckIn = () => {
-    this.props.doDeleteUserCheckIn();
+    this.props.doConfirmDeleteUserCheckIn();
   };
 
-  onCheckInOut = (event) => {
-    event.preventDefault();
+  onEditCheckIn = () => {
+    this.setState({ editCheckIn: !this.state.editCheckIn });
+
+    switch (this.props.roomChecked) {
+      case 'GIRLS_ROOM':
+        return this.setState({
+          girlsRoomChecked: !this.state.girlsRoomChecked,
+        });
+      case 'PRIVATE_ROOM':
+        return this.setState({
+          privateRoomChecked: !this.state.privateRoomChecked,
+        });
+      case 'TRAINING_ROOM':
+        return this.setState({
+          trainingRoomChecked: !this.state.trainingRoomChecked,
+        });
+      default:
+        break;
+    }
+  };
+
+  onUpdateCheckIn = () => {
+    const { roomChecked, inviteNumberExists, invitationByMobileUser } =
+      this.handleCheckInOptions();
+
+    this.props.doUpdateCheckIn(
+      roomChecked,
+      inviteNumberExists,
+      invitationByMobileUser
+    );
+  };
+
+  handleCheckInOptions = () => {
     const roomChecked = this.state.girlsRoomChecked
       ? 'GIRLS_ROOM'
       : this.state.privateRoomChecked
@@ -77,6 +114,18 @@ class CheckInOut extends React.Component {
           inviteByMobile: '',
           inviteByName: '',
         };
+    return {
+      roomChecked: roomChecked,
+      inviteNumberExists: inviteNumberExists,
+      invitationByMobileUser: invitationByMobileUser,
+    };
+  };
+
+  onCheckInOut = (event) => {
+    event.preventDefault();
+
+    const { roomChecked, inviteNumberExists, invitationByMobileUser } =
+      this.handleCheckInOptions();
 
     const ratingValue =
       this.state.ratingValue === 0 && this.props.rating > 0
@@ -109,60 +158,105 @@ class CheckInOut extends React.Component {
     this.setState({ trainingRoomChecked: event.target.checked });
   };
 
-  renderPrivateRoomButton = () => {
-    if (this.props.checkedOut === 'NOT_CHECKED_IN')
+  renderCheckInOptions = () => {
+    if (
+      this.props.checkedOut === 'NOT_CHECKED_IN' ||
+      (this.props.checkedOut === 'NOT_CHECKED_OUT' && this.state.editCheckIn)
+    )
       return (
-        <div className='col'>
-          <div className='form-check form-check-inline mt-3 me-3'>
-            <input
-              className='form-check-input m-2 p-3'
-              type='checkbox'
-              id='private-room'
-              onChange={this.onPrivateRoom}
-              disabled={
-                this.state.girlsRoomChecked ||
-                this.state.trainingRoomChecked ||
-                this.state.invitationChecked
-              }
-            />
-            <label className='form-check-label mt-1 p-2' htmlFor='private-room'>
-              Private Room ({this.props.privateRoomRate}/hr)
-            </label>
-          </div>
+        <div className='row'>
+          {this.renderPrivateRoomButton()}
+          {this.renderTrainingRoomButton()}
+          {this.renderGirlsRoomButton()}
+          {this.renderInvitationButton()}
+          {this.renderInvitationCheckByMobile()}
+          {this.renderInvitationByMobileManual()}
         </div>
       );
   };
 
-  renderTrainingRoomButton = () => {
+  renderCheckInButton = () => {
     if (this.props.checkedOut === 'NOT_CHECKED_IN')
       return (
-        <div className='col'>
-          <div className='form-check form-check-inline mt-3 me-3'>
-            <input
-              className='form-check-input m-2 p-3'
-              type='checkbox'
-              id='training-room'
-              onChange={this.onTrainingRoom}
-              disabled={
-                this.state.girlsRoomChecked ||
-                this.state.privateRoomChecked ||
-                this.state.invitationChecked
-              }
-            />
-            <label
-              className='form-check-label mt-1 p-2'
-              htmlFor='training-room'
-            >
-              Training Room ({this.props.trainingRoomRate}/hr)
-            </label>
-          </div>
-        </div>
+        <button
+          className='ui primary button stabraq-bg me-3 mt-1'
+          name='checkIn'
+          value='CHECK_IN'
+          onClick={this.onCheckInOut}
+          type='submit'
+        >
+          <i className='right arrow icon me-1' />
+          Check In
+        </button>
       );
+  };
+
+  renderCheckOutButton = () => {
+    if (!this.state.editCheckIn)
+      return (
+        <button
+          className='ui primary button stabraq-bg ms-3 mt-1'
+          name='checkOut'
+          value='CHECK_OUT'
+          onClick={this.onCheckInOut}
+          type='submit'
+        >
+          <i className='left arrow icon me-1' />
+          Check Out
+        </button>
+      );
+  };
+
+  renderPrivateRoomButton = () => {
+    return (
+      <div className='col'>
+        <div className='form-check form-check-inline mt-3 me-3'>
+          <input
+            className='form-check-input m-2 p-3'
+            type='checkbox'
+            id='private-room'
+            onChange={this.onPrivateRoom}
+            checked={this.state.privateRoomChecked}
+            disabled={
+              this.state.girlsRoomChecked ||
+              this.state.trainingRoomChecked ||
+              this.state.invitationChecked
+            }
+          />
+          <label className='form-check-label mt-1 p-2' htmlFor='private-room'>
+            Private Room ({this.props.privateRoomRate}/hr)
+          </label>
+        </div>
+      </div>
+    );
+  };
+
+  renderTrainingRoomButton = () => {
+    return (
+      <div className='col'>
+        <div className='form-check form-check-inline mt-3 me-3'>
+          <input
+            className='form-check-input m-2 p-3'
+            type='checkbox'
+            id='training-room'
+            onChange={this.onTrainingRoom}
+            checked={this.state.trainingRoomChecked}
+            disabled={
+              this.state.girlsRoomChecked ||
+              this.state.privateRoomChecked ||
+              this.state.invitationChecked
+            }
+          />
+          <label className='form-check-label mt-1 p-2' htmlFor='training-room'>
+            Training Room ({this.props.trainingRoomRate}/hr)
+          </label>
+        </div>
+      </div>
+    );
   };
 
   renderGirlsRoomButton = () => {
     if (
-      this.props.checkedOut === 'NOT_CHECKED_IN' &&
       this.props.gender === 'Female' &&
       this.props.membership === 'NOT_MEMBER'
     )
@@ -174,6 +268,7 @@ class CheckInOut extends React.Component {
               type='checkbox'
               id='girls-room'
               onChange={this.onGirlsRoom}
+              checked={this.state.girlsRoomChecked}
               disabled={
                 this.state.privateRoomChecked ||
                 this.state.trainingRoomChecked ||
@@ -189,10 +284,7 @@ class CheckInOut extends React.Component {
   };
 
   renderInvitationButton = () => {
-    if (
-      this.props.checkedOut === 'NOT_CHECKED_IN' &&
-      this.props.membership === 'NOT_MEMBER'
-    )
+    if (this.props.membership === 'NOT_MEMBER')
       return (
         <div>
           <div className='form-check form-check-inline mt-3 me-3'>
@@ -217,11 +309,7 @@ class CheckInOut extends React.Component {
   };
 
   renderInvitationCheckByMobile = () => {
-    if (
-      this.props.checkedOut === 'NOT_CHECKED_IN' &&
-      this.props.membership === 'NOT_MEMBER' &&
-      this.state.invitationChecked
-    )
+    if (this.props.membership === 'NOT_MEMBER' && this.state.invitationChecked)
       return (
         <div className='text-center'>
           <form className='ui form error'>
@@ -243,7 +331,6 @@ class CheckInOut extends React.Component {
 
   renderInvitationByMobileManual = () => {
     if (
-      this.props.checkedOut === 'NOT_CHECKED_IN' &&
       this.props.membership === 'NOT_MEMBER' &&
       this.state.invitationChecked &&
       this.state.inviteNumberExists === 'NOT_EXISTS'
@@ -289,7 +376,7 @@ class CheckInOut extends React.Component {
   };
 
   renderRating = () => {
-    if (this.props.checkedOut === 'NOT_CHECKED_OUT')
+    if (this.props.checkedOut === 'NOT_CHECKED_OUT' && !this.state.editCheckIn)
       return (
         <div className='text-center'>
           <Rating
@@ -312,7 +399,7 @@ class CheckInOut extends React.Component {
   };
 
   renderCommentSection = () => {
-    if (this.props.checkedOut === 'NOT_CHECKED_OUT')
+    if (this.props.checkedOut === 'NOT_CHECKED_OUT' && !this.state.editCheckIn)
       return (
         <div className='text-center'>
           <textarea
@@ -328,7 +415,7 @@ class CheckInOut extends React.Component {
   };
 
   renderDeleteCheckInButton = () => {
-    if (this.props.checkedOut === 'NOT_CHECKED_OUT')
+    if (this.props.checkedOut === 'NOT_CHECKED_OUT' && !this.state.editCheckIn)
       return (
         <button
           className='ui red button ms-3 mt-1'
@@ -339,6 +426,41 @@ class CheckInOut extends React.Component {
         >
           <i className='trash alternate outline icon me-1' />
           Delete Check In
+        </button>
+      );
+  };
+
+  renderEditCheckInButton = () => {
+    const className = !this.state.editCheckIn ? 'blue' : 'black';
+    const btnText = !this.state.editCheckIn ? 'Edit Check In' : 'Cancel Edit';
+    const btnIcon = !this.state.editCheckIn ? 'edit outline' : 'reply';
+    if (this.props.checkedOut === 'NOT_CHECKED_OUT')
+      return (
+        <button
+          className={`ui ${className} button ms-3 mt-1`}
+          name='editCheckIn'
+          value='EDIT_CHECK_IN'
+          onClick={this.onEditCheckIn}
+          type='submit'
+        >
+          <i className={`${btnIcon} icon me-1`} />
+          {btnText}
+        </button>
+      );
+  };
+
+  renderUpdateCheckInButton = () => {
+    if (this.props.checkedOut === 'NOT_CHECKED_OUT' && this.state.editCheckIn)
+      return (
+        <button
+          className='ui orange button ms-3 mt-1'
+          name='updateCheckIn'
+          value='UPDATE_CHECK_IN'
+          onClick={this.onUpdateCheckIn}
+          type='submit'
+        >
+          <i className='edit icon me-1' />
+          Update Check In
         </button>
       );
   };
@@ -383,36 +505,13 @@ class CheckInOut extends React.Component {
 
     return (
       <div className='ui segment text-center'>
-        <div className='row'>
-          {this.renderPrivateRoomButton()}
-          {this.renderTrainingRoomButton()}
-          {this.renderGirlsRoomButton()}
-          {this.renderInvitationButton()}
-          {this.renderInvitationCheckByMobile()}
-          {this.renderInvitationByMobileManual()}
-          {this.renderRating()}
-          {this.renderCommentSection()}
-        </div>
-        <button
-          className='ui primary button stabraq-bg me-3 mt-1'
-          name='checkIn'
-          value='CHECK_IN'
-          onClick={this.onCheckInOut}
-          type='submit'
-        >
-          <i className='right arrow icon me-1' />
-          Check In
-        </button>
-        <button
-          className='ui primary button stabraq-bg ms-3 mt-1'
-          name='checkOut'
-          value='CHECK_OUT'
-          onClick={this.onCheckInOut}
-          type='submit'
-        >
-          <i className='left arrow icon me-1' />
-          Check Out
-        </button>
+        {this.renderCheckInOptions()}
+        {this.renderRating()}
+        {this.renderCommentSection()}
+        {this.renderCheckInButton()}
+        {this.renderCheckOutButton()}
+        {this.renderEditCheckInButton()}
+        {this.renderUpdateCheckInButton()}
         {this.renderDeleteCheckInButton()}
       </div>
     );
@@ -421,7 +520,8 @@ class CheckInOut extends React.Component {
 
 const mapStateToProps = (state) => {
   const { loading, mobileNumber, showCheckInOut } = state.app;
-  const { gender, membership, checkedOut, rating } = state.user.valuesMatched;
+  const { gender, membership, checkedOut, rating, roomChecked } =
+    state.user.valuesMatched;
   const { trainingRoomRate, privateRoomRate, sharedHourRate, girlsHourRate } =
     state.user.hoursDailyRates;
   const { inviteNumberExists } = state.user;
@@ -434,6 +534,7 @@ const mapStateToProps = (state) => {
     membership,
     checkedOut,
     rating,
+    roomChecked,
     trainingRoomRate,
     privateRoomRate,
     sharedHourRate,
@@ -446,5 +547,6 @@ const mapStateToProps = (state) => {
 export default connect(mapStateToProps, {
   doCheckInOut,
   doCheckByMobile,
-  doDeleteUserCheckIn,
+  doConfirmDeleteUserCheckIn,
+  doUpdateCheckIn,
 })(CheckInOut);

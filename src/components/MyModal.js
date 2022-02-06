@@ -8,6 +8,21 @@ class MyModal extends React.Component {
     this.myModal.show();
   }
 
+  renderYesButton = () => {
+    const { yesAction } = this.props;
+    if (yesAction)
+      return (
+        <button
+          type='button'
+          className='btn btn-warning'
+          data-bs-dismiss='modal'
+          onClick={yesAction}
+        >
+          Yes
+        </button>
+      );
+  };
+
   render() {
     const { body, bodyBackground, closeAction } = this.props;
     return (
@@ -38,6 +53,7 @@ class MyModal extends React.Component {
                 {body}
               </div>
               <div className='modal-footer'>
+                {this.renderYesButton()}
                 <button
                   type='button'
                   className='btn btn-stabraq'

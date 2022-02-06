@@ -21,6 +21,9 @@ import {
   CLEAR_PREV_INVITE_USER_STATE,
   HOURS_DAILY_RATES,
   ACTIVE_USERS_LIST,
+  ON_UPDATE_CHECK_IN_SUBMIT,
+  ON_DELETE_CHECK_IN_SUBMIT,
+  ON_CONFIRM_DELETE_CHECK_IN_SUBMIT,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -45,6 +48,7 @@ import {
   getSheetValuesBatchGet,
   executeValuesAppendUserComment,
   executeBatchUpdateDeleteRange,
+  executeValuesAppendUpdateCheckIn,
 } from '../functions/executeFunc';
 
 import history from '../history';
@@ -236,14 +240,27 @@ export const doSortActiveUsersList = (index) => async (dispatch, getState) => {
   await dispatch({ type: ACTIVE_USERS_LIST, payload: activeUsersSorted });
 };
 
+export const doConfirmDeleteUserCheckIn = () => async (dispatch, getState) => {
+  dispatch(submitType(ON_CONFIRM_DELETE_CHECK_IN_SUBMIT));
+  const { showMyModal } = getState().app;
+  if (showMyModal) {
+    await dispatch(doShowMyModal(false));
+  }
+  await dispatch(doShowMyModal(true));
+};
+
 export const doDeleteUserCheckIn = () => async (dispatch, getState) => {
   const { rowNumber } = getState().user.valuesMatched;
   dispatch(doLoading(true));
+  dispatch(submitType(ON_DELETE_CHECK_IN_SUBMIT));
   await executeBatchUpdateDeleteRange(rowNumber);
   dispatch(doLoading(false));
-  if (history.location.pathname === '/preferences/main/user/check-in-out') {
-    history.push('/preferences/main/user');
+
+  const { showMyModal } = getState().app;
+  if (showMyModal) {
+    await dispatch(doShowMyModal(false));
   }
+  await dispatch(doShowMyModal(true));
 };
 
 /**
@@ -502,6 +519,30 @@ export const doCheckInOut =
       }
     }
     dispatch(doLoading(false));
+    const { showMyModal } = getState().app;
+    if (showMyModal) {
+      await dispatch(doShowMyModal(false));
+    }
+    await dispatch(doShowMyModal(true));
+  };
+
+export const doUpdateCheckIn =
+  (roomChecked, inviteNumberExists, invitationByMobileUser) =>
+  async (dispatch, getState) => {
+    if (!navigator.onLine) return;
+    dispatch(submitType(ON_UPDATE_CHECK_IN_SUBMIT));
+    dispatch(doLoading(true));
+
+    const { rowNumber } = getState().user.valuesMatched;
+    await executeValuesAppendUpdateCheckIn(
+      rowNumber,
+      roomChecked,
+      inviteNumberExists,
+      invitationByMobileUser
+    );
+
+    dispatch(doLoading(false));
+
     const { showMyModal } = getState().app;
     if (showMyModal) {
       await dispatch(doShowMyModal(false));

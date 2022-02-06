@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import MyModal from './MyModal';
 import { connect } from 'react-redux';
-import { doShowMyModal, doRevealLogo } from '../actions';
+import { doShowMyModal, doRevealLogo, doDeleteUserCheckIn } from '../actions';
 import history from '../history';
 
 export class MyModalUser extends Component {
@@ -111,6 +111,16 @@ export class MyModalUser extends Component {
               return <DefaultBody message={message} />;
             }
           }
+        case 'ON_CONFIRM_DELETE_CHECK_IN_SUBMIT':
+          return (
+            <DefaultBody
+              message={`Are you sure you want to\ndelete user Check In?`}
+            />
+          );
+        case 'ON_DELETE_CHECK_IN_SUBMIT':
+          return <DefaultBody message='Check In Deleted Successfully' />;
+        case 'ON_UPDATE_CHECK_IN_SUBMIT':
+          return <DefaultBody message='Check In Updated Successfully' />;
         default:
           return null;
       }
@@ -197,6 +207,34 @@ export class MyModalUser extends Component {
           default:
             return null;
         }
+      case 'ON_DELETE_CHECK_IN_SUBMIT':
+        if (error) {
+          return goToCheckInOut;
+        } else {
+          return goToHome;
+        }
+      case 'ON_UPDATE_CHECK_IN_SUBMIT':
+        if (error) {
+          return goToCheckInOut;
+        } else {
+          return goToHome;
+        }
+      default:
+        return null;
+    }
+  };
+  /**
+   *
+   * @a renderYesAction
+   */
+  renderYesAction = () => {
+    const { submitType, doDeleteUserCheckIn } = this.props;
+    const deleteUser = async () => {
+      await doDeleteUserCheckIn();
+    };
+    switch (submitType) {
+      case 'ON_CONFIRM_DELETE_CHECK_IN_SUBMIT':
+        return deleteUser;
       default:
         return null;
     }
@@ -206,9 +244,11 @@ export class MyModalUser extends Component {
    * @a renderBodyBackground
    */
   renderBodyBackground() {
-    const { error } = this.props;
+    const { error, submitType } = this.props;
     if (error) {
       return 'error-bg';
+    } else if (submitType === 'ON_CONFIRM_DELETE_CHECK_IN_SUBMIT') {
+      return 'bg-warning';
     } else {
       return 'stabraq-bg';
     }
@@ -224,6 +264,7 @@ export class MyModalUser extends Component {
           body={this.renderBody()}
           closeAction={this.renderAction()}
           bodyBackground={this.renderBodyBackground()}
+          yesAction={this.renderYesAction()}
         />
       );
     }
@@ -271,6 +312,8 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps, { doShowMyModal, doRevealLogo })(
-  MyModalUser
-);
+export default connect(mapStateToProps, {
+  doShowMyModal,
+  doRevealLogo,
+  doDeleteUserCheckIn,
+})(MyModalUser);
