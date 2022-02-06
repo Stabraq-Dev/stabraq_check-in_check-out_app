@@ -220,8 +220,10 @@ export const doCheckResponse = (res) => async (dispatch, getState) => {
 export const doGetActiveUsersList = () => async (dispatch) => {
   dispatch(doLoading(true));
   const allCheckedInUsers = await getSheetValues(DATA_SHEET_ACTIVE_RANGE);
-  const activeUsers = allCheckedInUsers.filter((value) => value.length <= 6);
-  await dispatch({ type: ACTIVE_USERS_LIST, payload: activeUsers });
+  if (allCheckedInUsers) {
+    const activeUsers = allCheckedInUsers.filter((value) => value.length <= 6);
+    await dispatch({ type: ACTIVE_USERS_LIST, payload: activeUsers });
+  }
   dispatch(doLoading(false));
 };
 
