@@ -44,6 +44,7 @@ import {
   executeChangeWorkSheetPermission,
   getSheetValuesBatchGet,
   executeValuesAppendUserComment,
+  executeBatchUpdateDeleteRange,
 } from '../functions/executeFunc';
 
 import history from '../history';
@@ -233,6 +234,16 @@ export const doSortActiveUsersList = (index) => async (dispatch, getState) => {
     a[index].localeCompare(b[index])
   );
   await dispatch({ type: ACTIVE_USERS_LIST, payload: activeUsersSorted });
+};
+
+export const doDeleteUserCheckIn = () => async (dispatch, getState) => {
+  const { rowNumber } = getState().user.valuesMatched;
+  dispatch(doLoading(true));
+  await executeBatchUpdateDeleteRange(rowNumber);
+  dispatch(doLoading(false));
+  if (history.location.pathname === '/preferences/main/user/check-in-out') {
+    history.push('/preferences/main/user');
+  }
 };
 
 /**

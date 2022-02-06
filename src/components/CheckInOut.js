@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { doCheckInOut, doCheckByMobile } from '../actions';
+import { doCheckInOut, doCheckByMobile, doDeleteUserCheckIn } from '../actions';
 import { checkForMobNum } from '../functions/validation';
 import history from '../history';
 import InputMobile from './InputMobile';
@@ -43,6 +43,10 @@ class CheckInOut extends React.Component {
       history.push('/preferences/main/user');
     }
   }
+
+  onDeleteCheckIn = () => {
+    this.props.doDeleteUserCheckIn();
+  };
 
   onCheckInOut = (event) => {
     event.preventDefault();
@@ -323,6 +327,22 @@ class CheckInOut extends React.Component {
       );
   };
 
+  renderDeleteCheckInButton = () => {
+    if (this.props.checkedOut === 'NOT_CHECKED_OUT')
+      return (
+        <button
+          className='ui red button ms-3 mt-1'
+          name='deleteCheckIn'
+          value='DELETE_CHECK_IN'
+          onClick={this.onDeleteCheckIn}
+          type='submit'
+        >
+          <i className='trash alternate outline icon me-1' />
+          Delete Check In
+        </button>
+      );
+  };
+
   checkForErrors = async (mobile) => {
     this.setState({ errorMessage: await checkForMobNum(mobile) });
   };
@@ -393,6 +413,7 @@ class CheckInOut extends React.Component {
           <i className='left arrow icon me-1' />
           Check Out
         </button>
+        {this.renderDeleteCheckInButton()}
       </div>
     );
   }
@@ -422,6 +443,8 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps, { doCheckInOut, doCheckByMobile })(
-  CheckInOut
-);
+export default connect(mapStateToProps, {
+  doCheckInOut,
+  doCheckByMobile,
+  doDeleteUserCheckIn,
+})(CheckInOut);

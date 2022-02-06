@@ -271,6 +271,39 @@ export const executeBatchUpdateCopyToWorksheet = async (
   }
 };
 
+export const executeBatchUpdateDeleteRange = async (rowNumber) => {
+  try {
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
+    const response = await googleSheetsAPI.post(`${SHEET_ID}:batchUpdate`, {
+      requests: [
+        {
+          deleteRange: {
+            shiftDimension: 'ROWS',
+            range: {
+              sheetId: global.config.source.sheetId,
+              startRowIndex: rowNumber - 1,
+              endRowIndex: rowNumber,
+            },
+          },
+        },
+      ],
+    });
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log('Response executeBatchUpdateDeleteRange', response);
+    }
+
+    return response;
+  } catch (err) {
+    console.error(
+      'Execute error executeBatchUpdateDeleteRange',
+      err.response.data.error
+    );
+    return err.response.data.error;
+  }
+};
+
 export const executeValuesBatchClear = async () => {
   try {
     await axiosAuth(SHEET_ID);
