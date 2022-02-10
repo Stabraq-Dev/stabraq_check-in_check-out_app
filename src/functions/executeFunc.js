@@ -414,6 +414,8 @@ export const executeValuesAppendNewUserData = async (
         ? 7
         : '';
 
+    const offersChecked = offers ? true : '';
+
     const range = CLIENTS_SHEET_APPEND_RANGE;
     const valueInputOption = 'USER_ENTERED';
     const response = await googleSheetsAPI.post(
@@ -434,7 +436,7 @@ export const executeValuesAppendNewUserData = async (
           [invitations],
           [0],
           [gender],
-          [offers],
+          [offersChecked],
         ],
       },
       { params: { valueInputOption: valueInputOption } }
