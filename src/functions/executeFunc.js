@@ -574,8 +574,8 @@ export const executeValuesAppendCheckOut = async (
 
     const range = APPEND_CHECKOUT_RANGE(rowNumber);
     const valueInputOption = 'USER_ENTERED';
-    const response = await googleSheetsAPI.post(
-      `${SHEET_ID}/values/${range}:append`,
+    const response = await googleSheetsAPI.put(
+      `${SHEET_ID}/values/${range}`,
       {
         majorDimension: 'COLUMNS',
         values: [
