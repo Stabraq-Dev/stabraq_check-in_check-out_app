@@ -41,7 +41,7 @@ const NewUserForm = ({
     return (
       <div className={className}>
         <label>{label}</label>
-        <input {...input} placeholder={placeholder} maxLength={maxLength} />
+        <input {...input} placeholder={placeholder} maxLength={maxLength} autoComplete='off' />
         {renderError(meta)}
       </div>
     );
