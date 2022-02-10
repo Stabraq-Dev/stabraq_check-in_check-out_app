@@ -182,7 +182,8 @@ export class MyModalUser extends Component {
           default:
             return () =>
               history.push(
-                `/preferences/main/qr-code-gen/?mobile=${mobileNumber}`
+                // `/preferences/main/qr-code-gen/?mobile=${mobileNumber}`
+                `/preferences/main/user/?mobile=${mobileNumber}`
               );
         }
 
