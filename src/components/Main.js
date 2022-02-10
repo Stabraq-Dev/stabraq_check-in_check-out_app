@@ -10,6 +10,7 @@ import {
   doReveal,
   doLogOut,
   doClearPrevUserState,
+  doGetActiveUsersList,
 } from '../actions';
 
 const revealAll = [
@@ -49,9 +50,10 @@ class Main extends React.Component {
     await doReveal(revealAll);
   };
   onFormSubmitActiveUsers = async () => {
-    const { doReveal } = this.props;
+    const { doReveal, doGetActiveUsersList } = this.props;
     await doReveal(['USER-BTN', 'NEW-USER-BTN', 'QR-CODE-GEN-BTN']);
     await doReveal(revealAll);
+    await doGetActiveUsersList();
   };
 
   render() {
@@ -146,4 +148,5 @@ export default connect(mapStateToProps, {
   doReveal,
   doLogOut,
   doClearPrevUserState,
+  doGetActiveUsersList,
 })(Main);
