@@ -17,6 +17,7 @@ import { loadAuth } from '../api/auth';
 
 const App = ({ doCheckSignedIn }) => {
   const [online, setOnline] = useState(true);
+  const [downlink, setDownlink] = useState(0);
   useEffect(() => {
     if (!navigator.onLine) {
       return;
@@ -43,8 +44,20 @@ const App = ({ doCheckSignedIn }) => {
     setOnline(true);
   });
 
+  // Register for event changes:
+  navigator.connection.addEventListener('change', (e) => {
+    // Handle change of connection type here.
+    console.log(e.currentTarget.downlink);
+    setDownlink(e.currentTarget.downlink);
+  });
+
   const renderNoInternet = () => {
     if (!online) return <MyAlert bodyContent='NO INTERNET CONNECTION' />;
+  };
+
+  const renderSlowInternet = () => {
+    if (downlink > 0 && downlink < 1)
+      return <MyAlert bodyContent='SLOW INTERNET CONNECTION' />;
   };
 
   // if (!navigator.onLine) {
@@ -54,6 +67,7 @@ const App = ({ doCheckSignedIn }) => {
   return (
     <div className='container-fluid'>
       {renderNoInternet()}
+      {renderSlowInternet()}
       <Router history={history}>
         <div>
           <Splash />
