@@ -11,12 +11,9 @@ import {
 import { doOnNewUserFormSubmit, doShowMyModal } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
 
-const NewUserForm = ({
-  doShowMyModal,
-  loading,
-  doOnNewUserFormSubmit,
-  initialValues,
-}) => {
+const initialValues = JSON.parse(sessionStorage.getItem('formValues'));
+
+const NewUserForm = ({ doShowMyModal, loading, doOnNewUserFormSubmit }) => {
   useEffect(() => {
     // Anything in here is fired on component mount.
     return () => {
@@ -41,7 +38,12 @@ const NewUserForm = ({
     return (
       <div className={className}>
         <label>{label}</label>
-        <input {...input} placeholder={placeholder} maxLength={maxLength} autoComplete='off' />
+        <input
+          {...input}
+          placeholder={placeholder}
+          maxLength={maxLength}
+          autoComplete='off'
+        />
         {renderError(meta)}
       </div>
     );

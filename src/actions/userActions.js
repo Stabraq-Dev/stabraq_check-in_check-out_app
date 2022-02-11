@@ -340,6 +340,8 @@ export const doCheckByMobile = (mobile) => async (dispatch, getState) => {
 
 export const doOnNewUserFormSubmit =
   (formValues) => async (dispatch, getState) => {
+    sessionStorage.setItem('formValues', JSON.stringify(formValues));
+
     if (!navigator.onLine) return;
     const { showMyModal } = getState().app;
     dispatch(submitType(ON_NEW_USER_SUBMIT));
@@ -365,6 +367,10 @@ export const doOnNewUserFormSubmit =
     }
 
     await executeValuesUpdate('');
+    const { error } = getState().app;
+    if (error === '') {
+      sessionStorage.removeItem('formValues');
+    }
 
     dispatch(doLoading(false));
     dispatch(doShowCheckInOut(true));
