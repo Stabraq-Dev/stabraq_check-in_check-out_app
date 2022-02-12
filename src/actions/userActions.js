@@ -234,17 +234,19 @@ export const doGetActiveUsersList = () => async (dispatch) => {
 
 export const doSortActiveUsersList = (index) => async (dispatch, getState) => {
   const { activeUsersList } = getState().user;
-  const activeUsersSorted = activeUsersList.sort((a, b) =>
-    index === 5
-      ? Date.parse(`${new Date().toLocaleDateString('en-US')} ${a[index]}`)
-          .toString()
-          .localeCompare(
-            Date.parse(
-              `${new Date().toLocaleDateString('en-US')} ${b[index]}`
-            ).toString()
-          )
-      : a[index].localeCompare(b[index])
-  );
+  const activeUsersSorted = activeUsersList.sort((a, b) => {
+    const one = Date.parse(
+      `${new Date().toLocaleDateString('en-US')} ${a[index]}`
+    ).toString();
+    const two = Date.parse(
+      `${new Date().toLocaleDateString('en-US')} ${b[index]}`
+    ).toString();
+
+    return index === 5
+      ? one.localeCompare(two)
+      : a[index].localeCompare(b[index]);
+  });
+  
   await dispatch({ type: ACTIVE_USERS_LIST, payload: activeUsersSorted });
 };
 
