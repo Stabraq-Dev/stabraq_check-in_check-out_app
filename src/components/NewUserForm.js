@@ -131,6 +131,13 @@ const NewUserForm = ({ doShowMyModal, loading, doOnNewUserFormSubmit }) => {
   };
 
   const onSubmit = (formValues) => {
+    if (
+      formValues.membership !== 'HOURS_MEMBERSHIP' &&
+      formValues.hoursPackages
+    ) {
+      delete formValues.hoursPackages;
+    }
+
     doOnNewUserFormSubmit(formValues);
   };
 
