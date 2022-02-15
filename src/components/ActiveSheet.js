@@ -43,6 +43,7 @@ export class ActiveSheet extends Component {
           <div className='content'>
             <div className='header'>{active[0]}</div>
             <div className='description'>{active[3]}</div>
+            <i className='description'>{active[5]}</i>
           </div>
         </div>
       );
