@@ -65,7 +65,7 @@ const App = ({ doCheckSignedIn }) => {
   // }
 
   return (
-    <div className='container-fluid'>
+    <div className='container-fluid myOverflowHidden'>
       {renderNoInternet()}
       {renderSlowInternet()}
       <Router history={history}>

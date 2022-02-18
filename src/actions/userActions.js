@@ -24,6 +24,7 @@ import {
   ON_UPDATE_CHECK_IN_SUBMIT,
   ON_DELETE_CHECK_IN_SUBMIT,
   ON_CONFIRM_DELETE_CHECK_IN_SUBMIT,
+  ON_UPDATE_CHECK_OUT_SUBMIT,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -49,6 +50,7 @@ import {
   executeValuesAppendUserComment,
   executeBatchUpdateDeleteRange,
   executeValuesAppendUpdateCheckIn,
+  executeValuesAppendUpdateCheckOut,
 } from '../functions/executeFunc';
 
 import history from '../history';
@@ -246,7 +248,7 @@ export const doSortActiveUsersList = (index) => async (dispatch, getState) => {
       ? one.localeCompare(two)
       : a[index].localeCompare(b[index]);
   });
-  
+
   await dispatch({ type: ACTIVE_USERS_LIST, payload: activeUsersSorted });
 };
 
@@ -543,7 +545,7 @@ export const doCheckInOut =
   };
 
 export const doUpdateCheckIn =
-  (roomChecked, inviteNumberExists, invitationByMobileUser) =>
+  (roomChecked, inviteNumberExists, invitationByMobileUser, newCheckInTime) =>
   async (dispatch, getState) => {
     if (!navigator.onLine) return;
     dispatch(submitType(ON_UPDATE_CHECK_IN_SUBMIT));
@@ -554,8 +556,27 @@ export const doUpdateCheckIn =
       rowNumber,
       roomChecked,
       inviteNumberExists,
-      invitationByMobileUser
+      invitationByMobileUser,
+      newCheckInTime
     );
+
+    dispatch(doLoading(false));
+
+    const { showMyModal } = getState().app;
+    if (showMyModal) {
+      await dispatch(doShowMyModal(false));
+    }
+    await dispatch(doShowMyModal(true));
+  };
+
+export const doUpdateCheckOut =
+  (newCheckOutTime) => async (dispatch, getState) => {
+    if (!navigator.onLine) return;
+    dispatch(submitType(ON_UPDATE_CHECK_OUT_SUBMIT));
+    dispatch(doLoading(true));
+
+    const { rowNumber } = getState().user.valuesMatched;
+    await executeValuesAppendUpdateCheckOut(rowNumber, newCheckOutTime);
 
     dispatch(doLoading(false));
 

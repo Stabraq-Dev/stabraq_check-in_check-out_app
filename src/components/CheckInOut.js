@@ -5,6 +5,7 @@ import {
   doCheckByMobile,
   doConfirmDeleteUserCheckIn,
   doUpdateCheckIn,
+  doUpdateCheckOut,
 } from '../actions';
 import { checkForMobNum } from '../functions/validation';
 import history from '../history';
@@ -18,6 +19,7 @@ import {
   MdSentimentSatisfiedAlt,
   MdSentimentVerySatisfied,
 } from 'react-icons/md';
+import ResponsiveTimePickers from './ResponsiveTimePickers';
 
 const customIcons = [
   { icon: <MdSentimentVeryDissatisfied size={50} /> },
@@ -42,6 +44,8 @@ class CheckInOut extends React.Component {
     ratingValue: 0,
     commentText: '',
     editCheckIn: false,
+    editCheckOut: false,
+    newTimePickerValue: '',
   };
 
   componentDidMount() {
@@ -75,6 +79,10 @@ class CheckInOut extends React.Component {
     }
   };
 
+  onEditCheckOut = () => {
+    this.setState({ editCheckOut: !this.state.editCheckOut });
+  };
+
   onUpdateCheckIn = () => {
     const { roomChecked, inviteNumberExists, invitationByMobileUser } =
       this.handleCheckInOptions();
@@ -82,8 +90,13 @@ class CheckInOut extends React.Component {
     this.props.doUpdateCheckIn(
       roomChecked,
       inviteNumberExists,
-      invitationByMobileUser
+      invitationByMobileUser,
+      this.state.newTimePickerValue
     );
+  };
+
+  onUpdateCheckOut = () => {
+    this.props.doUpdateCheckOut(this.state.newTimePickerValue);
   };
 
   handleCheckInOptions = () => {
@@ -165,6 +178,7 @@ class CheckInOut extends React.Component {
     )
       return (
         <div className='row'>
+          {this.renderCheckInTime()}
           {this.renderPrivateRoomButton()}
           {this.renderTrainingRoomButton()}
           {this.renderGirlsRoomButton()}
@@ -173,6 +187,11 @@ class CheckInOut extends React.Component {
           {this.renderInvitationByMobileManual()}
         </div>
       );
+  };
+
+  renderCheckOutOptions = () => {
+    if (this.props.checkedOut === 'CHECKED_OUT' && this.state.editCheckOut)
+      return <div className='row'>{this.renderCheckOutTime()}</div>;
   };
 
   renderCheckInButton = () => {
@@ -192,7 +211,7 @@ class CheckInOut extends React.Component {
   };
 
   renderCheckOutButton = () => {
-    if (!this.state.editCheckIn)
+    if (!this.state.editCheckIn && !this.state.editCheckOut)
       return (
         <button
           className='ui primary button stabraq-bg ms-3 mt-1'
@@ -204,6 +223,36 @@ class CheckInOut extends React.Component {
           <i className='left arrow icon me-1' />
           Check Out
         </button>
+      );
+  };
+
+  onTimePickersChange = (newTime) => {
+    this.setState({ newTimePickerValue: newTime });
+  };
+
+  renderCheckInTime = () => {
+    if (this.props.checkedOut === 'NOT_CHECKED_OUT' && this.state.editCheckIn)
+      return (
+        <div className='myOverflowUnset'>
+          <ResponsiveTimePickers
+            label='Edit Check In Time'
+            initValue={this.props.checkInTime}
+            onTimeChange={this.onTimePickersChange}
+          />
+        </div>
+      );
+  };
+
+  renderCheckOutTime = () => {
+    if (this.props.checkedOut === 'CHECKED_OUT' && this.state.editCheckOut)
+      return (
+        <div className='myOverflowUnset'>
+          <ResponsiveTimePickers
+            label='Edit Check Out Time'
+            initValue={this.props.checkOutTime}
+            onTimeChange={this.onTimePickersChange}
+          />
+        </div>
       );
   };
 
@@ -449,6 +498,25 @@ class CheckInOut extends React.Component {
       );
   };
 
+  renderEditCheckOutButton = () => {
+    const className = !this.state.editCheckOut ? 'blue' : 'black';
+    const btnText = !this.state.editCheckOut ? 'Edit Check Out' : 'Cancel Edit';
+    const btnIcon = !this.state.editCheckOut ? 'edit outline' : 'reply';
+    if (this.props.checkedOut === 'CHECKED_OUT')
+      return (
+        <button
+          className={`ui ${className} button ms-3 mt-1`}
+          name='editCheckOut'
+          value='EDIT_CHECK_OUT'
+          onClick={this.onEditCheckOut}
+          type='submit'
+        >
+          <i className={`${btnIcon} icon me-1`} />
+          {btnText}
+        </button>
+      );
+  };
+
   renderUpdateCheckInButton = () => {
     if (this.props.checkedOut === 'NOT_CHECKED_OUT' && this.state.editCheckIn)
       return (
@@ -461,6 +529,22 @@ class CheckInOut extends React.Component {
         >
           <i className='edit icon me-1' />
           Update Check In
+        </button>
+      );
+  };
+
+  renderUpdateCheckOutButton = () => {
+    if (this.props.checkedOut === 'CHECKED_OUT' && this.state.editCheckOut)
+      return (
+        <button
+          className='ui orange button ms-3 mt-1'
+          name='updateCheckOut'
+          value='UPDATE_CHECK_OUT'
+          onClick={this.onUpdateCheckOut}
+          type='submit'
+        >
+          <i className='edit icon me-1' />
+          Update Check Out
         </button>
       );
   };
@@ -506,6 +590,7 @@ class CheckInOut extends React.Component {
     return (
       <div className='ui segment text-center'>
         {this.renderCheckInOptions()}
+        {this.renderCheckOutOptions()}
         {this.renderRating()}
         {this.renderCommentSection()}
         {this.renderCheckInButton()}
@@ -513,6 +598,9 @@ class CheckInOut extends React.Component {
         {this.renderEditCheckInButton()}
         {this.renderUpdateCheckInButton()}
         {this.renderDeleteCheckInButton()}
+        {this.renderEditCheckOutButton()}
+        {this.renderUpdateCheckOutButton()}
+        {/* {this.renderDeleteCheckInButton()} */}
       </div>
     );
   }
@@ -520,8 +608,15 @@ class CheckInOut extends React.Component {
 
 const mapStateToProps = (state) => {
   const { loading, mobileNumber, showCheckInOut } = state.app;
-  const { gender, membership, checkedOut, rating, roomChecked } =
-    state.user.valuesMatched;
+  const {
+    gender,
+    membership,
+    checkedOut,
+    rating,
+    roomChecked,
+    checkInTime,
+    checkOutTime,
+  } = state.user.valuesMatched;
   const { trainingRoomRate, privateRoomRate, sharedHourRate, girlsHourRate } =
     state.user.hoursDailyRates;
   const { inviteNumberExists } = state.user;
@@ -535,6 +630,8 @@ const mapStateToProps = (state) => {
     checkedOut,
     rating,
     roomChecked,
+    checkInTime,
+    checkOutTime,
     trainingRoomRate,
     privateRoomRate,
     sharedHourRate,
@@ -549,4 +646,5 @@ export default connect(mapStateToProps, {
   doCheckByMobile,
   doConfirmDeleteUserCheckIn,
   doUpdateCheckIn,
+  doUpdateCheckOut,
 })(CheckInOut);

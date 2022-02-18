@@ -36,6 +36,8 @@ const valuesMatchedObj = {
   invite: '',
   inviteByMobile: '',
   inviteByName: '',
+  checkInTime: '',
+  checkOutTime: '',
 };
 
 const INITIAL_STATE = {
@@ -85,6 +87,8 @@ let valuesMatchedKeys = [
   'invite',
   'inviteByMobile',
   'inviteByName',
+  'checkInTime',
+  'checkOutTime',
 ];
 
 let durationCostKeys = ['duration', 'approxDuration', 'cost'];

@@ -53,7 +53,7 @@ export class MyModalUser extends Component {
           } else if (numberExists === 'NOT_EXISTS') {
             return <DefaultBody message='Not Exist' />;
           } else {
-            return <DefaultBody message='See you soon' />;
+            return <DefaultBody message={`See you soon\n${userName}`} />;
           }
 
         case 'ON_NEW_USER_SUBMIT':
@@ -121,6 +121,8 @@ export class MyModalUser extends Component {
           return <DefaultBody message='Check In Deleted Successfully' />;
         case 'ON_UPDATE_CHECK_IN_SUBMIT':
           return <DefaultBody message='Check In Updated Successfully' />;
+        case 'ON_UPDATE_CHECK_OUT_SUBMIT':
+          return <DefaultBody message='Check Out Updated Successfully' />;
         default:
           return null;
       }
@@ -215,6 +217,12 @@ export class MyModalUser extends Component {
           return goToHome;
         }
       case 'ON_UPDATE_CHECK_IN_SUBMIT':
+        if (error) {
+          return goToCheckInOut;
+        } else {
+          return goToHome;
+        }
+      case 'ON_UPDATE_CHECK_OUT_SUBMIT':
         if (error) {
           return goToCheckInOut;
         } else {

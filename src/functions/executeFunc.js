@@ -6,6 +6,7 @@ import qs from 'qs';
 import {
   APPEND_CHECKOUT_RANGE,
   APPEND_UPDATE_CHECK_IN_RANGE,
+  APPEND_UPDATE_CHECK_OUT_RANGE,
   APPROX_DURATION_EXCEL_FORMULA,
   CLIENTS_SHEET_APPEND_RANGE,
   COMMENTS_SHEET_APPEND_RANGE,
@@ -605,7 +606,8 @@ export const executeValuesAppendUpdateCheckIn = async (
   rowNumber,
   roomChecked,
   inviteNumberExists,
-  invitationByMobileUser
+  invitationByMobileUser,
+  newCheckInTime
 ) => {
   try {
     await axiosAuth(SHEET_ID);
@@ -618,6 +620,12 @@ export const executeValuesAppendUpdateCheckIn = async (
       {
         majorDimension: 'COLUMNS',
         values: [
+          [newCheckInTime],
+          [],
+          [],
+          [],
+          [],
+          [],
           [roomChecked],
           [inviteNumberExists],
           [`'${invitationByMobileUser.inviteByMobile}`],
@@ -634,6 +642,35 @@ export const executeValuesAppendUpdateCheckIn = async (
     return response;
   } catch (err) {
     console.error('Execute error executeValuesAppendUpdateCheckIn', err);
+  }
+};
+
+export const executeValuesAppendUpdateCheckOut = async (
+  rowNumber,
+  newCheckOutTime
+) => {
+  try {
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
+
+    const range = APPEND_UPDATE_CHECK_OUT_RANGE(rowNumber);
+    const valueInputOption = 'USER_ENTERED';
+    const response = await googleSheetsAPI.put(
+      `${SHEET_ID}/values/${range}`,
+      {
+        majorDimension: 'COLUMNS',
+        values: [[newCheckOutTime]],
+      },
+      { params: { valueInputOption: valueInputOption } }
+    );
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log('Response executeValuesAppendUpdateCheckOut', response);
+    }
+
+    return response;
+  } catch (err) {
+    console.error('Execute error executeValuesAppendUpdateCheckOut', err);
   }
 };
 

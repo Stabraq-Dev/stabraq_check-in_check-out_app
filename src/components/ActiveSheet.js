@@ -33,8 +33,28 @@ export class ActiveSheet extends Component {
       );
     }
     return this.props.activeUsersList.map((active, index) => {
+      const getColor = (value) => {
+        switch (value) {
+          case 'GREEN':
+            return 'text-green-member-color';
+          case 'ORANGE':
+            return 'text-orange-member-color';
+          case '10_DAYS':
+            return 'text-ten-days-member-color';
+          case 'HOURS_MEMBERSHIP':
+            return 'text-hours-member-color';
+          case 'NOT_MEMBER':
+            return 'text-not-member-color';
+
+          default:
+            return '';
+        }
+      };
+
+      const membershipTextColor = getColor(active[3]);
+      const rowColor = index % 2 === 0 ? 'row-color' : '';
       return (
-        <div className='item' key={index}>
+        <div className={`item ${rowColor}`} key={index}>
           {this.renderSearch(active[1])}
           <i className='middle aligned icon'>
             {(index + 1).toString().padStart(2, '0')}
@@ -42,7 +62,9 @@ export class ActiveSheet extends Component {
           <i className='large middle aligned icon user circle'></i>
           <div className='content'>
             <div className='header'>{active[0]}</div>
-            <div className='description'>{active[3]}</div>
+            <div className={`description ${membershipTextColor}`}>
+              {active[3]}
+            </div>
             <i className='description'>{active[5]}</i>
           </div>
         </div>

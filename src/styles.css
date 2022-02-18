@@ -2,8 +2,12 @@
   border: 1px black dashed;
 }
 
-div {
+.myOverflowHidden {
   overflow: hidden;
+}
+
+.myOverflowUnset {
+  overflow: unset;
 }
 
 #comment {
@@ -129,4 +133,28 @@ footer {
     height: 100% !important;
     width: 100% !important;
   }
+}
+
+.text-green-member-color {
+  color: #21ba45 !important;
+}
+
+.text-orange-member-color {
+  color: #f2711c !important;
+}
+
+.text-hours-member-color {
+  color: #076ec2 !important;
+}
+
+.text-ten-days-member-color {
+  color: #21d0c8 !important;
+}
+
+.text-not-member-color {
+  color: #9a08c7 !important;
+}
+
+.row-color {
+  background: #f0f8ff;
 }

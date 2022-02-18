@@ -9,14 +9,17 @@ export const APPEND_CHECKOUT_RANGE = (rowNumber) => {
   return `Data!G${rowNumber}`;
 };
 export const APPEND_UPDATE_CHECK_IN_RANGE = (rowNumber) => {
-  return `Data!L${rowNumber}`;
+  return `Data!F${rowNumber}`;
+};
+export const APPEND_UPDATE_CHECK_OUT_RANGE = (rowNumber) => {
+  return `Data!G${rowNumber}`;
 };
 export const DATA_SHEET_ACTIVE_RANGE = 'Data!A4:G';
 
 /* FUNC */
 export const NUMBER_TO_CHECK_EXISTS_RANGE = 'Func!A2';
 export const NUMBER_EXISTS_RANGE = 'Func!B2';
-export const VALUES_MATCHED_RANGES = ['Func!C2:O2', 'Func!A4:G4'];
+export const VALUES_MATCHED_RANGES = ['Func!C2:O2', 'Func!A4:I4'];
 export const LAST_BLANK_ROW_RANGE = 'Func!A6';
 
 export const HOURS_DAILY_RATES_RANGE = 'Func!A8:F8';
