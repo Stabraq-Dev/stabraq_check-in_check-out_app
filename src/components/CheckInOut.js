@@ -4,6 +4,7 @@ import {
   doCheckInOut,
   doCheckByMobile,
   doConfirmDeleteUserCheckIn,
+  doConfirmDeleteUserCheckOut,
   doUpdateCheckIn,
   doUpdateCheckOut,
 } from '../actions';
@@ -56,6 +57,10 @@ class CheckInOut extends React.Component {
 
   onDeleteCheckIn = () => {
     this.props.doConfirmDeleteUserCheckIn();
+  };
+
+  onDeleteCheckOut = () => {
+    this.props.doConfirmDeleteUserCheckOut();
   };
 
   onEditCheckIn = () => {
@@ -479,6 +484,22 @@ class CheckInOut extends React.Component {
       );
   };
 
+  renderDeleteCheckOutButton = () => {
+    if (this.props.checkedOut === 'CHECKED_OUT' && !this.state.editCheckOut)
+      return (
+        <button
+          className='ui red button ms-3 mt-1'
+          name='deleteCheckOut'
+          value='DELETE_CHECK_OUT'
+          onClick={this.onDeleteCheckOut}
+          type='submit'
+        >
+          <i className='trash alternate outline icon me-1' />
+          Delete Check Out
+        </button>
+      );
+  };
+
   renderEditCheckInButton = () => {
     const className = !this.state.editCheckIn ? 'blue' : 'black';
     const btnText = !this.state.editCheckIn ? 'Edit Check In' : 'Cancel Edit';
@@ -600,7 +621,7 @@ class CheckInOut extends React.Component {
         {this.renderDeleteCheckInButton()}
         {this.renderEditCheckOutButton()}
         {this.renderUpdateCheckOutButton()}
-        {/* {this.renderDeleteCheckInButton()} */}
+        {this.renderDeleteCheckOutButton()}
       </div>
     );
   }
@@ -645,6 +666,7 @@ export default connect(mapStateToProps, {
   doCheckInOut,
   doCheckByMobile,
   doConfirmDeleteUserCheckIn,
+  doConfirmDeleteUserCheckOut,
   doUpdateCheckIn,
   doUpdateCheckOut,
 })(CheckInOut);

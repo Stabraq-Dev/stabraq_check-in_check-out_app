@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import MyModal from './MyModal';
 import { connect } from 'react-redux';
-import { doShowMyModal, doRevealLogo, doDeleteUserCheckIn } from '../actions';
+import {
+  doShowMyModal,
+  doRevealLogo,
+  doDeleteUserCheckIn,
+  doDeleteUserCheckOut,
+} from '../actions';
 import history from '../history';
 
 export class MyModalUser extends Component {
@@ -117,8 +122,16 @@ export class MyModalUser extends Component {
               message={`Are you sure you want to\ndelete user Check In?`}
             />
           );
+        case 'ON_CONFIRM_DELETE_CHECK_OUT_SUBMIT':
+          return (
+            <DefaultBody
+              message={`Are you sure you want to\ndelete user Check Out?`}
+            />
+          );
         case 'ON_DELETE_CHECK_IN_SUBMIT':
           return <DefaultBody message='Check In Deleted Successfully' />;
+        case 'ON_DELETE_CHECK_OUT_SUBMIT':
+          return <DefaultBody message='Check Out Deleted Successfully' />;
         case 'ON_UPDATE_CHECK_IN_SUBMIT':
           return <DefaultBody message='Check In Updated Successfully' />;
         case 'ON_UPDATE_CHECK_OUT_SUBMIT':
@@ -216,6 +229,12 @@ export class MyModalUser extends Component {
         } else {
           return goToHome;
         }
+      case 'ON_DELETE_CHECK_OUT_SUBMIT':
+        if (error) {
+          return goToCheckInOut;
+        } else {
+          return goToHome;
+        }
       case 'ON_UPDATE_CHECK_IN_SUBMIT':
         if (error) {
           return goToCheckInOut;
@@ -237,13 +256,19 @@ export class MyModalUser extends Component {
    * @a renderYesAction
    */
   renderYesAction = () => {
-    const { submitType, doDeleteUserCheckIn } = this.props;
-    const deleteUser = async () => {
+    const { submitType, doDeleteUserCheckIn, doDeleteUserCheckOut } =
+      this.props;
+    const deleteUserCheckIn = async () => {
       await doDeleteUserCheckIn();
+    };
+    const deleteUserCheckOut = async () => {
+      await doDeleteUserCheckOut();
     };
     switch (submitType) {
       case 'ON_CONFIRM_DELETE_CHECK_IN_SUBMIT':
-        return deleteUser;
+        return deleteUserCheckIn;
+      case 'ON_CONFIRM_DELETE_CHECK_OUT_SUBMIT':
+        return deleteUserCheckOut;
       default:
         return null;
     }
@@ -256,7 +281,10 @@ export class MyModalUser extends Component {
     const { error, submitType } = this.props;
     if (error) {
       return 'error-bg';
-    } else if (submitType === 'ON_CONFIRM_DELETE_CHECK_IN_SUBMIT') {
+    } else if (
+      submitType === 'ON_CONFIRM_DELETE_CHECK_IN_SUBMIT' ||
+      submitType === 'ON_CONFIRM_DELETE_CHECK_OUT_SUBMIT'
+    ) {
       return 'bg-warning';
     } else {
       return 'stabraq-bg';
@@ -325,4 +353,5 @@ export default connect(mapStateToProps, {
   doShowMyModal,
   doRevealLogo,
   doDeleteUserCheckIn,
+  doDeleteUserCheckOut,
 })(MyModalUser);

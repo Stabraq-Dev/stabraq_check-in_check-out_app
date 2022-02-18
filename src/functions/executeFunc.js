@@ -602,6 +602,32 @@ export const executeValuesAppendCheckOut = async (
   }
 };
 
+export const executeValuesAppendDeleteCheckOut = async (rowNumber) => {
+  try {
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
+
+    const range = APPEND_CHECKOUT_RANGE(rowNumber);
+    const valueInputOption = 'USER_ENTERED';
+    const response = await googleSheetsAPI.put(
+      `${SHEET_ID}/values/${range}`,
+      {
+        majorDimension: 'COLUMNS',
+        values: [[''], [''], [''], [''], ['']],
+      },
+      { params: { valueInputOption: valueInputOption } }
+    );
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log('Response executeValuesAppendDeleteCheckOut', response);
+    }
+
+    return response;
+  } catch (err) {
+    console.error('Execute error executeValuesAppendDeleteCheckOut', err);
+  }
+};
+
 export const executeValuesAppendUpdateCheckIn = async (
   rowNumber,
   roomChecked,

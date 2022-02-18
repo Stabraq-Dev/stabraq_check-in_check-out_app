@@ -25,6 +25,8 @@ import {
   ON_DELETE_CHECK_IN_SUBMIT,
   ON_CONFIRM_DELETE_CHECK_IN_SUBMIT,
   ON_UPDATE_CHECK_OUT_SUBMIT,
+  ON_CONFIRM_DELETE_CHECK_OUT_SUBMIT,
+  ON_DELETE_CHECK_OUT_SUBMIT,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -51,6 +53,7 @@ import {
   executeBatchUpdateDeleteRange,
   executeValuesAppendUpdateCheckIn,
   executeValuesAppendUpdateCheckOut,
+  executeValuesAppendDeleteCheckOut,
 } from '../functions/executeFunc';
 
 import history from '../history';
@@ -266,6 +269,29 @@ export const doDeleteUserCheckIn = () => async (dispatch, getState) => {
   dispatch(doLoading(true));
   dispatch(submitType(ON_DELETE_CHECK_IN_SUBMIT));
   await executeBatchUpdateDeleteRange(rowNumber);
+  dispatch(doLoading(false));
+
+  const { showMyModal } = getState().app;
+  if (showMyModal) {
+    await dispatch(doShowMyModal(false));
+  }
+  await dispatch(doShowMyModal(true));
+};
+
+export const doConfirmDeleteUserCheckOut = () => async (dispatch, getState) => {
+  dispatch(submitType(ON_CONFIRM_DELETE_CHECK_OUT_SUBMIT));
+  const { showMyModal } = getState().app;
+  if (showMyModal) {
+    await dispatch(doShowMyModal(false));
+  }
+  await dispatch(doShowMyModal(true));
+};
+
+export const doDeleteUserCheckOut = () => async (dispatch, getState) => {
+  const { rowNumber } = getState().user.valuesMatched;
+  dispatch(doLoading(true));
+  dispatch(submitType(ON_DELETE_CHECK_OUT_SUBMIT));
+  await executeValuesAppendDeleteCheckOut(rowNumber);
   dispatch(doLoading(false));
 
   const { showMyModal } = getState().app;
