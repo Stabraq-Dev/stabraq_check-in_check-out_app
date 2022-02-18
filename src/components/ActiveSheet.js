@@ -61,7 +61,7 @@ export class ActiveSheet extends Component {
           </i>
           <i className='large middle aligned icon user circle'></i>
           <div className='content'>
-            <div className='header'>{active[0]}</div>
+            <div className='header mb-1'>{active[0]}</div>
             <div className={`description ${membershipTextColor}`}>
               {active[3]}
             </div>
@@ -74,7 +74,7 @@ export class ActiveSheet extends Component {
 
   renderSearch(mobile) {
     return (
-      <div className='right floated content'>
+      <div className='right floated content mt-2'>
         <Link
           to={`/preferences/main/user/?mobile=${mobile}`}
           className='ui button positive'
