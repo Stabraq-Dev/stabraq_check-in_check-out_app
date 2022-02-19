@@ -42,7 +42,7 @@ footer {
 .btn-check:checked + .btn-outline-stabraq,
 .btn-outline-stabraq:hover,
 .btn-outline-stabraq:active {
-  color: #fff;
+  color: #ffffff;
   background-color: #3adb6b;
   border-color: #3adb6b;
   box-shadow: 0 0 0 0rem;
@@ -67,11 +67,11 @@ footer {
 }
 
 #exampleModal .modal-body.error-bg {
-  background-color: red;
+  background-color: #ff0000;
 }
 
 .freebirdLightBackground {
-  background-color: rgb(210, 235, 211);
+  background-color: #d2ebd3;
 }
 
 .my-pre-wrap {
@@ -157,4 +157,12 @@ footer {
 
 .row-color {
   background: #f0f8ff;
+}
+
+.active-bg-color {
+  background: #deb887 !important;
+}
+
+.non-active-bg-color {
+  background: #008b8b !important;
 }

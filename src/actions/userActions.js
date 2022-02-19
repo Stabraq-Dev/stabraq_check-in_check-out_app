@@ -27,6 +27,7 @@ import {
   ON_UPDATE_CHECK_OUT_SUBMIT,
   ON_CONFIRM_DELETE_CHECK_OUT_SUBMIT,
   ON_DELETE_CHECK_OUT_SUBMIT,
+  NON_ACTIVE_USERS_LIST,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -232,27 +233,39 @@ export const doGetActiveUsersList = () => async (dispatch) => {
   const allCheckedInUsers = await getSheetValues(DATA_SHEET_ACTIVE_RANGE);
   if (allCheckedInUsers) {
     const activeUsers = allCheckedInUsers.filter((value) => value.length <= 6);
+    const nonActiveUsers = allCheckedInUsers.filter(
+      (value) => value.length > 6
+    );
     await dispatch({ type: ACTIVE_USERS_LIST, payload: activeUsers });
+    await dispatch({ type: NON_ACTIVE_USERS_LIST, payload: nonActiveUsers });
+  } else {
+    await dispatch({ type: ACTIVE_USERS_LIST, payload: [] });
+    await dispatch({ type: NON_ACTIVE_USERS_LIST, payload: [] });
   }
   dispatch(doLoading(false));
 };
 
 export const doSortActiveUsersList = (index) => async (dispatch, getState) => {
-  const { activeUsersList } = getState().user;
-  const activeUsersSorted = activeUsersList.sort((a, b) => {
-    const one = Date.parse(
-      `${new Date().toLocaleDateString('en-US')} ${a[index]}`
-    ).toString();
-    const two = Date.parse(
-      `${new Date().toLocaleDateString('en-US')} ${b[index]}`
-    ).toString();
+  const { activeUsersList, nonActiveUsersList } = getState().user;
+  const activeUsersSorted = (list) =>
+    list.sort((a, b) => {
+      const one = Date.parse(
+        `${new Date().toLocaleDateString('en-US')} ${a[index]}`
+      ).toString();
+      const two = Date.parse(
+        `${new Date().toLocaleDateString('en-US')} ${b[index]}`
+      ).toString();
 
-    return index === 5
-      ? one.localeCompare(two)
-      : a[index].localeCompare(b[index]);
-  });
+      return index === 5
+        ? one.localeCompare(two)
+        : a[index].localeCompare(b[index]);
+    });
 
-  await dispatch({ type: ACTIVE_USERS_LIST, payload: activeUsersSorted });
+  const activeSorted = activeUsersSorted(activeUsersList);
+  const nonActiveSorted = activeUsersSorted(nonActiveUsersList);
+
+  await dispatch({ type: ACTIVE_USERS_LIST, payload: activeSorted });
+  await dispatch({ type: NON_ACTIVE_USERS_LIST, payload: nonActiveSorted });
 };
 
 export const doConfirmDeleteUserCheckIn = () => async (dispatch, getState) => {

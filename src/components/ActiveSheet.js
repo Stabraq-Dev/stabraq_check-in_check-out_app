@@ -3,36 +3,40 @@ import { connect } from 'react-redux';
 import { doGetActiveUsersList, doSortActiveUsersList } from '../actions';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from './LoadingSpinner';
+import { getSheetValues } from '../functions/executeFunc';
+import { DATA_SHEET_TOTAL_COST_RANGE } from '../ranges';
 
 export class ActiveSheet extends Component {
-  state = { sortedBy: 'Time' };
+  state = { sortedBy: 'Time', totalCost: '' };
 
   componentDidMount() {
     this.props.doGetActiveUsersList();
+    this.setState({ totalCost: '' });
   }
 
-  renderCountActiveUsers = () => {
-    const { activeUsersList } = this.props;
-    const usersText = activeUsersList.length === 1 ? 'User' : 'Users';
-    if (activeUsersList.length > 0)
+  renderCountActiveUsers = ({ list, type }) => {
+    const usersText = list.length === 1 ? 'User' : 'Users';
+    const bgColor =
+      type === 'Active' ? 'active-bg-color' : 'non-active-bg-color';
+    if (list.length > 0)
       return (
-        <div className='ui segment'>
+        <div className={`ui segment ${bgColor}`}>
           <div className='ui center aligned header'>
-            Active {usersText}: {activeUsersList.length} {usersText}
+            {type} {usersText}: {list.length} {usersText}
           </div>
         </div>
       );
   };
 
-  renderList = () => {
-    if (this.props.activeUsersList.length === 0) {
+  renderList = ({ list, type }) => {
+    if (list.length === 0) {
       return (
         <div className='ui segment'>
-          <div className='ui center aligned header'>No Active Users</div>
+          <div className='ui center aligned header'>No {type} Users</div>
         </div>
       );
     }
-    return this.props.activeUsersList.map((active, index) => {
+    return list.map((active, index) => {
       const getColor = (value) => {
         switch (value) {
           case 'GREEN':
@@ -65,7 +69,14 @@ export class ActiveSheet extends Component {
             <div className={`description ${membershipTextColor}`}>
               {active[3]}
             </div>
-            <i className='description'>{active[5]}</i>
+            <i className='description'>In: {active[5]}</i>
+            {active[6] && <i className='description'>Out: {active[6]}</i>}
+            {active[8] && (
+              <div className='description'>Duration: {active[8]} HR</div>
+            )}
+            {active[9] && (
+              <div className='description'>Cost: {active[9]} EGP</div>
+            )}
           </div>
         </div>
       );
@@ -92,13 +103,18 @@ export class ActiveSheet extends Component {
     });
   };
 
+  onGetTotalCost = async () => {
+    const totalCost = await getSheetValues(DATA_SHEET_TOTAL_COST_RANGE);
+    this.setState({ totalCost: totalCost[0][0] });
+  };
+
   renderSortButtons = () => {
     const { sortedBy } = this.state;
-    const { activeUsersList } = this.props;
+    const { activeUsersList, nonActiveUsersList } = this.props;
     const membership = sortedBy === 'Membership' ? 'bg-dark' : 'stabraq-bg';
     const name = sortedBy === 'Name' ? 'bg-dark' : 'stabraq-bg';
     const time = sortedBy === 'Time' ? 'bg-dark' : 'stabraq-bg';
-    if (activeUsersList.length > 0)
+    if (activeUsersList.length > 0 || nonActiveUsersList.length > 0)
       return (
         <div className='ui segment text-center'>
           <button
@@ -138,15 +154,53 @@ export class ActiveSheet extends Component {
       );
   };
 
+  renderGetTotalCostButtons = () => {
+    const { nonActiveUsersList } = this.props;
+
+    if (nonActiveUsersList.length > 0)
+      return (
+        <div className='ui segment text-center'>
+          <button
+            className={`ui primary button mt-1`}
+            name='getTotalCost'
+            onClick={this.onGetTotalCost}
+            type='submit'
+            value='GET_TOTAL_COST'
+          >
+            Get Total Cost
+          </button>
+          {this.renderTotalCost()}
+        </div>
+      );
+  };
+
+  renderTotalCost = () => {
+    if (this.state.totalCost)
+      return (
+        <div className='description'>
+          Total Cost: {this.state.totalCost} EGP
+        </div>
+      );
+  };
+
   render() {
+    const { activeUsersList, nonActiveUsersList } = this.props;
+    const activeProps = { list: activeUsersList, type: 'Active' };
+    const nonActiveProps = { list: nonActiveUsersList, type: 'Non-Active' };
+
     if (this.props.loading) {
       return <LoadingSpinner />;
     }
+
     return (
       <>
-        {this.renderCountActiveUsers()}
+        {this.renderCountActiveUsers(activeProps)}
         {this.renderSortButtons()}
-        <div className='ui celled list'>{this.renderList()}</div>
+        <div className='ui celled list'>{this.renderList(activeProps)}</div>
+        {this.renderCountActiveUsers(nonActiveProps)}
+        {this.renderSortButtons()}
+        <div className='ui celled list'>{this.renderList(nonActiveProps)}</div>
+        {this.renderGetTotalCostButtons()}
       </>
     );
   }
@@ -154,10 +208,11 @@ export class ActiveSheet extends Component {
 
 const mapStateToProps = (state) => {
   const { loading } = state.app;
-  const { activeUsersList } = state.user;
+  const { activeUsersList, nonActiveUsersList } = state.user;
   return {
     loading,
     activeUsersList,
+    nonActiveUsersList,
   };
 };
 

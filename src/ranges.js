@@ -14,7 +14,8 @@ export const APPEND_UPDATE_CHECK_IN_RANGE = (rowNumber) => {
 export const APPEND_UPDATE_CHECK_OUT_RANGE = (rowNumber) => {
   return `Data!G${rowNumber}`;
 };
-export const DATA_SHEET_ACTIVE_RANGE = 'Data!A4:G';
+export const DATA_SHEET_ACTIVE_RANGE = 'Data!A4:K';
+export const DATA_SHEET_TOTAL_COST_RANGE = 'Data!J2';
 
 /* FUNC */
 export const NUMBER_TO_CHECK_EXISTS_RANGE = 'Func!A2';
