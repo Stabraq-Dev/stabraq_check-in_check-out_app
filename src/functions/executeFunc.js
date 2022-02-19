@@ -415,7 +415,7 @@ export const executeValuesAppendNewUserData = async (
         ? 7
         : '';
 
-    const offersChecked = offers ? true : '';
+    const offersChecked = offers ? true : false;
 
     const range = CLIENTS_SHEET_APPEND_RANGE;
     const valueInputOption = 'USER_ENTERED';
