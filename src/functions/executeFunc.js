@@ -506,6 +506,8 @@ export const executeValuesAppendCheckIn = async (
     await axiosAuth(SHEET_ID);
     const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
+    const { inviteByMobile, inviteByName } = invitationByMobileUser;
+
     const range = DATA_SHEET_APPEND_RANGE;
     const valueInputOption = 'USER_ENTERED';
     const response = await googleSheetsAPI.post(
@@ -526,8 +528,8 @@ export const executeValuesAppendCheckIn = async (
           [''],
           [roomChecked],
           [inviteNumberExists],
-          [`'${invitationByMobileUser.inviteByMobile}`],
-          [invitationByMobileUser.inviteByName],
+          [`'${inviteByMobile}`],
+          [inviteByName],
         ],
       },
       { params: { valueInputOption: valueInputOption } }
@@ -639,6 +641,15 @@ export const executeValuesAppendUpdateCheckIn = async (
     await axiosAuth(SHEET_ID);
     const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
+    const { inviteByMobile, inviteByName } = invitationByMobileUser;
+
+    const inviteNumberExistsFinal =
+      inviteNumberExists || roomChecked ? [inviteNumberExists] : [];
+    const inviteByMobileFinal =
+      inviteByMobile || roomChecked ? [`'${inviteByMobile}`] : [];
+    const inviteByNameFinal =
+      inviteByName || roomChecked || inviteByName === '' ? [inviteByName] : [];
+
     const range = APPEND_UPDATE_CHECK_IN_RANGE(rowNumber);
     const valueInputOption = 'USER_ENTERED';
     const response = await googleSheetsAPI.put(
@@ -646,16 +657,16 @@ export const executeValuesAppendUpdateCheckIn = async (
       {
         majorDimension: 'COLUMNS',
         values: [
-          [newCheckInTime],
+          newCheckInTime ? [newCheckInTime] : [],
           [],
           [],
           [],
           [],
           [],
           [roomChecked],
-          [inviteNumberExists],
-          [`'${invitationByMobileUser.inviteByMobile}`],
-          [invitationByMobileUser.inviteByName],
+          inviteNumberExistsFinal,
+          inviteByMobileFinal,
+          inviteByNameFinal,
         ],
       },
       { params: { valueInputOption: valueInputOption } }

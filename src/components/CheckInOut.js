@@ -82,6 +82,33 @@ class CheckInOut extends React.Component {
       default:
         break;
     }
+
+    if (this.props.invite !== 'NO') {
+      this.setState({
+        invitationChecked: !this.state.invitationChecked,
+      });
+
+      this.setState({ invitationByMobile: this.props.inviteByMobile });
+      this.setState({ inviteNumberExists: this.props.invite });
+
+      if (this.props.invite === 'EXISTS') {
+        this.setState({ inviteUserName: this.props.inviteByName });
+      } else {
+        this.setState({ invitationByMobileManual: this.props.inviteByMobile });
+        if (
+          this.props.inviteByName === 'NO' ||
+          this.props.inviteByName === ' '
+        ) {
+          this.setState({
+            invitationByUserNameManual: '',
+          });
+        } else {
+          this.setState({
+            invitationByUserNameManual: this.props.inviteByName,
+          });
+        }
+      }
+    }
   };
 
   onEditCheckOut = () => {
@@ -585,6 +612,13 @@ class CheckInOut extends React.Component {
         inviteNumberExists: this.props.inviteNumberExists,
         inviteUserName: this.props.userName,
       });
+
+      if (this.props.inviteNumberExists === 'NOT_EXISTS') {
+        this.setState({
+          invitationByMobileManual: mobile,
+          invitationByUserNameManual: '',
+        });
+      }
     }
   };
 
@@ -635,6 +669,9 @@ const mapStateToProps = (state) => {
     checkedOut,
     rating,
     roomChecked,
+    invite,
+    inviteByMobile,
+    inviteByName,
     checkInTime,
     checkOutTime,
   } = state.user.valuesMatched;
@@ -651,6 +688,9 @@ const mapStateToProps = (state) => {
     checkedOut,
     rating,
     roomChecked,
+    invite,
+    inviteByMobile,
+    inviteByName,
     checkInTime,
     checkOutTime,
     trainingRoomRate,
