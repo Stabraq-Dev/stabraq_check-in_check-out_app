@@ -138,6 +138,13 @@ const NewUserForm = ({ doShowMyModal, loading, doOnNewUserFormSubmit }) => {
       delete formValues.hoursPackages;
     }
 
+    formValues.username = formValues.username.replace(
+      /(^\w{1})|(\s+\w{1})/g,
+      (letter) => letter.toUpperCase()
+    );
+
+    formValues.email = formValues.email.toLowerCase();
+
     doOnNewUserFormSubmit(formValues);
   };
 
