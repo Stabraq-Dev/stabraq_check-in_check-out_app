@@ -232,9 +232,11 @@ export const doGetActiveUsersList = () => async (dispatch) => {
   dispatch(doLoading(true));
   const allCheckedInUsers = await getSheetValues(DATA_SHEET_ACTIVE_RANGE);
   if (allCheckedInUsers) {
-    const activeUsers = allCheckedInUsers.filter((value) => value.length <= 6);
+    const activeUsers = allCheckedInUsers.filter(
+      (value) => value[10] !== 'CHECKED_OUT'
+    );
     const nonActiveUsers = allCheckedInUsers.filter(
-      (value) => value.length > 6
+      (value) => value[10] === 'CHECKED_OUT'
     );
     await dispatch({ type: ACTIVE_USERS_LIST, payload: activeUsers });
     await dispatch({ type: NON_ACTIVE_USERS_LIST, payload: nonActiveUsers });

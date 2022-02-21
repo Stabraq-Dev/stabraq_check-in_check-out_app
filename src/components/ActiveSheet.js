@@ -77,6 +77,12 @@ export class ActiveSheet extends Component {
             {active[9] && (
               <div className='description'>Cost: {active[9]} EGP</div>
             )}
+            {active[11] && (
+              <div className='description text-danger'>Room: {active[11]}</div>
+            )}
+            {active[12] && (
+              <div className='description'>Invitation: {active[12]}</div>
+            )}
           </div>
         </div>
       );
