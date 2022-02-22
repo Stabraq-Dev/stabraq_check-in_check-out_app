@@ -10,6 +10,12 @@ import {
 } from '../functions/validation';
 import { doOnNewUserFormSubmit, doShowMyModal } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
+import {
+  hoursPackagesOptions,
+  membershipOptions,
+} from './react-final-form/membershipOptions';
+import { renderSelectOptions } from './react-final-form/renderSelectOptions';
+import { renderError } from './react-final-form/renderError';
 
 const initialValues = JSON.parse(sessionStorage.getItem('formValues'));
 
@@ -23,16 +29,6 @@ const NewUserForm = ({ doShowMyModal, loading, doOnNewUserFormSubmit }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const renderError = ({ error, touched }) => {
-    if (touched && error) {
-      return (
-        <div className='ui error message'>
-          <h4 className='ui header'>{error}</h4>
-        </div>
-      );
-    }
-  };
-
   const renderInput = ({ input, label, meta, placeholder, maxLength }) => {
     const className = `field ${meta.error && meta.touched ? 'error' : ''}`;
     return (
@@ -44,31 +40,6 @@ const NewUserForm = ({ doShowMyModal, loading, doOnNewUserFormSubmit }) => {
           maxLength={maxLength}
           autoComplete='off'
         />
-        {renderError(meta)}
-      </div>
-    );
-  };
-
-  const renderOptions = (input, options) => {
-    return (
-      <select {...input}>
-        {options.map((o) => {
-          return (
-            <option key={o.key} value={o.value}>
-              {o.text}
-            </option>
-          );
-        })}
-      </select>
-    );
-  };
-
-  const renderSelect = ({ input, label, meta, options }) => {
-    const className = `field ${meta.error && meta.touched ? 'error' : ''}`;
-    return (
-      <div className={className}>
-        <label>{label}</label>
-        {renderOptions(input, options)}
         {renderError(meta)}
       </div>
     );
@@ -226,31 +197,16 @@ const NewUserForm = ({ doShowMyModal, loading, doOnNewUserFormSubmit }) => {
           />
           <Field
             name='membership'
-            component={renderSelect}
+            component={renderSelectOptions}
             label='Membership'
-            options={[
-              { key: 0, value: '', text: '...Select...' },
-              { key: 1, value: 'NOT_MEMBER', text: 'Not Member' },
-              { key: 2, value: 'GREEN', text: 'Green' },
-              { key: 3, value: 'ORANGE', text: 'Orange' },
-              { key: 4, value: 'BUSINESS', text: 'Business' },
-              { key: 5, value: '10_DAYS', text: 'Ten Days' },
-              { key: 6, value: 'HOURS_MEMBERSHIP', text: 'Hours' },
-            ]}
+            options={membershipOptions}
           ></Field>
           {values.membership === 'HOURS_MEMBERSHIP' && (
             <Field
               name='hoursPackages'
-              component={renderSelect}
+              component={renderSelectOptions}
               label='Hours Packages'
-              options={[
-                { key: 0, value: '', text: '...Select...' },
-                { key: 1, value: 50, text: '50 Hours' },
-                { key: 2, value: 100, text: '100 Hours' },
-                { key: 3, value: 150, text: '150 Hours' },
-                { key: 4, value: 250, text: '250 Hours' },
-                { key: 5, value: 500, text: '500 Hours' },
-              ]}
+              options={hoursPackagesOptions}
             ></Field>
           )}
           <Field
