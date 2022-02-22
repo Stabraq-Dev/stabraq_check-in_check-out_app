@@ -31,6 +31,7 @@ import {
   ACTIVE_USERS_LIST_FILTERED,
   NON_ACTIVE_USERS_LIST_FILTERED,
   ACTIVE_SHEET_FILTERED_BY,
+  CLIENTS_LIST,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -69,6 +70,7 @@ import {
 } from '../functions/helperFunc';
 
 import {
+  CLIENTS_SHEET_CLIENTS_RANGE,
   CURR_MONTH_WORKSHEET_RANGE,
   DATA_SHEET_ACTIVE_RANGE,
   DATA_SHEET_DATE_RANGE,
@@ -295,6 +297,15 @@ export const doFilterActiveUsersList =
       payload: nonActiveFiltered,
     });
   };
+
+export const doGetClientsList = () => async (dispatch) => {
+  dispatch(doLoading(true));
+  const clientsList = await getSheetValues(CLIENTS_SHEET_CLIENTS_RANGE);
+
+  await dispatch({ type: CLIENTS_LIST, payload: clientsList });
+
+  dispatch(doLoading(false));
+};
 
 export const doConfirmDeleteUserCheckIn = () => async (dispatch, getState) => {
   dispatch(submitType(ON_CONFIRM_DELETE_CHECK_IN_SUBMIT));

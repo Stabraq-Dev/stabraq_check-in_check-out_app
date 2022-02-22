@@ -11,6 +11,7 @@ import {
   doLogOut,
   doClearPrevUserState,
   doGetActiveUsersList,
+  doGetClientsList,
 } from '../actions';
 
 const revealAll = [
@@ -19,6 +20,7 @@ const revealAll = [
   'NEW-USER-BTN',
   'QR-CODE-GEN-BTN',
   'ACTIVE-USERS-BTN',
+  'CLIENTS-BTN',
 ];
 
 class Main extends React.Component {
@@ -33,27 +35,58 @@ class Main extends React.Component {
   onFormSubmitUser = async () => {
     const { doClearPrevUserState, doReveal, doShowCheckInOut } = this.props;
     await doClearPrevUserState();
-    await doReveal(['NEW-USER-BTN', 'QR-CODE-GEN-BTN', 'ACTIVE-USERS-BTN']);
+    await doReveal([
+      'NEW-USER-BTN',
+      'QR-CODE-GEN-BTN',
+      'ACTIVE-USERS-BTN',
+      'CLIENTS-BTN',
+    ]);
     await doReveal(revealAll);
     await doShowCheckInOut(true);
   };
 
   onFormSubmitNewUser = async () => {
     const { doReveal, doShowCheckInOut } = this.props;
-    await doReveal(['USER-BTN', 'QR-CODE-GEN-BTN', 'ACTIVE-USERS-BTN']);
+    await doReveal([
+      'USER-BTN',
+      'QR-CODE-GEN-BTN',
+      'ACTIVE-USERS-BTN',
+      'CLIENTS-BTN',
+    ]);
     await doReveal(revealAll);
     await doShowCheckInOut(false);
   };
   onFormSubmitQRCodeGen = async () => {
     const { doReveal } = this.props;
-    await doReveal(['USER-BTN', 'NEW-USER-BTN', 'ACTIVE-USERS-BTN']);
+    await doReveal([
+      'USER-BTN',
+      'NEW-USER-BTN',
+      'ACTIVE-USERS-BTN',
+      'CLIENTS-BTN',
+    ]);
     await doReveal(revealAll);
   };
   onFormSubmitActiveUsers = async () => {
     const { doReveal, doGetActiveUsersList } = this.props;
-    await doReveal(['USER-BTN', 'NEW-USER-BTN', 'QR-CODE-GEN-BTN']);
+    await doReveal([
+      'USER-BTN',
+      'NEW-USER-BTN',
+      'QR-CODE-GEN-BTN',
+      'CLIENTS-BTN',
+    ]);
     await doReveal(revealAll);
     await doGetActiveUsersList();
+  };
+  onFormSubmitClients = async () => {
+    const { doReveal, doGetClientsList } = this.props;
+    await doReveal([
+      'USER-BTN',
+      'NEW-USER-BTN',
+      'QR-CODE-GEN-BTN',
+      'ACTIVE-USERS-BTN',
+    ]);
+    await doReveal(revealAll);
+    await doGetClientsList();
   };
 
   render() {
@@ -65,7 +98,7 @@ class Main extends React.Component {
             STABRAQ COMMUNITY SPACE
           </Zoom>
         </h4>
-        <div className='col-md-3 col-sm-6 col-xs-12 mt-3 text-center'>
+        <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
           <LightSpeed left when={reveal.includes('USER-BTN')}>
             <Link to='/preferences/main/user'>
               <button
@@ -80,7 +113,7 @@ class Main extends React.Component {
           </LightSpeed>
         </div>
 
-        <div className='col-md-3 col-sm-6 col-xs-12 mt-3 text-center'>
+        <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
           <LightSpeed right when={reveal.includes('NEW-USER-BTN')}>
             <Link to='/preferences/main/new-user'>
               <button
@@ -94,7 +127,7 @@ class Main extends React.Component {
             </Link>
           </LightSpeed>
         </div>
-        <div className='col-md-3 col-sm-4 col-xs-12 mt-3 text-center'>
+        <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
           <LightSpeed left when={reveal.includes('QR-CODE-GEN-BTN')}>
             <Link to='/preferences/main/qr-code-gen'>
               <button
@@ -108,7 +141,7 @@ class Main extends React.Component {
             </Link>
           </LightSpeed>
         </div>
-        <div className='col-md-3 col-sm-4 col-xs-12 mt-3 text-center'>
+        <div className='col-md-6 col-sm-4 col-xs-12 mt-3 text-center'>
           <LightSpeed right when={reveal.includes('ACTIVE-USERS-BTN')}>
             <Link to='/preferences/main/active-sheet'>
               <button
@@ -118,6 +151,20 @@ class Main extends React.Component {
               >
                 <i className='user circle icon' />
                 Active
+              </button>
+            </Link>
+          </LightSpeed>
+        </div>
+        <div className='col-md-6 col-sm-4 col-xs-12 mt-3 text-center'>
+          <LightSpeed left when={reveal.includes('CLIENTS-BTN')}>
+            <Link to='/preferences/main/clients-list'>
+              <button
+                className='ui text-stabraq button bg-dark'
+                type='button'
+                onClick={this.onFormSubmitClients}
+              >
+                <i className='list icon' />
+                Clients
               </button>
             </Link>
           </LightSpeed>
@@ -149,4 +196,5 @@ export default connect(mapStateToProps, {
   doLogOut,
   doClearPrevUserState,
   doGetActiveUsersList,
+  doGetClientsList,
 })(Main);

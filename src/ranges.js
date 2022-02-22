@@ -29,6 +29,7 @@ export const CURR_MONTH_WORKSHEET_RANGE = 'Func!A12';
 
 /* CLIENTS */
 export const CLIENTS_SHEET_APPEND_RANGE = 'Clients!A3';
+export const CLIENTS_SHEET_CLIENTS_RANGE = 'Clients!A3:N';
 export const REMAINING_HOURS_RANGE = (clientRowNumber) => {
   return `Clients!I${clientRowNumber}`;
 };

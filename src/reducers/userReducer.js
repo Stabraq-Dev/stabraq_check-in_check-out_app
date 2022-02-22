@@ -17,6 +17,7 @@ import {
   ACTIVE_USERS_LIST_FILTERED,
   NON_ACTIVE_USERS_LIST_FILTERED,
   ACTIVE_SHEET_FILTERED_BY,
+  CLIENTS_LIST,
 } from '../actions/types';
 
 const valuesMatchedObj = {
@@ -72,6 +73,7 @@ const INITIAL_STATE = {
   activeSheetFilteredBy: '',
   activeUsersListFiltered: [],
   nonActiveUsersListFiltered: [],
+  clientsList: [],
 };
 
 let valuesMatchedKeys = [
@@ -203,6 +205,11 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         nonActiveUsersListFiltered: action.payload,
+      };
+    case CLIENTS_LIST:
+      return {
+        ...state,
+        clientsList: action.payload,
       };
     default:
       return state;
