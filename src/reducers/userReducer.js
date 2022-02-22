@@ -14,6 +14,9 @@ import {
   HOURS_DAILY_RATES,
   ACTIVE_USERS_LIST,
   NON_ACTIVE_USERS_LIST,
+  ACTIVE_USERS_LIST_FILTERED,
+  NON_ACTIVE_USERS_LIST_FILTERED,
+  ACTIVE_SHEET_FILTERED_BY,
 } from '../actions/types';
 
 const valuesMatchedObj = {
@@ -66,6 +69,9 @@ const INITIAL_STATE = {
   },
   activeUsersList: [],
   nonActiveUsersList: [],
+  activeSheetFilteredBy: '',
+  activeUsersListFiltered: [],
+  nonActiveUsersListFiltered: [],
 };
 
 let valuesMatchedKeys = [
@@ -182,6 +188,21 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         nonActiveUsersList: action.payload,
+      };
+    case ACTIVE_SHEET_FILTERED_BY:
+      return {
+        ...state,
+        activeSheetFilteredBy: action.payload,
+      };
+    case ACTIVE_USERS_LIST_FILTERED:
+      return {
+        ...state,
+        activeUsersListFiltered: action.payload,
+      };
+    case NON_ACTIVE_USERS_LIST_FILTERED:
+      return {
+        ...state,
+        nonActiveUsersListFiltered: action.payload,
       };
     default:
       return state;

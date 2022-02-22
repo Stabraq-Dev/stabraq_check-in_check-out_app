@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import LoadingSpinner from './LoadingSpinner';
 import { getSheetValues } from '../functions/executeFunc';
 import { DATA_SHEET_TOTAL_COST_RANGE } from '../ranges';
+import FilterByMembership from './FilterByMembership';
 
 export class ActiveSheet extends Component {
   state = { sortedBy: 'Time', totalCost: '' };
@@ -13,7 +14,13 @@ export class ActiveSheet extends Component {
     this.props.doGetActiveUsersList();
     this.setState({ totalCost: '' });
   }
+  renderFilterActiveUsers = () => {
+    const { activeUsersList, nonActiveUsersList } = this.props;
 
+    if (activeUsersList.length > 0 || nonActiveUsersList.length > 0) {
+      return <FilterByMembership />;
+    }
+  };
   renderCountActiveUsers = ({ list, type }) => {
     const usersText = list.length === 1 ? 'User' : 'Users';
     const bgColor =
@@ -29,10 +36,11 @@ export class ActiveSheet extends Component {
   };
 
   renderList = ({ list, type }) => {
+    const { activeSheetFilteredBy } = this.props;
     if (list.length === 0) {
       return (
         <div className='ui segment'>
-          <div className='ui center aligned header'>No {type} Users</div>
+          <div className='ui center aligned header'>No {type} {activeSheetFilteredBy.filterValue} Users</div>
         </div>
       );
     }
@@ -116,11 +124,15 @@ export class ActiveSheet extends Component {
 
   renderSortButtons = () => {
     const { sortedBy } = this.state;
-    const { activeUsersList, nonActiveUsersList } = this.props;
+    const { activeUsersList, nonActiveUsersList, activeSheetFilteredBy } =
+      this.props;
     const membership = sortedBy === 'Membership' ? 'bg-dark' : 'stabraq-bg';
     const name = sortedBy === 'Name' ? 'bg-dark' : 'stabraq-bg';
     const time = sortedBy === 'Time' ? 'bg-dark' : 'stabraq-bg';
-    if (activeUsersList.length > 0 || nonActiveUsersList.length > 0)
+    if (
+      (activeUsersList.length > 0 || nonActiveUsersList.length > 0) &&
+      !activeSheetFilteredBy.filterBy
+    )
       return (
         <div className='ui segment text-center'>
           <button
@@ -190,9 +202,22 @@ export class ActiveSheet extends Component {
   };
 
   render() {
-    const { activeUsersList, nonActiveUsersList } = this.props;
-    const activeProps = { list: activeUsersList, type: 'Active' };
-    const nonActiveProps = { list: nonActiveUsersList, type: 'Non-Active' };
+    const {
+      activeUsersList,
+      nonActiveUsersList,
+      activeSheetFilteredBy,
+      activeUsersListFiltered,
+      nonActiveUsersListFiltered,
+    } = this.props;
+    const finalActiveList = activeSheetFilteredBy.filterBy
+      ? activeUsersListFiltered
+      : activeUsersList;
+    const finalNonActiveList = activeSheetFilteredBy.filterBy
+      ? nonActiveUsersListFiltered
+      : nonActiveUsersList;
+
+    const activeProps = { list: finalActiveList, type: 'Active' };
+    const nonActiveProps = { list: finalNonActiveList, type: 'Non-Active' };
 
     if (this.props.loading) {
       return <LoadingSpinner />;
@@ -200,6 +225,7 @@ export class ActiveSheet extends Component {
 
     return (
       <>
+        {this.renderFilterActiveUsers()}
         {this.renderCountActiveUsers(activeProps)}
         {this.renderSortButtons()}
         <div className='ui celled list'>{this.renderList(activeProps)}</div>
@@ -214,11 +240,20 @@ export class ActiveSheet extends Component {
 
 const mapStateToProps = (state) => {
   const { loading } = state.app;
-  const { activeUsersList, nonActiveUsersList } = state.user;
+  const {
+    activeUsersList,
+    nonActiveUsersList,
+    activeSheetFilteredBy,
+    activeUsersListFiltered,
+    nonActiveUsersListFiltered,
+  } = state.user;
   return {
     loading,
     activeUsersList,
     nonActiveUsersList,
+    activeSheetFilteredBy,
+    activeUsersListFiltered,
+    nonActiveUsersListFiltered,
   };
 };
 

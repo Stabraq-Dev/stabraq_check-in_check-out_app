@@ -28,6 +28,9 @@ import {
   ON_CONFIRM_DELETE_CHECK_OUT_SUBMIT,
   ON_DELETE_CHECK_OUT_SUBMIT,
   NON_ACTIVE_USERS_LIST,
+  ACTIVE_USERS_LIST_FILTERED,
+  NON_ACTIVE_USERS_LIST_FILTERED,
+  ACTIVE_SHEET_FILTERED_BY,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -269,6 +272,29 @@ export const doSortActiveUsersList = (index) => async (dispatch, getState) => {
   await dispatch({ type: ACTIVE_USERS_LIST, payload: activeSorted });
   await dispatch({ type: NON_ACTIVE_USERS_LIST, payload: nonActiveSorted });
 };
+
+export const doFilterActiveUsersList =
+  (index, filterValue, filterBy) => async (dispatch, getState) => {
+    const { activeUsersList, nonActiveUsersList } = getState().user;
+    const activeUsersSorted = (list) =>
+      list.filter((value) => value[index] === filterValue);
+
+    const activeFiltered = activeUsersSorted(activeUsersList);
+    const nonActiveFiltered = activeUsersSorted(nonActiveUsersList);
+
+    await dispatch({
+      type: ACTIVE_SHEET_FILTERED_BY,
+      payload: { filterBy: filterBy, filterValue: filterValue },
+    });
+    await dispatch({
+      type: ACTIVE_USERS_LIST_FILTERED,
+      payload: activeFiltered,
+    });
+    await dispatch({
+      type: NON_ACTIVE_USERS_LIST_FILTERED,
+      payload: nonActiveFiltered,
+    });
+  };
 
 export const doConfirmDeleteUserCheckIn = () => async (dispatch, getState) => {
   dispatch(submitType(ON_CONFIRM_DELETE_CHECK_IN_SUBMIT));
