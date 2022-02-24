@@ -12,23 +12,8 @@ import { checkForMobNum } from '../functions/validation';
 import history from '../history';
 import InputMobile from './InputMobile';
 import LoadingSpinner from './LoadingSpinner';
-import { Rating } from 'react-simple-star-rating';
-import {
-  MdSentimentVeryDissatisfied,
-  MdSentimentDissatisfied,
-  MdSentimentNeutral,
-  MdSentimentSatisfiedAlt,
-  MdSentimentVerySatisfied,
-} from 'react-icons/md';
+import RatingBar from './RatingBar';
 import ResponsiveTimePickers from './ResponsiveTimePickers';
-
-const customIcons = [
-  { icon: <MdSentimentVeryDissatisfied size={50} /> },
-  { icon: <MdSentimentDissatisfied size={50} /> },
-  { icon: <MdSentimentNeutral size={50} /> },
-  { icon: <MdSentimentSatisfiedAlt size={50} /> },
-  { icon: <MdSentimentVerySatisfied size={50} /> },
-];
 
 class CheckInOut extends React.Component {
   state = {
@@ -460,18 +445,8 @@ class CheckInOut extends React.Component {
     if (this.props.checkedOut === 'NOT_CHECKED_OUT' && !this.state.editCheckIn)
       return (
         <div className='text-center'>
-          <Rating
-            customIcons={customIcons}
+          <RatingBar
             onClick={this.handleRating}
-            showTooltip
-            // fillColor='#ff5500'
-            fillColorArray={[
-              '#e12025',
-              '#f47950',
-              '#fcb040',
-              '#91ca61',
-              '#3ab54a',
-            ]}
             ratingValue={this.state.ratingValue * 20}
             initialValue={this.props.rating}
           />
