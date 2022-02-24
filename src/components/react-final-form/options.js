@@ -16,3 +16,8 @@ export const hoursPackagesOptions = [
   { key: 4, value: 250, text: '250 Hours' },
   { key: 5, value: 500, text: '500 Hours' },
 ];
+
+export const genderOptions = [
+  { key: 0, value: 'Male', label: 'Male' },
+  { key: 1, value: 'Female', label: 'Female' },
+];
