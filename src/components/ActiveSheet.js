@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { doGetActiveUsersList, doSortActiveUsersList } from '../actions';
+import {
+  doGetActiveUsersList,
+  doOrderSortActiveUsersList,
+  doSortActiveUsersList,
+} from '../actions';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from './LoadingSpinner';
 import { getSheetValues } from '../functions/executeFunc';
@@ -8,7 +12,7 @@ import { DATA_SHEET_TOTAL_COST_RANGE } from '../ranges';
 import FilterByMembership from './FilterByMembership';
 
 export class ActiveSheet extends Component {
-  state = { sortedBy: 'Time', totalCost: '' };
+  state = { sortedBy: 'Check In Time', totalCost: '', ascending: true };
 
   componentDidMount() {
     this.props.doGetActiveUsersList();
@@ -40,7 +44,9 @@ export class ActiveSheet extends Component {
     if (list.length === 0) {
       return (
         <div className='ui segment'>
-          <div className='ui center aligned header'>No {type} {activeSheetFilteredBy.filterValue} Users</div>
+          <div className='ui center aligned header'>
+            No {type} {activeSheetFilteredBy.filterValue} Users
+          </div>
         </div>
       );
     }
@@ -68,6 +74,7 @@ export class ActiveSheet extends Component {
       return (
         <div className={`item ${rowColor}`} key={index}>
           {this.renderSearch(active[1])}
+          {this.renderEditClient(active[1])}
           <i className='middle aligned icon'>
             {(index + 1).toString().padStart(2, '0')}
           </i>
@@ -109,6 +116,18 @@ export class ActiveSheet extends Component {
       </div>
     );
   }
+  renderEditClient(mobile) {
+    return (
+      <div className='right floated content mt-2'>
+        <Link
+          to={`/preferences/main/clients-list/?mobile=${mobile}`}
+          className='ui button positive'
+        >
+          Profile
+        </Link>
+      </div>
+    );
+  }
 
   sortActiveUserList = async (event, index) => {
     await this.props.doSortActiveUsersList(index);
@@ -123,50 +142,64 @@ export class ActiveSheet extends Component {
   };
 
   renderSortButtons = () => {
-    const { sortedBy } = this.state;
+    const buttons = [
+      { name: 'sortByMembership', sortIndex: 3, value: 'Membership' },
+      { name: 'sortByName', sortIndex: 0, value: 'Name' },
+      { name: 'sortByCheckInTime', sortIndex: 5, value: 'Check In Time' },
+      { name: 'sortByCheckOutTime', sortIndex: 6, value: 'Check Out Time' },
+    ];
+
+    return buttons.map((active, index) => {
+      const { sortedBy } = this.state;
+      const { name, sortIndex, value } = active;
+      const activeClass = sortedBy === value ? 'bg-dark' : 'stabraq-bg';
+      return (
+        <button
+          key={sortIndex}
+          className={`ui primary button ${activeClass} me-3 mt-1`}
+          name={name}
+          onClick={(e) => {
+            this.sortActiveUserList(e, sortIndex);
+            this.setState({ ascending: true });
+          }}
+          type='submit'
+          value={value}
+        >
+          {value}
+        </button>
+      );
+    });
+  };
+
+  renderSortBar = () => {
+    const { ascending } = this.state;
+    const orderClass = ascending ? 'sort amount down' : 'sort amount up';
+    const activeClass = !ascending ? 'bg-dark' : '';
+    const order = ascending ? 'Ascending' : 'Descending';
+
     const { activeUsersList, nonActiveUsersList, activeSheetFilteredBy } =
       this.props;
-    const membership = sortedBy === 'Membership' ? 'bg-dark' : 'stabraq-bg';
-    const name = sortedBy === 'Name' ? 'bg-dark' : 'stabraq-bg';
-    const time = sortedBy === 'Time' ? 'bg-dark' : 'stabraq-bg';
+
     if (
       (activeUsersList.length > 0 || nonActiveUsersList.length > 0) &&
       !activeSheetFilteredBy.filterBy
     )
       return (
         <div className='ui segment text-center'>
+          <div className='text-start fw-bold'>Sort By</div>
+          {this.renderSortButtons()}
           <button
-            className={`ui primary button ${membership} me-3 mt-1`}
-            name='sortByMembership'
+            className={`ui primary button ${activeClass} me-3 mt-1`}
+            name='ascending'
             onClick={(e) => {
-              this.sortActiveUserList(e, 3);
+              this.setState({ ascending: !ascending });
+              this.props.doOrderSortActiveUsersList();
             }}
             type='submit'
-            value='Membership'
+            value='ascending'
           >
-            Sort by Membership
-          </button>
-          <button
-            className={`ui primary button ${name} me-3 mt-1`}
-            name='sortByName'
-            onClick={(e) => {
-              this.sortActiveUserList(e, 0);
-            }}
-            type='submit'
-            value='Name'
-          >
-            Sort by Name
-          </button>
-          <button
-            className={`ui primary button ${time} me-3 mt-1`}
-            name='sortByTime'
-            onClick={(e) => {
-              this.sortActiveUserList(e, 5);
-            }}
-            type='submit'
-            value='Time'
-          >
-            Sort by Time
+            <i className={`${orderClass} icon me-1`} />
+            {order}
           </button>
         </div>
       );
@@ -227,10 +260,10 @@ export class ActiveSheet extends Component {
       <>
         {this.renderFilterActiveUsers()}
         {this.renderCountActiveUsers(activeProps)}
-        {this.renderSortButtons()}
+        {this.renderSortBar()}
         <div className='ui celled list'>{this.renderList(activeProps)}</div>
         {this.renderCountActiveUsers(nonActiveProps)}
-        {this.renderSortButtons()}
+        {this.renderSortBar()}
         <div className='ui celled list'>{this.renderList(nonActiveProps)}</div>
         {this.renderGetTotalCostButtons()}
       </>
@@ -260,4 +293,5 @@ const mapStateToProps = (state) => {
 export default connect(mapStateToProps, {
   doGetActiveUsersList,
   doSortActiveUsersList,
+  doOrderSortActiveUsersList,
 })(ActiveSheet);

@@ -272,6 +272,18 @@ export const doSortActiveUsersList = (index) => async (dispatch, getState) => {
         : a[index].localeCompare(b[index]);
     });
 
+  const activeSorted =
+    index === 6 ? activeUsersList : activeUsersSorted(activeUsersList);
+  const nonActiveSorted = activeUsersSorted(nonActiveUsersList);
+
+  await dispatch({ type: ACTIVE_USERS_LIST, payload: activeSorted });
+  await dispatch({ type: NON_ACTIVE_USERS_LIST, payload: nonActiveSorted });
+};
+
+export const doOrderSortActiveUsersList = () => async (dispatch, getState) => {
+  const { activeUsersList, nonActiveUsersList } = getState().user;
+  const activeUsersSorted = (list) => list.reverse();
+
   const activeSorted = activeUsersSorted(activeUsersList);
   const nonActiveSorted = activeUsersSorted(nonActiveUsersList);
 
