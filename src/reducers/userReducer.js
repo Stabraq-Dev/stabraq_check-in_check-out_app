@@ -19,6 +19,7 @@ import {
   ACTIVE_SHEET_FILTERED_BY,
   CLIENTS_LIST,
   CLIENT_STATE_TO_EDIT,
+  CLIENTS_LIST_FILTERED,
 } from '../actions/types';
 
 const valuesMatchedObj = {
@@ -91,6 +92,7 @@ const INITIAL_STATE = {
     gender: '',
     offers: '',
   },
+  clientsListFiltered: [],
 };
 
 let valuesMatchedKeys = [
@@ -252,6 +254,11 @@ export default (state = INITIAL_STATE, action) => {
           action.payload,
           clientStateToEditKeys
         ),
+      };
+    case CLIENTS_LIST_FILTERED:
+      return {
+        ...state,
+        clientsListFiltered: action.payload,
       };
     default:
       return state;

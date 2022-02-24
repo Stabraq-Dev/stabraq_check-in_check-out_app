@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { doGetClientsList, setClientStateToEdit, fromURL } from '../actions';
+import FilterByName from './FilterByName';
 import LoadingSpinner from './LoadingSpinner';
 
 export class ClientsList extends Component {
@@ -29,14 +30,20 @@ export class ClientsList extends Component {
     this.setState({ activeIndex: userIndex });
   };
 
-  renderList = () => {
+  getOriginalRow = (mobile) => {
+    const { clientsList } = this.props;
+    const row = clientsList.findIndex((x) => x[0] === mobile) + 3;
+    return row;
+  };
+
+  renderList = (list) => {
     const { clientsList } = this.props;
     this.refs = clientsList.reduce((acc, value) => {
       acc[value[0]] = React.createRef();
       return acc;
     }, {});
 
-    return clientsList.map((active, index) => {
+    return list.map((active, index) => {
       const getColor = (value) => {
         switch (value) {
           case 'GREEN':
@@ -59,6 +66,8 @@ export class ClientsList extends Component {
       const rowColor = index % 2 === 0 ? 'row-color' : '';
       const activeClass = this.state.activeIndex === index ? 'active' : '';
       const genderClass = active[12] === 'Male' ? 'user' : 'user outline';
+
+      const originalRow = this.getOriginalRow(active[0]);
       return (
         <React.Fragment key={index}>
           <div
@@ -86,7 +95,7 @@ export class ClientsList extends Component {
           <div className={`content ${activeClass}`}>
             <div className='ui celled list'>
               <div className={`item ${rowColor}`}>
-                {this.renderEdit(index + 3, active)}
+                {this.renderEdit(originalRow, active)}
                 <div className='content'>
                   <div className='description mb-1'>User Name: {active[1]}</div>
                   <div className='description'>Mobile Number: {active[0]}</div>
@@ -150,15 +159,26 @@ export class ClientsList extends Component {
     );
   }
 
+  renderFilterClients = () => {
+    return <FilterByName />;
+  };
+
   render() {
     if (this.props.loading) {
       return <LoadingSpinner />;
     }
+    const { clientsList, clientsListFiltered } = this.props;
+
+    const finalClientsList =
+      clientsListFiltered.length !== clientsList.length
+        ? clientsListFiltered
+        : clientsList;
 
     return (
       <>
         <div className='ui styled fluid accordion mb-3'>
-          {this.renderList()}
+          {this.renderFilterClients()}
+          {this.renderList(finalClientsList)}
         </div>
       </>
     );
@@ -167,10 +187,11 @@ export class ClientsList extends Component {
 
 const mapStateToProps = (state) => {
   const { loading } = state.app;
-  const { clientsList } = state.user;
+  const { clientsList, clientsListFiltered } = state.user;
   return {
     loading,
     clientsList,
+    clientsListFiltered,
   };
 };
 

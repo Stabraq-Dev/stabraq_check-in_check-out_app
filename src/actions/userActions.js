@@ -34,6 +34,7 @@ import {
   CLIENTS_LIST,
   CLIENT_STATE_TO_EDIT,
   ON_EDIT_CLIENT_SUBMIT,
+  CLIENTS_LIST_FILTERED,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -340,6 +341,19 @@ export const setClientStateToEdit = (active) => async (dispatch) => {
 
   dispatch(doLoading(false));
 };
+
+export const doFilterClientsUsersList =
+  (index, filterValue, filterBy) => async (dispatch, getState) => {
+    const { clientsList } = getState().user;
+    const clientsListFiltered = clientsList.filter((value) =>
+      value[index].toLowerCase().includes(filterValue.toLowerCase())
+    );
+
+    await dispatch({
+      type: CLIENTS_LIST_FILTERED,
+      payload: clientsListFiltered,
+    });
+  };
 
 export const doConfirmDeleteUserCheckIn = () => async (dispatch, getState) => {
   dispatch(submitType(ON_CONFIRM_DELETE_CHECK_IN_SUBMIT));
