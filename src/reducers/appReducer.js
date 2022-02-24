@@ -10,6 +10,7 @@ import {
   SEARCH_BY_MOBILE,
   ERROR,
   REVEAL_LOGO,
+  PICKED_DATE,
 } from '../actions/types';
 
 const INITIAL_STATE = {
@@ -24,6 +25,7 @@ const INITIAL_STATE = {
   showMyModal: false,
   submitType: '',
   error: '',
+  pickedDate: new Date(),
 };
 
 /* eslint import/no-anonymous-default-export: [2, {"allowArrowFunction": true}] */
@@ -51,6 +53,8 @@ export default (state = INITIAL_STATE, action) => {
       return { ...state, submitType: action.payload };
     case ERROR:
       return { ...state, error: action.payload };
+    case PICKED_DATE:
+      return { ...state, pickedDate: action.payload };
     default:
       return state;
   }

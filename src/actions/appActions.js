@@ -5,6 +5,7 @@ import {
   SHRINK_LOGO,
   SHOW_MY_MODAL,
   SUBMIT_TYPE,
+  PICKED_DATE,
 } from './types';
 
 export const doLoading = (loadingStatus) => {
@@ -46,5 +47,12 @@ export const doRevealLogo = (revealLogoStatus) => {
   return {
     type: REVEAL_LOGO,
     payload: revealLogoStatus,
+  };
+};
+
+export const doSetDatePicker = (pickedDate) => {
+  return {
+    type: PICKED_DATE,
+    payload: pickedDate,
   };
 };

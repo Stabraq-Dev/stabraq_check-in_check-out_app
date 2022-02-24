@@ -18,6 +18,7 @@ import {
   NON_ACTIVE_USERS_LIST_FILTERED,
   ACTIVE_SHEET_FILTERED_BY,
   CLIENTS_LIST,
+  CLIENT_STATE_TO_EDIT,
 } from '../actions/types';
 
 const valuesMatchedObj = {
@@ -74,6 +75,22 @@ const INITIAL_STATE = {
   activeUsersListFiltered: [],
   nonActiveUsersListFiltered: [],
   clientsList: [],
+  clientStateToEdit: {
+    mobileNumber: '',
+    userName: '',
+    eMailAddress: '',
+    membership: '',
+    expiryDate: '',
+    remainDays: '',
+    hoursPackage: '',
+    registrationDateTime: '',
+    remainingHours: '',
+    remainingOfTenDays: '',
+    invitations: '',
+    rating: '',
+    gender: '',
+    offers: '',
+  },
 };
 
 let valuesMatchedKeys = [
@@ -99,6 +116,23 @@ let valuesMatchedKeys = [
   'inviteByName',
   'checkInTime',
   'checkOutTime',
+];
+
+let clientStateToEditKeys = [
+  'mobileNumber',
+  'userName',
+  'eMailAddress',
+  'membership',
+  'expiryDate',
+  'remainDays',
+  'hoursPackage',
+  'registrationDateTime',
+  'remainingHours',
+  'remainingOfTenDays',
+  'invitations',
+  'rating',
+  'gender',
+  'offers',
 ];
 
 let durationCostKeys = ['duration', 'approxDuration', 'cost'];
@@ -210,6 +244,14 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         clientsList: action.payload,
+      };
+    case CLIENT_STATE_TO_EDIT:
+      return {
+        ...state,
+        clientStateToEdit: mapArrayDataObject(
+          action.payload,
+          clientStateToEditKeys
+        ),
       };
     default:
       return state;

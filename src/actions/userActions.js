@@ -32,6 +32,8 @@ import {
   NON_ACTIVE_USERS_LIST_FILTERED,
   ACTIVE_SHEET_FILTERED_BY,
   CLIENTS_LIST,
+  CLIENT_STATE_TO_EDIT,
+  ON_EDIT_CLIENT_SUBMIT,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -59,6 +61,7 @@ import {
   executeValuesAppendUpdateCheckIn,
   executeValuesAppendUpdateCheckOut,
   executeValuesAppendDeleteCheckOut,
+  executeValuesUpdateEditClient,
 } from '../functions/executeFunc';
 
 import history from '../history';
@@ -82,6 +85,7 @@ import {
   RATING_RANGE,
   REMAINING_HOURS_RANGE,
   REMAINING_OF_TEN_DAYS_RANGE,
+  SINGLE_CLIENT_RANGE,
   VALUES_MATCHED_RANGES,
 } from '../ranges';
 
@@ -307,6 +311,24 @@ export const doGetClientsList = () => async (dispatch) => {
   dispatch(doLoading(false));
 };
 
+export const doGetSingleClient = (rowNumber) => async (dispatch) => {
+  dispatch(doLoading(true));
+  const range = SINGLE_CLIENT_RANGE(rowNumber);
+  const clientData = await getSheetValues(range);
+
+  await dispatch({ type: CLIENT_STATE_TO_EDIT, payload: clientData[0] });
+
+  dispatch(doLoading(false));
+};
+
+export const setClientStateToEdit = (active) => async (dispatch) => {
+  dispatch(doLoading(true));
+
+  await dispatch({ type: CLIENT_STATE_TO_EDIT, payload: active });
+
+  dispatch(doLoading(false));
+};
+
 export const doConfirmDeleteUserCheckIn = () => async (dispatch, getState) => {
   dispatch(submitType(ON_CONFIRM_DELETE_CHECK_IN_SUBMIT));
   const { showMyModal } = getState().app;
@@ -465,6 +487,28 @@ export const doOnNewUserFormSubmit =
     dispatch(doLoading(false));
     dispatch(doShowCheckInOut(true));
     dispatch(searchMobileNumber(formValues.mobile));
+
+    if (showMyModal) {
+      dispatch(doShowMyModal(false));
+    }
+    dispatch(doShowMyModal(true));
+  };
+
+/**
+ *
+ * @o doOnEditClientFormSubmit
+ *
+ */
+
+export const doOnEditClientFormSubmit =
+  (formValues, rowNumber) => async (dispatch, getState) => {
+    if (!navigator.onLine) return;
+    const { showMyModal } = getState().app;
+    dispatch(submitType(ON_EDIT_CLIENT_SUBMIT));
+
+    dispatch(doLoading(true));
+    await executeValuesUpdateEditClient(formValues, rowNumber);
+    dispatch(doLoading(false));
 
     if (showMyModal) {
       dispatch(doShowMyModal(false));

@@ -66,6 +66,8 @@ export class MyModalUser extends Component {
             return <DefaultBody message='Exist' />;
           }
           return <DefaultBody message='Form Submitted' />;
+        case 'ON_EDIT_CLIENT_SUBMIT':
+          return <DefaultBody message='Client Edit Updated Successfully' />;
 
         case 'ON_CHECK_IN_OUT_SUBMIT':
           if (checkInOutStatus === 'CHECK_IN') {
@@ -170,6 +172,9 @@ export class MyModalUser extends Component {
     const goToCheckInOut = () => {
       history.push('/preferences/main/user/check-in-out');
     };
+    const goToClientsList = () => {
+      history.push('/preferences/main/clients-list');
+    };
 
     switch (submitType) {
       case 'ON_SEARCH_SUBMIT':
@@ -200,6 +205,13 @@ export class MyModalUser extends Component {
                 // `/preferences/main/qr-code-gen/?mobile=${mobileNumber}`
                 `/preferences/main/user/?mobile=${mobileNumber}`
               );
+        }
+
+      case 'ON_EDIT_CLIENT_SUBMIT':
+        if (error) {
+          return goToClientsList;
+        } else {
+          return goToHome;
         }
 
       case 'ON_CHECK_IN_OUT_SUBMIT':

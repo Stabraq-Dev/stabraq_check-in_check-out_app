@@ -1,6 +1,10 @@
 import { authInstance, loadClient, loadClientForDrive } from '../api/auth';
 import { axiosAuth } from '../api/googleSheetsAPI';
-import { changeDateFormat, getData } from '../functions/helperFunc';
+import {
+  calculateUserData,
+  changeDateFormat,
+  getData,
+} from '../functions/helperFunc';
 import '../config';
 import qs from 'qs';
 import {
@@ -16,8 +20,8 @@ import {
   DATA_SHEET_DATE_RANGE,
   DURATION_EXCEL_FORMULA,
   NUMBER_TO_CHECK_EXISTS_RANGE,
-  REMAIN_DAYS_EXCEL_FORMULA,
   TOTAL_COST_EXCEL_FORMULA,
+  UPDATE_EDIT_CLIENT_RANGE,
 } from '../ranges';
 
 const SHEET_ID = process.env.REACT_APP_SHEET_ID;
@@ -373,12 +377,6 @@ export const executeValuesAppendNewUserData = async (
     await axiosAuth(SHEET_ID);
     const googleSheetsAPI = await axiosAuth(SHEET_ID);
 
-    const getExpiryDate = (days) => {
-      let expiry_date = new Date();
-      expiry_date.setDate(expiry_date.getDate() + days);
-      return expiry_date.toLocaleDateString('en-US');
-    };
-
     const {
       mobile,
       username,
@@ -389,31 +387,13 @@ export const executeValuesAppendNewUserData = async (
       offers,
     } = formValues;
 
-    const expiryDate =
-      membership === 'HOURS_MEMBERSHIP'
-        ? getExpiryDate(90)
-        : membership === 'NOT_MEMBER'
-        ? ''
-        : getExpiryDate(30);
-
-    const remainDays =
-      membership === 'NOT_MEMBER'
-        ? ''
-        : REMAIN_DAYS_EXCEL_FORMULA(lastBlankRow);
-
-    const remainingHours =
-      membership === 'HOURS_MEMBERSHIP' ? hoursPackages : '';
-
-    const remainingOfTenDays = membership === '10_DAYS' ? 10 : '';
-
-    const invitations =
-      membership === 'GREEN'
-        ? 3
-        : membership === 'ORANGE'
-        ? 5
-        : membership === 'BUSINESS'
-        ? 7
-        : '';
+    const {
+      expiryDate,
+      remainDays,
+      remainingHours,
+      remainingOfTenDays,
+      invitations,
+    } = calculateUserData(formValues, lastBlankRow);
 
     const offersChecked = offers ? true : false;
 
@@ -679,6 +659,65 @@ export const executeValuesAppendUpdateCheckIn = async (
     return response;
   } catch (err) {
     console.error('Execute error executeValuesAppendUpdateCheckIn', err);
+  }
+};
+
+export const executeValuesUpdateEditClient = async (formValues, rowNumber) => {
+  try {
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
+
+    const {
+      mobile,
+      username,
+      email,
+      membership,
+      expiryDate,
+      hoursPackages,
+      registrationDateTime,
+      remainingHours,
+      remainingOfTenDays,
+      invitations,
+      rating,
+      gender,
+      offers,
+    } = formValues;
+
+    const { remainDays } = calculateUserData(formValues, rowNumber);
+
+    const range = UPDATE_EDIT_CLIENT_RANGE(rowNumber);
+    const valueInputOption = 'USER_ENTERED';
+    const response = await googleSheetsAPI.put(
+      `${SHEET_ID}/values/${range}`,
+      {
+        majorDimension: 'COLUMNS',
+        values: [
+          [`'${mobile}`],
+          [username],
+          [email],
+          [membership],
+          [expiryDate],
+          [remainDays],
+          [hoursPackages],
+          [registrationDateTime],
+          [remainingHours],
+          [remainingOfTenDays],
+          [invitations],
+          [rating],
+          [gender],
+          [offers],
+        ],
+      },
+      { params: { valueInputOption: valueInputOption } }
+    );
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log('Response executeValuesUpdateEditClient', response);
+    }
+
+    return response;
+  } catch (err) {
+    console.error('Execute error executeValuesUpdateEditClient', err);
   }
 };
 

@@ -2,20 +2,17 @@ import React, { useEffect } from 'react';
 import { Form, Field } from 'react-final-form';
 import { connect } from 'react-redux';
 
-import {
-  checkForUserName,
-  checkForMobNum,
-  checkForEmail,
-  checkForMembership,
-} from '../functions/validation';
 import { doOnNewUserFormSubmit, doShowMyModal } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
 import {
+  genderOptions,
   hoursPackagesOptions,
   membershipOptions,
-} from './react-final-form/membershipOptions';
+} from './react-final-form/options';
 import { renderSelectOptions } from './react-final-form/renderSelectOptions';
-import { renderError } from './react-final-form/renderError';
+import { renderInput } from './react-final-form/renderInput';
+import { renderRadio } from './react-final-form/renderRadio';
+import { validate } from './react-final-form/validate';
 
 const initialValues = JSON.parse(sessionStorage.getItem('formValues'));
 
@@ -28,57 +25,6 @@ const NewUserForm = ({ doShowMyModal, loading, doOnNewUserFormSubmit }) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const renderInput = ({ input, label, meta, placeholder, maxLength }) => {
-    const className = `field ${meta.error && meta.touched ? 'error' : ''}`;
-    return (
-      <div className={className}>
-        <label>{label}</label>
-        <input
-          {...input}
-          placeholder={placeholder}
-          maxLength={maxLength}
-          autoComplete='off'
-        />
-        {renderError(meta)}
-      </div>
-    );
-  };
-
-  const renderRadioOptions = (input, options, checked) => {
-    return (
-      <React.Fragment>
-        {options.map((o) => {
-          return (
-            <div className='form-check form-check-inline' key={o.key}>
-              <input
-                {...input}
-                checked={checked === o.value ? true : false}
-                value={o.value}
-                className='btn-check ms-1'
-                id={o.value}
-                autoComplete='off'
-              />
-              <label className='btn btn-outline-stabraq' htmlFor={o.value}>
-                {o.label}
-              </label>
-            </div>
-          );
-        })}
-      </React.Fragment>
-    );
-  };
-
-  const renderRadio = ({ input, label, meta, options, checked }) => {
-    const className = `field ${meta.error && meta.touched ? 'error' : ''}`;
-    return (
-      <div className={className}>
-        <label>{label}</label>
-        {renderRadioOptions(input, options, checked)}
-        {renderError(meta)}
-      </div>
-    );
-  };
 
   const renderSubmitButton = () => {
     if (loading) {
@@ -123,44 +69,7 @@ const NewUserForm = ({ doShowMyModal, loading, doOnNewUserFormSubmit }) => {
     <Form
       initialValues={initialValues}
       onSubmit={onSubmit}
-      validate={async (formValues) => {
-        const errors = {};
-        const { username, mobile, email, membership, hoursPackages, gender } =
-          formValues;
-
-        const validUserName = await checkForUserName(username);
-        const validMobile = await checkForMobNum(mobile);
-        const validEmail = await checkForEmail(email);
-        const validMembership = await checkForMembership(membership);
-        const validHoursPackages = await checkForMembership(hoursPackages);
-        const validGender = await checkForMembership(gender);
-
-        if (validUserName) {
-          errors.username = validUserName;
-        }
-
-        if (validMobile) {
-          errors.mobile = validMobile;
-        }
-
-        if (validEmail) {
-          errors.email = validEmail;
-        }
-
-        if (validMembership) {
-          errors.membership = validMembership;
-        }
-
-        if (validHoursPackages && membership === 'HOURS_MEMBERSHIP') {
-          errors.hoursPackages = 'Please select a package';
-        }
-
-        if (validGender) {
-          errors.gender = 'Please select a gender';
-        }
-
-        return errors;
-      }}
+      validate={(formValues) => validate(formValues)}
       render={({ values, handleSubmit }) => (
         <form onSubmit={handleSubmit} className='ui form segment error'>
           <Field
@@ -183,10 +92,7 @@ const NewUserForm = ({ doShowMyModal, loading, doOnNewUserFormSubmit }) => {
             label='Gender'
             type='radio'
             checked={values.gender}
-            options={[
-              { key: 0, value: 'Male', label: 'Male' },
-              { key: 1, value: 'Female', label: 'Female' },
-            ]}
+            options={genderOptions}
           />
           <Field
             name='email'

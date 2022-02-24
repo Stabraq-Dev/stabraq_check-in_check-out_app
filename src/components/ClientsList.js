@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { doGetClientsList } from '../actions';
+import { doGetClientsList, setClientStateToEdit, fromURL } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
 
 export class ClientsList extends Component {
@@ -50,15 +50,20 @@ export class ClientsList extends Component {
               {(index + 1).toString().padStart(3, '0')}
             </i>
             <i className={`large middle aligned icon ${genderClass}`}></i>
-            {active[1]}
-            <div className={membershipTextColor}>{active[3]}</div>
+            <div className='ui breadcrumb'>
+              <div className='d-inline ms-2'>{active[1]}</div>
+              <i className='right angle icon divider'></i>
+              <div className={`d-inline ${membershipTextColor}`}>
+                ({active[3]})
+              </div>
+            </div>
           </div>
           <div className={`content ${activeClass}`}>
             <div className='ui celled list'>
               <div className={`item ${rowColor}`}>
-                {this.renderEdit(active[0])}
+                {this.renderEdit(index + 3, active)}
                 <div className='content'>
-                  <div className='header mb-1'>User Name: {active[1]}</div>
+                  <div className='description mb-1'>User Name: {active[1]}</div>
                   <div className='description'>Mobile Number: {active[0]}</div>
                   <div className='description'>E-Mail Address: {active[2]}</div>
                   <div className={`description ${membershipTextColor}`}>
@@ -103,12 +108,16 @@ export class ClientsList extends Component {
     });
   };
 
-  renderEdit(mobile) {
+  renderEdit(row, active) {
     return (
       <div className='right floated content mt-2'>
         <Link
-          to={`/preferences/main/edit-client/?mobile=${mobile}`}
+          to={`/preferences/main/edit-client/?row=${row}`}
           className='ui button positive'
+          onClick={() => {
+            this.props.setClientStateToEdit(active);
+            this.props.fromURL();
+          }}
         >
           Edit
         </Link>
@@ -122,7 +131,9 @@ export class ClientsList extends Component {
     }
     return (
       <>
-        <div className='ui styled fluid accordion mb-3'>{this.renderList()}</div>
+        <div className='ui styled fluid accordion mb-3'>
+          {this.renderList()}
+        </div>
       </>
     );
   }
@@ -137,4 +148,8 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps, { doGetClientsList })(ClientsList);
+export default connect(mapStateToProps, {
+  doGetClientsList,
+  setClientStateToEdit,
+  fromURL,
+})(ClientsList);

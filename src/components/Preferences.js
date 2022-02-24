@@ -12,6 +12,7 @@ import MyModalUser from './MyModalUser';
 import QRCodeGenerator from './QRCodeGenerator';
 import ActiveSheet from './ActiveSheet';
 import ClientsList from './ClientsList';
+import EditClient from './EditClient';
 
 function Preferences({ isSignedIn, doRedirectToSignIn }) {
   if (isSignedIn) {
@@ -42,6 +43,10 @@ function Preferences({ isSignedIn, doRedirectToSignIn }) {
             <Route
               path='/preferences/main/clients-list'
               component={ClientsList}
+            ></Route>
+            <Route
+              path='/preferences/main/edit-client'
+              component={EditClient}
             ></Route>
           </div>
         </Router>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Field } from 'react-final-form';
 import { renderSelectOptions } from './react-final-form/renderSelectOptions';
-import { membershipOptions } from './react-final-form/membershipOptions';
+import { membershipOptions } from './react-final-form/options';
 import { connect } from 'react-redux';
 import { doFilterActiveUsersList } from '../actions';
 
