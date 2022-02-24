@@ -11,7 +11,10 @@ class EditClient extends React.Component {
     // http://localhost:3000/preferences/main/edit-client/?row=3
     // https://stabraq-logbook.netlify.app/preferences/main/edit-client/?row=3
 
-    if (this.props.fromURL !== '/preferences/main/clients-list') {
+    if (
+      this.props.fromURL === null &&
+      this.props.fromURL !== '/preferences/main/clients-list'
+    ) {
       // this.props.doGetSingleClient(this.row);
       history.push('/preferences/main/clients-list');
     }

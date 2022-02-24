@@ -7,10 +7,34 @@ import LoadingSpinner from './LoadingSpinner';
 export class ClientsList extends Component {
   state = { activeIndex: null };
   componentDidMount() {
-    this.props.doGetClientsList();
+    this.mobile = new URLSearchParams(window.location.search).get('mobile');
+    this.onStart();
   }
+
+  onStart = async () => {
+    await this.props.doGetClientsList();
+    if (this.mobile) {
+      await this.onScroll();
+    }
+  };
+
+  onScroll = async () => {
+    this.refs[this.mobile].current.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    });
+
+    const { clientsList } = this.props;
+    const userIndex = clientsList.findIndex((x) => x[0] === this.mobile);
+    this.setState({ activeIndex: userIndex });
+  };
+
   renderList = () => {
     const { clientsList } = this.props;
+    this.refs = clientsList.reduce((acc, value) => {
+      acc[value[0]] = React.createRef();
+      return acc;
+    }, {});
 
     return clientsList.map((active, index) => {
       const getColor = (value) => {
@@ -38,6 +62,7 @@ export class ClientsList extends Component {
       return (
         <React.Fragment key={index}>
           <div
+            ref={this.refs[active[0]]}
             className={`title ${activeClass} ${rowColor}`}
             onClick={() => {
               this.state.activeIndex === index
@@ -129,6 +154,7 @@ export class ClientsList extends Component {
     if (this.props.loading) {
       return <LoadingSpinner />;
     }
+
     return (
       <>
         <div className='ui styled fluid accordion mb-3'>
