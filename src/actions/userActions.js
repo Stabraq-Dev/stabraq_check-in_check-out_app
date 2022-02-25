@@ -342,7 +342,7 @@ export const setClientStateToEdit = (active) => async (dispatch) => {
   dispatch(doLoading(false));
 };
 
-export const doFilterClientsUsersList =
+export const doFilterClientsList =
   (index, filterValue, filterBy) => async (dispatch, getState) => {
     const { clientsList } = getState().user;
     const clientsListFiltered = clientsList.filter((value) =>

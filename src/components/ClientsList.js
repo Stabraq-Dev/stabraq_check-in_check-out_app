@@ -2,11 +2,11 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { doGetClientsList, setClientStateToEdit, fromURL } from '../actions';
-import FilterByName from './FilterByName';
+import FilterClientsBy from './FilterClientsBy';
 import LoadingSpinner from './LoadingSpinner';
 
 export class ClientsList extends Component {
-  state = { activeIndex: null };
+  state = { activeIndex: null, filterBy: 'Name', resetFilter: false };
   componentDidMount() {
     this.mobile = new URLSearchParams(window.location.search).get('mobile');
     this.onStart();
@@ -159,8 +159,51 @@ export class ClientsList extends Component {
     );
   }
 
+  renderFilterBar = () => {
+    return (
+      <div className='text-center'>{this.renderFilterButtons()}</div>
+    );
+  };
+
+  renderFilterButtons = () => {
+    const buttons = [
+      { name: 'filterByName', filterIndex: 1, value: 'Name' },
+      { name: 'filterByMobile', filterIndex: 0, value: 'Mobile' },
+    ];
+
+    return buttons.map((active) => {
+      const { filterBy } = this.state;
+      const { name, filterIndex, value } = active;
+      const activeClass = filterBy === value ? 'bg-dark' : 'stabraq-bg';
+      return (
+        <button
+          key={filterIndex}
+          className={`ui primary button ${activeClass} me-3 mt-1`}
+          name={name}
+          onClick={(e) => {
+            this.setState({
+              filterBy: e.target.value,
+              resetFilter: !this.state.resetFilter,
+            });
+          }}
+          type='submit'
+          value={value}
+        >
+          {value}
+        </button>
+      );
+    });
+  };
+
   renderFilterClients = () => {
-    return <FilterByName />;
+    const { filterBy } = this.state;
+    const filterIndex = filterBy === 'Name' ? 1 : 0;
+    return (
+      <FilterClientsBy
+        filterIndex={filterIndex}
+        resetFilter={this.state.resetFilter}
+      />
+    );
   };
 
   render() {
@@ -177,7 +220,10 @@ export class ClientsList extends Component {
     return (
       <>
         <div className='ui styled fluid accordion mb-3'>
-          {this.renderFilterClients()}
+          <div className='ui segment'>
+            {this.renderFilterBar()}
+            {this.renderFilterClients()}
+          </div>
           {this.renderList(finalClientsList)}
         </div>
       </>
