@@ -21,6 +21,7 @@ import {
   DURATION_EXCEL_FORMULA,
   NUMBER_TO_CHECK_EXISTS_RANGE,
   TOTAL_COST_EXCEL_FORMULA,
+  TOTAL_USERS_EXCEL_FORMULA,
   UPDATE_EDIT_CLIENT_RANGE,
 } from '../ranges';
 
@@ -345,7 +346,7 @@ export const executeValuesAppendAddSheet = async () => {
         majorDimension: 'COLUMNS',
         values: [
           [new Date().toLocaleDateString('en-US')],
-          [''],
+          [TOTAL_USERS_EXCEL_FORMULA],
           [''],
           [''],
           [''],

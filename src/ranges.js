@@ -82,4 +82,5 @@ export const COST_EXCEL_FORMULA = (
 export const REMAIN_DAYS_EXCEL_FORMULA = (lastBlankRow) => {
   return `=IF(E${lastBlankRow}>TODAY(),DATEDIF(TODAY(),E${lastBlankRow},"d"),(-1*DATEDIF(E${lastBlankRow},TODAY(),"d")))`;
 };
+export const TOTAL_USERS_EXCEL_FORMULA = '=COUNTA(B4:B)';
 export const TOTAL_COST_EXCEL_FORMULA = '=SUM(J4:J)';
