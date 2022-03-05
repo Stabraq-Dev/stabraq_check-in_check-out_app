@@ -12,6 +12,15 @@ export class ClientsList extends Component {
     this.onStart();
   }
 
+  componentDidUpdate(prevProps) {
+    if (
+      prevProps.clientsListFiltered.length !==
+      this.props.clientsListFiltered.length
+    ) {
+      this.setState({ activeIndex: null });
+    }
+  }
+
   onStart = async () => {
     await this.props.doGetClientsList();
     if (this.mobile) {
@@ -20,6 +29,7 @@ export class ClientsList extends Component {
   };
 
   onScroll = async () => {
+    await this.props.doGetClientsList();
     this.refs[this.mobile].current.scrollIntoView({
       behavior: 'smooth',
       block: 'center',
@@ -159,6 +169,24 @@ export class ClientsList extends Component {
     );
   }
 
+  renderListCount() {
+    const { clientsList, clientsListFiltered } = this.props;
+    const usersText = clientsListFiltered.length <= 1 ? 'User' : 'Users';
+    const filteredText =
+      clientsList.length === clientsListFiltered.length ? ' ' : ' Filtered ';
+    const bgColor =
+      clientsList.length === clientsListFiltered.length
+        ? 'active-bg-color'
+        : 'non-active-bg-color';
+    return (
+      <div className={`ui segment ${bgColor}`}>
+        <div className='ui center aligned header'>
+          All{filteredText}Users: {clientsListFiltered.length} {usersText}
+        </div>
+      </div>
+    );
+  }
+
   render() {
     if (this.props.loading) {
       return <LoadingSpinner />;
@@ -176,6 +204,7 @@ export class ClientsList extends Component {
           <div className='ui segment'>
             <FilterClientsBy />
           </div>
+          {this.renderListCount()}
           {this.renderList(finalClientsList)}
         </div>
       </>
