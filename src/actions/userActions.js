@@ -634,7 +634,11 @@ export const doCheckInOut =
         dispatch(doCalcDurationCost(resData[0]));
         if (membership === 'HOURS_MEMBERSHIP' && roomChecked === 'NO') {
           const { approxDuration } = getState().user.durationCost;
-          const remains = remainingHours - approxDuration;
+          const finalRemains =
+            remainingHours % 1 === 0 ? remainingHours - 0.4 : remainingHours;
+          const remains = parseFloat(
+            (finalRemains - approxDuration).toFixed(2)
+          );
           await executeValuesUpdateCheckOut({
             value: remains,
             range: REMAINING_HOURS_RANGE(clientRowNumber),

@@ -544,6 +544,7 @@ export const executeValuesAppendCheckOut = async (
 
     const approxDuration = APPROX_DURATION_EXCEL_FORMULA(
       roomChecked,
+      membership,
       rowNumber
     );
 
