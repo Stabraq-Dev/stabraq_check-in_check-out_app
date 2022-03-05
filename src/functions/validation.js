@@ -19,15 +19,15 @@ export const checkForEmail = async (inputTerm) => {
   const regexpForEmail =
     /^[\w]{1,}[\w.+-]{0,}@[\w-]{2,}([.][a-zA-Z]{2,}|[.][\w-]{2,}[.][a-zA-Z]{2,})$/g;
 
-  if (!inputTerm) {
-    return 'Please enter e-mail';
-  }
+  // if (!inputTerm) {
+  //   return 'Please enter e-mail';
+  // }
 
-  if (!regexpForNoSpaces.test(inputTerm)) {
+  if (inputTerm && !regexpForNoSpaces.test(inputTerm)) {
     return 'Please delete spaces, Email cannot contain spaces';
   }
 
-  if (!regexpForEmail.test(inputTerm)) {
+  if (inputTerm && !regexpForEmail.test(inputTerm)) {
     return 'Please enter valid e-mail';
   }
 

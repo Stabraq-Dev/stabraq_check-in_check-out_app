@@ -60,7 +60,9 @@ const NewUserForm = ({ doShowMyModal, loading, doOnNewUserFormSubmit }) => {
       (letter) => letter.toUpperCase()
     );
 
-    formValues.email = formValues.email.toLowerCase();
+    if (formValues.email) {
+      formValues.email = formValues.email.toLowerCase();
+    }
 
     doOnNewUserFormSubmit(formValues);
   };
