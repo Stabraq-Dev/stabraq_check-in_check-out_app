@@ -82,7 +82,7 @@ export const COST_EXCEL_FORMULA = (
     : roomChecked === 'TRAINING_ROOM'
     ? `=I${rowNumber}*${trainingRoomRate}`
     : membership === 'NOT_MEMBER' && invite === 'NO'
-    ? `=IF(I${rowNumber}>=7,${fullDayRate},I${rowNumber}*${hrRate})`
+    ? `=IF(I${rowNumber}>=${fullDayRate/10},${fullDayRate},I${rowNumber}*${hrRate})`
     : '';
 };
 export const REMAIN_DAYS_EXCEL_FORMULA = (lastBlankRow) => {
