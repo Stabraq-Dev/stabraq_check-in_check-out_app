@@ -48,7 +48,7 @@ export const doLogIn = (formValues) => async (dispatch, getState) => {
     case 'TRUE':
       dispatch(signIn());
       dispatch(wrongUserPass(false));
-      localStorage.setItem('user', Date.now() + 60 * 60 * 1000);
+      localStorage.setItem('user', Date.now() + 7200000);
       const { fromURL } = getState().auth;
       if (fromURL) {
         history.push(fromURL);
@@ -69,8 +69,12 @@ export const doLogIn = (formValues) => async (dispatch, getState) => {
 
 export const doCheckSignedIn = () => async (dispatch) => {
   const user = localStorage.getItem('user');
+  console.log('doCheckSignedIn');
+  console.log(user);
   if (user > Date.now()) {
     dispatch(signIn());
+  } else {
+    dispatch(signOut());
   }
 };
 
