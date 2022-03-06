@@ -69,8 +69,6 @@ export const doLogIn = (formValues) => async (dispatch, getState) => {
 
 export const doCheckSignedIn = () => async (dispatch) => {
   const user = localStorage.getItem('user');
-  console.log('doCheckSignedIn');
-  console.log(user);
   if (user > Date.now()) {
     dispatch(signIn());
   } else {
