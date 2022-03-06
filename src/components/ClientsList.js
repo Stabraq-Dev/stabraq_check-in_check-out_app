@@ -11,15 +11,13 @@ export class ClientsList extends Component {
     this.mobile = new URLSearchParams(window.location.search).get('mobile');
     this.btnRef = React.createRef();
     this.onStart();
-
-    window.onscroll = () => {
-      document.body.scrollTop > 400 || document.documentElement.scrollTop > 400
-        ? (this.btnRef.current.style.display = 'block')
-        : (this.btnRef.current.style.display = 'none');
-    };
   }
 
   componentDidUpdate(prevProps) {
+    if (this.btnRef.current !== null) {
+      window.addEventListener('scroll', this.handleScroll);
+    }
+
     if (
       prevProps.clientsListFiltered.length !==
       this.props.clientsListFiltered.length
@@ -27,6 +25,17 @@ export class ClientsList extends Component {
       this.setState({ activeIndex: null });
     }
   }
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this.handleScroll);
+  }
+
+  handleScroll = () => {
+    const btn = this.btnRef.current;
+    document.body.scrollTop > 400 || document.documentElement.scrollTop > 400
+      ? (btn.style.display = 'block')
+      : (btn.style.display = 'none');
+  };
 
   onStart = async () => {
     await this.props.doGetClientsList();
