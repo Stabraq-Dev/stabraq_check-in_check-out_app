@@ -18,6 +18,13 @@ export class ActiveSheet extends Component {
     this.props.doGetActiveUsersList();
     this.setState({ totalCost: '' });
   }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.nonActiveUsersList !== this.props.nonActiveUsersList) {
+      this.setState({ totalCost: '' });
+    }
+  }
+
   renderFilterActiveUsers = () => {
     const { activeUsersList, nonActiveUsersList } = this.props;
 
