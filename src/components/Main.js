@@ -12,6 +12,7 @@ import {
   doClearPrevUserState,
   doGetActiveUsersList,
   doGetClientsList,
+  doCheckSignedIn,
 } from '../actions';
 
 const revealAll = [
@@ -26,6 +27,10 @@ const revealAll = [
 class Main extends React.Component {
   componentDidMount() {
     this.props.doReveal(revealAll);
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    this.props.doCheckSignedIn();
   }
 
   componentWillUnmount() {
@@ -197,4 +202,5 @@ export default connect(mapStateToProps, {
   doClearPrevUserState,
   doGetActiveUsersList,
   doGetClientsList,
+  doCheckSignedIn,
 })(Main);

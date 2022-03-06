@@ -239,6 +239,7 @@ export const doCheckResponse = (res) => async (dispatch, getState) => {
 };
 
 export const doGetActiveUsersList = () => async (dispatch) => {
+  if (!navigator.onLine) return;
   dispatch(doLoading(true));
   const allCheckedInUsers = await getSheetValues(DATA_SHEET_ACTIVE_RANGE);
   if (allCheckedInUsers) {
@@ -316,6 +317,7 @@ export const doFilterActiveUsersList =
   };
 
 export const doGetClientsList = () => async (dispatch) => {
+  if (!navigator.onLine) return;
   dispatch(doLoading(true));
   const clientsList = await getSheetValues(CLIENTS_SHEET_CLIENTS_RANGE);
 
