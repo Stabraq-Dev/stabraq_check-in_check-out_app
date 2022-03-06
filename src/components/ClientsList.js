@@ -9,7 +9,14 @@ export class ClientsList extends Component {
   state = { activeIndex: null };
   componentDidMount() {
     this.mobile = new URLSearchParams(window.location.search).get('mobile');
+    this.btnRef = React.createRef();
     this.onStart();
+
+    window.onscroll = () => {
+      document.body.scrollTop > 400 || document.documentElement.scrollTop > 400
+        ? (this.btnRef.current.style.display = 'block')
+        : (this.btnRef.current.style.display = 'none');
+    };
   }
 
   componentDidUpdate(prevProps) {
@@ -44,6 +51,17 @@ export class ClientsList extends Component {
     const { clientsList } = this.props;
     const row = clientsList.findIndex((x) => x[0] === mobile) + 3;
     return row;
+  };
+
+  onGotoTopBtn = () => {
+    document.body.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+    document.documentElement.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
   };
 
   renderList = (list) => {
@@ -206,6 +224,14 @@ export class ClientsList extends Component {
           </div>
           {this.renderListCount()}
           {this.renderList(finalClientsList)}
+          <button
+            ref={this.btnRef}
+            onClick={this.onGotoTopBtn}
+            className='goToTopBtn'
+            data-tip='Go to top'
+          >
+            Top
+          </button>
         </div>
       </>
     );
