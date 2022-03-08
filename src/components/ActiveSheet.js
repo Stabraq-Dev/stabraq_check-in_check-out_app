@@ -4,25 +4,51 @@ import {
   doGetActiveUsersList,
   doOrderSortActiveUsersList,
   doSortActiveUsersList,
+  doSortList,
+  doOrderList,
+  doClearActiveUsersList,
+  doClearSorting,
 } from '../actions';
 import { Link } from 'react-router-dom';
 import LoadingSpinner from './LoadingSpinner';
 import { getSheetValues } from '../functions/executeFunc';
 import { DATA_SHEET_TOTAL_COST_RANGE } from '../ranges';
 import FilterByMembership from './FilterByMembership';
+import ListSorting from './ListSorting';
+
+const buttons = [
+  { name: 'sortByMembership', sortIndex: 3, value: 'Membership' },
+  { name: 'sortByName', sortIndex: 0, value: 'Name' },
+  { name: 'sortByCheckInTime', sortIndex: 5, value: 'Check In Time' },
+];
 
 export class ActiveSheet extends Component {
-  state = { sortedBy: 'Check In Time', totalCost: '', ascending: true };
+  state = { totalCost: '', updateSort: false };
 
   componentDidMount() {
     this.props.doGetActiveUsersList();
     this.setState({ totalCost: '' });
+    this.props.doSortList('Check In Time', 5);
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevProps.nonActiveUsersList !== this.props.nonActiveUsersList) {
       this.setState({ totalCost: '' });
     }
+
+    if (prevProps.sortList.sortBy !== this.props.sortList.sortBy) {
+      this.setState({ updateSort: true });
+    }
+
+    const { index } = this.props.sortList;
+    if (this.state.updateSort) {
+      this.props.doSortActiveUsersList(index);
+    }
+  }
+
+  componentWillUnmount() {
+    this.props.doClearActiveUsersList();
+    this.props.doClearSorting();
   }
 
   renderFilterActiveUsers = () => {
@@ -136,78 +162,38 @@ export class ActiveSheet extends Component {
     );
   }
 
-  sortActiveUserList = async (event, index) => {
-    await this.props.doSortActiveUsersList(index);
-    this.setState({
-      sortedBy: event.target.value,
-    });
-  };
-
   onGetTotalCost = async () => {
     const totalCost = await getSheetValues(DATA_SHEET_TOTAL_COST_RANGE);
     this.setState({ totalCost: totalCost[0][0] });
   };
 
-  renderSortButtons = () => {
-    const buttons = [
-      { name: 'sortByMembership', sortIndex: 3, value: 'Membership' },
-      { name: 'sortByName', sortIndex: 0, value: 'Name' },
-      { name: 'sortByCheckInTime', sortIndex: 5, value: 'Check In Time' },
-      { name: 'sortByCheckOutTime', sortIndex: 6, value: 'Check Out Time' },
-    ];
+  renderActiveSortBar = () => {
+    const { activeUsersList, activeSheetFilteredBy } = this.props;
 
-    return buttons.map((active, index) => {
-      const { sortedBy } = this.state;
-      const { name, sortIndex, value } = active;
-      const activeClass = sortedBy === value ? 'bg-dark' : 'stabraq-bg';
-      return (
-        <button
-          key={sortIndex}
-          className={`ui primary button ${activeClass} me-3 mt-1`}
-          name={name}
-          onClick={(e) => {
-            this.sortActiveUserList(e, sortIndex);
-            this.setState({ ascending: true });
-          }}
-          type='submit'
-          value={value}
-        >
-          {value}
-        </button>
-      );
-    });
-  };
-
-  renderSortBar = () => {
-    const { ascending } = this.state;
-    const orderClass = ascending ? 'sort amount down' : 'sort amount up';
-    const activeClass = !ascending ? 'bg-dark' : '';
-    const order = ascending ? 'Ascending' : 'Descending';
-
-    const { activeUsersList, nonActiveUsersList, activeSheetFilteredBy } =
-      this.props;
-
-    if (
-      (activeUsersList.length > 0 || nonActiveUsersList.length > 0) &&
-      !activeSheetFilteredBy.filterBy
-    )
+    if (activeUsersList.length > 0 && !activeSheetFilteredBy.filterBy)
       return (
         <div className='ui segment text-center'>
-          <div className='text-start fw-bold'>Sort By</div>
-          {this.renderSortButtons()}
-          <button
-            className={`ui primary button ${activeClass} me-3 mt-1`}
-            name='ascending'
-            onClick={(e) => {
-              this.setState({ ascending: !ascending });
-              this.props.doOrderSortActiveUsersList();
-            }}
-            type='submit'
-            value='ascending'
-          >
-            <i className={`${orderClass} icon me-1`} />
-            {order}
-          </button>
+          <ListSorting buttons={buttons} />
+        </div>
+      );
+  };
+
+  renderNonActiveSortBar = () => {
+    const nonActiveButtons = [
+      ...buttons,
+      {
+        name: 'sortByCheckOutTime',
+        sortIndex: 6,
+        value: 'Check Out Time',
+      },
+    ];
+
+    const { nonActiveUsersList, activeSheetFilteredBy } = this.props;
+
+    if (nonActiveUsersList.length > 0 && !activeSheetFilteredBy.filterBy)
+      return (
+        <div className='ui segment text-center'>
+          <ListSorting buttons={nonActiveButtons} />
         </div>
       );
   };
@@ -267,10 +253,10 @@ export class ActiveSheet extends Component {
       <>
         {this.renderFilterActiveUsers()}
         {this.renderCountActiveUsers(activeProps)}
-        {this.renderSortBar()}
+        {this.renderActiveSortBar()}
         <div className='ui celled list'>{this.renderList(activeProps)}</div>
         {this.renderCountActiveUsers(nonActiveProps)}
-        {this.renderSortBar()}
+        {this.renderNonActiveSortBar()}
         <div className='ui celled list'>{this.renderList(nonActiveProps)}</div>
         {this.renderGetTotalCostButtons()}
       </>
@@ -286,6 +272,8 @@ const mapStateToProps = (state) => {
     activeSheetFilteredBy,
     activeUsersListFiltered,
     nonActiveUsersListFiltered,
+    sortList,
+    orderListAscending,
   } = state.user;
   return {
     loading,
@@ -294,6 +282,8 @@ const mapStateToProps = (state) => {
     activeSheetFilteredBy,
     activeUsersListFiltered,
     nonActiveUsersListFiltered,
+    sortList,
+    orderListAscending,
   };
 };
 
@@ -301,4 +291,8 @@ export default connect(mapStateToProps, {
   doGetActiveUsersList,
   doSortActiveUsersList,
   doOrderSortActiveUsersList,
+  doSortList,
+  doOrderList,
+  doClearActiveUsersList,
+  doClearSorting,
 })(ActiveSheet);

@@ -35,6 +35,8 @@ import {
   CLIENT_STATE_TO_EDIT,
   ON_EDIT_CLIENT_SUBMIT,
   CLIENTS_LIST_FILTERED,
+  SORT_LIST,
+  ORDER_LIST,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -165,6 +167,34 @@ export const doGetHoursDailyRates = () => async (dispatch) => {
   dispatch({ type: HOURS_DAILY_RATES, payload: hoursDailyRates[0] });
 };
 
+export const doSortList = (sortBy, index) => {
+  return {
+    type: SORT_LIST,
+    payload: { sortBy, index },
+  };
+};
+
+export const doOrderList = (ascending) => {
+  return {
+    type: ORDER_LIST,
+    payload: ascending,
+  };
+};
+
+export const doClearSorting = () => async (dispatch) => {
+  await dispatch({
+    type: SORT_LIST,
+    payload: {
+      sortBy: '',
+      index: null,
+    },
+  });
+  await dispatch({
+    type: ORDER_LIST,
+    payload: true,
+  });
+};
+
 export const doCreateNewSheet = () => async (dispatch, getState) => {
   const sheetDate = await getSheetValues(DATA_SHEET_DATE_RANGE);
   dispatch({ type: SHEET_DATE, payload: sheetDate[0][0] });
@@ -283,10 +313,11 @@ export const doSortActiveUsersList = (index) => async (dispatch, getState) => {
 };
 
 export const doOrderSortActiveUsersList = () => async (dispatch, getState) => {
-  const { activeUsersList, nonActiveUsersList } = getState().user;
+  const { activeUsersList, nonActiveUsersList, sortList } = getState().user;
   const activeUsersSorted = (list) => list.reverse();
 
-  const activeSorted = activeUsersSorted(activeUsersList);
+  const activeSorted =
+    sortList.index === 6 ? activeUsersList : activeUsersSorted(activeUsersList);
   const nonActiveSorted = activeUsersSorted(nonActiveUsersList);
 
   await dispatch({ type: ACTIVE_USERS_LIST, payload: activeSorted });
@@ -315,6 +346,14 @@ export const doFilterActiveUsersList =
       payload: nonActiveFiltered,
     });
   };
+
+export const doClearActiveUsersList = () => async (dispatch) => {
+  await dispatch({ type: ACTIVE_USERS_LIST, payload: [] });
+  await dispatch({ type: NON_ACTIVE_USERS_LIST, payload: [] });
+  await dispatch({ type: ACTIVE_SHEET_FILTERED_BY, payload: '' });
+  await dispatch({ type: ACTIVE_USERS_LIST_FILTERED, payload: [] });
+  await dispatch({ type: NON_ACTIVE_USERS_LIST_FILTERED, payload: [] });
+};
 
 export const doGetClientsList = () => async (dispatch) => {
   if (!navigator.onLine) return;

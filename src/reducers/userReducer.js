@@ -20,6 +20,8 @@ import {
   CLIENTS_LIST,
   CLIENT_STATE_TO_EDIT,
   CLIENTS_LIST_FILTERED,
+  SORT_LIST,
+  ORDER_LIST,
 } from '../actions/types';
 
 const valuesMatchedObj = {
@@ -93,6 +95,11 @@ const INITIAL_STATE = {
     offers: '',
   },
   clientsListFiltered: [],
+  sortList: {
+    sortBy: '',
+    index: null,
+  },
+  orderListAscending: true,
 };
 
 let valuesMatchedKeys = [
@@ -259,6 +266,16 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         clientsListFiltered: action.payload,
+      };
+    case SORT_LIST:
+      return {
+        ...state,
+        sortList: action.payload,
+      };
+    case ORDER_LIST:
+      return {
+        ...state,
+        orderListAscending: action.payload,
       };
     default:
       return state;
