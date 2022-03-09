@@ -37,6 +37,7 @@ import {
   CLIENTS_LIST_FILTERED,
   SORT_LIST,
   ORDER_LIST,
+  CLIENTS_LIST_SORTED,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -299,7 +300,7 @@ export const doSortActiveUsersList = (index) => async (dispatch, getState) => {
         `${new Date().toLocaleDateString('en-US')} ${b[index]}`
       ).toString();
 
-      return index === 5
+      return index === 5 || index === 6
         ? one.localeCompare(two)
         : a[index].localeCompare(b[index]);
     });
@@ -312,6 +313,36 @@ export const doSortActiveUsersList = (index) => async (dispatch, getState) => {
   await dispatch({ type: NON_ACTIVE_USERS_LIST, payload: nonActiveSorted });
 };
 
+export const doSortClientsList = (index) => async (dispatch, getState) => {
+  const { clientsList } = getState().user;
+  const getClientsSorted = (list) =>
+    list.sort((a, b) => {
+      const aVal = a[index];
+      const bVal = b[index];
+      const aValR = index === 5 && a[3] === 'NOT_MEMBER' ? 999 : parseInt(aVal);
+      const bValR = index === 5 && b[3] === 'NOT_MEMBER' ? 999 : parseInt(bVal);
+      const one =
+        index === 4 && a[3] === 'NOT_MEMBER'
+          ? '9999999999999'
+          : Date.parse(`${aVal.split('/').reverse().join('/')}`).toString();
+      const two =
+        index === 5 && b[3] === 'NOT_MEMBER'
+          ? '9999999999999'
+          : Date.parse(`${bVal.split('/').reverse().join('/')}`).toString();
+
+      return index === 4
+        ? one.localeCompare(two)
+        : index === 5
+        ? aValR - bValR
+        : aVal.localeCompare(bVal);
+    });
+
+  const clientsSorted =
+    index === 999 ? [...clientsList] : getClientsSorted([...clientsList]);
+
+  await dispatch({ type: CLIENTS_LIST_SORTED, payload: clientsSorted });
+};
+
 export const doOrderSortActiveUsersList = () => async (dispatch, getState) => {
   const { activeUsersList, nonActiveUsersList, sortList } = getState().user;
   const activeUsersSorted = (list) => list.reverse();
@@ -322,6 +353,15 @@ export const doOrderSortActiveUsersList = () => async (dispatch, getState) => {
 
   await dispatch({ type: ACTIVE_USERS_LIST, payload: activeSorted });
   await dispatch({ type: NON_ACTIVE_USERS_LIST, payload: nonActiveSorted });
+};
+
+export const doOrderSortClientsList = () => async (dispatch, getState) => {
+  const { clientsListSorted } = getState().user;
+  const activeUsersSorted = (list) => list.reverse();
+
+  const clientsListReversed = activeUsersSorted(clientsListSorted);
+
+  await dispatch({ type: CLIENTS_LIST_SORTED, payload: clientsListReversed });
 };
 
 export const doFilterActiveUsersList =
@@ -353,6 +393,12 @@ export const doClearActiveUsersList = () => async (dispatch) => {
   await dispatch({ type: ACTIVE_SHEET_FILTERED_BY, payload: '' });
   await dispatch({ type: ACTIVE_USERS_LIST_FILTERED, payload: [] });
   await dispatch({ type: NON_ACTIVE_USERS_LIST_FILTERED, payload: [] });
+};
+
+export const doClearClientsList = () => async (dispatch) => {
+  await dispatch({ type: CLIENTS_LIST, payload: [] });
+  await dispatch({ type: CLIENTS_LIST_SORTED, payload: [] });
+  await dispatch({ type: CLIENTS_LIST_FILTERED, payload: [] });
 };
 
 export const doGetClientsList = () => async (dispatch) => {

@@ -22,6 +22,7 @@ import {
   CLIENTS_LIST_FILTERED,
   SORT_LIST,
   ORDER_LIST,
+  CLIENTS_LIST_SORTED,
 } from '../actions/types';
 
 const valuesMatchedObj = {
@@ -95,6 +96,7 @@ const INITIAL_STATE = {
     offers: '',
   },
   clientsListFiltered: [],
+  clientsListSorted: [],
   sortList: {
     sortBy: '',
     index: null,
@@ -266,6 +268,11 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         clientsListFiltered: action.payload,
+      };
+    case CLIENTS_LIST_SORTED:
+      return {
+        ...state,
+        clientsListSorted: action.payload,
       };
     case SORT_LIST:
       return {

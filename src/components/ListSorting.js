@@ -4,22 +4,37 @@ import {
   doSortList,
   doOrderList,
   doOrderSortActiveUsersList,
+  doSortClientsList,
+  doOrderSortClientsList,
 } from '../actions';
 
 export class ListSorting extends Component {
   sortList = (event, index) => {
+    const { clientsList } = this.props;
     this.props.doSortList(event.target.value, index);
     this.props.doOrderList(true);
+    if (clientsList.length > 0) {
+      this.props.doSortClientsList(index);
+    }
   };
 
   orderList = () => {
-    const { orderListAscending } = this.props;
-    const { activeUsersList, nonActiveUsersList } = this.props;
+    const {
+      orderListAscending,
+      activeUsersList,
+      nonActiveUsersList,
+      clientsList,
+    } = this.props;
+
     this.props.doOrderList(!orderListAscending);
+
     if (orderListAscending) {
       if (activeUsersList.length > 0 || nonActiveUsersList.length > 0) {
         this.props.doOrderSortActiveUsersList();
       }
+    }
+    if (clientsList.length > 0) {
+      this.props.doOrderSortClientsList();
     }
   };
 
@@ -77,13 +92,19 @@ export class ListSorting extends Component {
 }
 
 const mapStateToProps = (state) => {
-  const { sortList, orderListAscending, activeUsersList, nonActiveUsersList } =
-    state.user;
+  const {
+    sortList,
+    orderListAscending,
+    activeUsersList,
+    nonActiveUsersList,
+    clientsList,
+  } = state.user;
   return {
     sortList,
     orderListAscending,
     activeUsersList,
     nonActiveUsersList,
+    clientsList,
   };
 };
 
@@ -91,4 +112,6 @@ export default connect(mapStateToProps, {
   doSortList,
   doOrderList,
   doOrderSortActiveUsersList,
+  doSortClientsList,
+  doOrderSortClientsList,
 })(ListSorting);

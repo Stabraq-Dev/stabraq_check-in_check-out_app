@@ -1,9 +1,27 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { doGetClientsList, setClientStateToEdit, fromURL } from '../actions';
+import {
+  doGetClientsList,
+  setClientStateToEdit,
+  fromURL,
+  doSortList,
+  doClearSorting,
+  doClearClientsList,
+  doSortClientsList,
+} from '../actions';
 import FilterClientsBy from './FilterClientsBy';
+import ListSorting from './ListSorting';
 import LoadingSpinner from './LoadingSpinner';
+
+const buttons = [
+  { name: 'sortBySheet', sortIndex: 999, value: 'Sheet' },
+  { name: 'sortByName', sortIndex: 1, value: 'Name' },
+  { name: 'sortByMembership', sortIndex: 3, value: 'Membership' },
+  { name: 'sortByExpiryDate', sortIndex: 4, value: 'Expiry Date' },
+  { name: 'sortByRemainDays', sortIndex: 5, value: 'Remain Days' },
+  { name: 'sortByGender', sortIndex: 12, value: 'Gender' },
+];
 
 export class ClientsList extends Component {
   state = { activeIndex: null };
@@ -11,6 +29,7 @@ export class ClientsList extends Component {
     this.mobile = new URLSearchParams(window.location.search).get('mobile');
     this.btnRef = React.createRef();
     this.onStart();
+    this.props.doSortList('Sheet', 999);
   }
 
   componentDidUpdate(prevProps) {
@@ -20,7 +39,9 @@ export class ClientsList extends Component {
 
     if (
       prevProps.clientsListFiltered.length !==
-      this.props.clientsListFiltered.length
+        this.props.clientsListFiltered.length ||
+      prevProps.sortList.sortBy !== this.props.sortList.sortBy ||
+      prevProps.orderListAscending !== this.props.orderListAscending
     ) {
       this.setState({ activeIndex: null });
     }
@@ -28,6 +49,8 @@ export class ClientsList extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('scroll', this.handleScroll);
+    this.props.doClearSorting();
+    this.props.doClearClientsList();
   }
 
   handleScroll = () => {
@@ -39,6 +62,7 @@ export class ClientsList extends Component {
 
   onStart = async () => {
     await this.props.doGetClientsList();
+    await this.props.doSortClientsList(999);
     if (this.mobile) {
       await this.onScroll();
     }
@@ -118,7 +142,7 @@ export class ClientsList extends Component {
           >
             <i className='dropdown icon'></i>
             <i className='middle aligned icon me-2'>
-              {(index + 1).toString().padStart(3, '0')}
+              {(originalRow - 2).toString().padStart(3, '0')}
             </i>
             <i className={`large middle aligned icon ${genderClass}`}></i>
             <div className='ui breadcrumb'>
@@ -218,17 +242,20 @@ export class ClientsList extends Component {
     if (this.props.loading) {
       return <LoadingSpinner />;
     }
-    const { clientsList, clientsListFiltered } = this.props;
+    const { clientsList, clientsListFiltered, clientsListSorted } = this.props;
 
     const finalClientsList =
       clientsListFiltered.length !== clientsList.length
         ? clientsListFiltered
+        : clientsListSorted.length > 0
+        ? clientsListSorted
         : clientsList;
 
     return (
       <>
         <div className='ui styled fluid accordion mb-3'>
           <div className='ui segment'>
+            <ListSorting buttons={buttons} />
             <FilterClientsBy />
           </div>
           {this.renderListCount()}
@@ -249,11 +276,20 @@ export class ClientsList extends Component {
 
 const mapStateToProps = (state) => {
   const { loading } = state.app;
-  const { clientsList, clientsListFiltered } = state.user;
+  const {
+    clientsList,
+    clientsListFiltered,
+    clientsListSorted,
+    sortList,
+    orderListAscending,
+  } = state.user;
   return {
     loading,
     clientsList,
     clientsListFiltered,
+    clientsListSorted,
+    sortList,
+    orderListAscending,
   };
 };
 
@@ -261,4 +297,8 @@ export default connect(mapStateToProps, {
   doGetClientsList,
   setClientStateToEdit,
   fromURL,
+  doSortList,
+  doClearSorting,
+  doClearClientsList,
+  doSortClientsList,
 })(ClientsList);
