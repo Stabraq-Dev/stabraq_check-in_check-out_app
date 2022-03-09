@@ -101,36 +101,48 @@ export class ActiveSheet extends Component {
             return '';
         }
       };
-
+      const sortBy = this.props.sortList.sortBy;
       const membershipTextColor = getColor(active[3]);
-      const rowColor = index % 2 === 0 ? 'row-color' : '';
+      const rowColor = index % 2 === 0 ? 'rounded-3 row-color' : 'border border-secondary border-1 rounded-3';
+      const membershipClass =
+        sortBy === 'Membership' ? 'fw-bold' : 'description';
+      const inClass = sortBy === 'Check In Time' ? 'fw-bold' : 'description';
+      const outClass = sortBy === 'Check Out Time' ? 'fw-bold' : 'description';
       return (
-        <div className={`item ${rowColor}`} key={index}>
-          {this.renderSearch(active[1])}
-          {this.renderEditClient(active[1])}
-          <i className='middle aligned icon'>
-            {(index + 1).toString().padStart(2, '0')}
-          </i>
-          <i className='large middle aligned icon user circle'></i>
-          <div className='content'>
-            <div className='header mb-1'>{active[0]}</div>
-            <div className={`description ${membershipTextColor}`}>
-              {active[3]}
+        <div className={`row ${rowColor}`} key={index}>
+          <div className='col m-2'>
+            <div className='content col'>
+              <div className='d-inline fw-bold me-1'>
+                {(index + 1).toString().padStart(2, '0')}
+              </div>
+              <i className='large middle aligned icon user circle'></i>
+              <div className='d-inline fw-bold mb-1'>{active[0]}</div>
+              <div className={`${membershipClass} ${membershipTextColor}`}>
+                {active[3]}
+              </div>
+              <div className={inClass}>In: {active[5]}</div>
+              {active[6] && <div className={outClass}>Out: {active[6]}</div>}
+              {active[8] && (
+                <div className='description'>Duration: {active[8]} HR</div>
+              )}
+              {active[9] && (
+                <div className='description'>Cost: {active[9]} EGP</div>
+              )}
+              {active[11] && (
+                <div className='description text-danger'>
+                  Room: {active[11]}
+                </div>
+              )}
+              {active[12] && (
+                <div className='description'>Invitation: {active[12]}</div>
+              )}
             </div>
-            <i className='description'>In: {active[5]}</i>
-            {active[6] && <i className='description'>Out: {active[6]}</i>}
-            {active[8] && (
-              <div className='description'>Duration: {active[8]} HR</div>
-            )}
-            {active[9] && (
-              <div className='description'>Cost: {active[9]} EGP</div>
-            )}
-            {active[11] && (
-              <div className='description text-danger'>Room: {active[11]}</div>
-            )}
-            {active[12] && (
-              <div className='description'>Invitation: {active[12]}</div>
-            )}
+          </div>
+          <div className='col d-flex align-items-center justify-content-end'>
+            <div className='row'>
+              {this.renderSearch(active[1])}
+              {this.renderEditClient(active[1])}
+            </div>
           </div>
         </div>
       );
@@ -139,7 +151,7 @@ export class ActiveSheet extends Component {
 
   renderSearch(mobile) {
     return (
-      <div className='right floated content mt-2'>
+      <div className='col d-flex align-items-center justify-content-end my-1'>
         <Link
           to={`/preferences/main/user/?mobile=${mobile}`}
           className='ui button positive'
@@ -151,7 +163,7 @@ export class ActiveSheet extends Component {
   }
   renderEditClient(mobile) {
     return (
-      <div className='right floated content mt-2'>
+      <div className='col d-flex align-items-center justify-content-end my-1'>
         <Link
           to={`/preferences/main/clients-list/?mobile=${mobile}`}
           className='ui button positive'
