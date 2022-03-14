@@ -140,8 +140,8 @@ export class ActiveSheet extends Component {
           </div>
           <div className='col d-flex align-items-center justify-content-end'>
             <div className='row'>
-              {this.renderSearch(active[1])}
               {this.renderEditClient(active[1])}
+              {this.renderSearch(active[1])}
             </div>
           </div>
         </div>
