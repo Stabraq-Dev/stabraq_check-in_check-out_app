@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { motion } from 'framer-motion/dist/framer-motion';
+import { InView } from 'react-intersection-observer';
+import { Link } from 'react-router-dom';
+
 import {
   doGetActiveUsersList,
   doOrderSortActiveUsersList,
@@ -9,7 +13,6 @@ import {
   doClearActiveUsersList,
   doClearSorting,
 } from '../actions';
-import { Link } from 'react-router-dom';
 import LoadingSpinner from './LoadingSpinner';
 import { getSheetValues } from '../functions/executeFunc';
 import { DATA_SHEET_TOTAL_COST_RANGE } from '../ranges';
@@ -21,6 +24,15 @@ const buttons = [
   { name: 'sortByName', sortIndex: 0, value: 'Name' },
   { name: 'sortByCheckInTime', sortIndex: 5, value: 'Check In Time' },
 ];
+
+const rowVariants = {
+  visible: {
+    opacity: 1,
+    translateX: 0,
+    transition: { duration: 0.3, delay: 0.3 },
+  },
+  hidden: { opacity: 0, translateX: -400 },
+};
 
 export class ActiveSheet extends Component {
   state = { totalCost: '', updateSort: false };
@@ -103,48 +115,63 @@ export class ActiveSheet extends Component {
       };
       const sortBy = this.props.sortList.sortBy;
       const membershipTextColor = getColor(active[3]);
-      const rowColor = index % 2 === 0 ? 'rounded-3 row-color' : 'border border-secondary border-1 rounded-3';
+      const rowColor =
+        index % 2 === 0
+          ? 'rounded-3 row-color'
+          : 'border border-secondary border-1 rounded-3';
       const membershipClass =
         sortBy === 'Membership' ? 'fw-bold' : 'description';
       const inClass = sortBy === 'Check In Time' ? 'fw-bold' : 'description';
       const outClass = sortBy === 'Check Out Time' ? 'fw-bold' : 'description';
       return (
-        <div className={`row ${rowColor}`} key={index}>
-          <div className='col m-2'>
-            <div className='content col'>
-              <div className='d-inline fw-bold me-1'>
-                {(index + 1).toString().padStart(2, '0')}
-              </div>
-              <i className='large middle aligned icon user circle'></i>
-              <div className='d-inline fw-bold mb-1'>{active[0]}</div>
-              <div className={`${membershipClass} ${membershipTextColor}`}>
-                {active[3]}
-              </div>
-              <div className={inClass}>In: {active[5]}</div>
-              {active[6] && <div className={outClass}>Out: {active[6]}</div>}
-              {active[8] && (
-                <div className='description'>Duration: {active[8]} HR</div>
-              )}
-              {active[9] && (
-                <div className='description'>Cost: {active[9]} EGP</div>
-              )}
-              {active[11] && (
-                <div className='description text-danger'>
-                  Room: {active[11]}
+        <InView key={index}>
+          {({ inView, ref, entry }) => (
+            <motion.div
+              ref={ref}
+              className={`row ${rowColor}`}
+              initial='hidden'
+              animate={inView ? 'visible' : 'hidden'}
+              variants={rowVariants}
+            >
+              <div className='col m-2'>
+                <div className='content col'>
+                  <div className='d-inline fw-bold me-1'>
+                    {(index + 1).toString().padStart(2, '0')}
+                  </div>
+                  <i className='large middle aligned icon user circle'></i>
+                  <div className='d-inline fw-bold mb-1'>{active[0]}</div>
+                  <div className={`${membershipClass} ${membershipTextColor}`}>
+                    {active[3]}
+                  </div>
+                  <div className={inClass}>In: {active[5]}</div>
+                  {active[6] && (
+                    <div className={outClass}>Out: {active[6]}</div>
+                  )}
+                  {active[8] && (
+                    <div className='description'>Duration: {active[8]} HR</div>
+                  )}
+                  {active[9] && (
+                    <div className='description'>Cost: {active[9]} EGP</div>
+                  )}
+                  {active[11] && (
+                    <div className='description text-danger'>
+                      Room: {active[11]}
+                    </div>
+                  )}
+                  {active[12] && (
+                    <div className='description'>Invitation: {active[12]}</div>
+                  )}
                 </div>
-              )}
-              {active[12] && (
-                <div className='description'>Invitation: {active[12]}</div>
-              )}
-            </div>
-          </div>
-          <div className='col d-flex align-items-center justify-content-end'>
-            <div className='row'>
-              {this.renderEditClient(active[1])}
-              {this.renderSearch(active[1])}
-            </div>
-          </div>
-        </div>
+              </div>
+              <div className='col d-flex align-items-center justify-content-end'>
+                <div className='row'>
+                  {this.renderEditClient(active[1])}
+                  {this.renderSearch(active[1])}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </InView>
       );
     });
   };
