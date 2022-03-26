@@ -31,7 +31,7 @@ const rowVariants = {
     translateX: 0,
     transition: { duration: 0.3, delay: 0.3 },
   },
-  hidden: { opacity: 0, translateX: -400 },
+  hidden: { opacity: 0, translateX: -300 },
 };
 
 export class ActiveSheet extends Component {
