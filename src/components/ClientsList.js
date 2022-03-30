@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { motion } from 'framer-motion/dist/framer-motion';
-import { InView } from 'react-intersection-observer';
 import { Link } from 'react-router-dom';
 
 import {
@@ -25,15 +23,6 @@ const buttons = [
   { name: 'sortByRemainDays', sortIndex: 5, value: 'Remain Days' },
   { name: 'sortByGender', sortIndex: 12, value: 'Gender' },
 ];
-
-const rowVariants = {
-  visible: {
-    opacity: 1,
-    translateY: 0,
-    transition: { duration: 0.3, delay: 0.3 },
-  },
-  hidden: { opacity: 0, translateY: -30 },
-};
 
 export class ClientsList extends Component {
   state = { activeIndex: null };
@@ -142,96 +131,75 @@ export class ClientsList extends Component {
 
       const originalRow = this.getOriginalRow(active[0]);
       return (
-        <InView key={index}>
-          {({ inView, ref, entry }) => (
-            <motion.div
-              initial='hidden'
-              animate={inView ? 'visible' : 'hidden'}
-              variants={rowVariants}
-              ref={ref}
-            >
-              <div
-                ref={this.refs[active[0]]}
-                className={`title ${activeClass} ${rowColor}`}
-                onClick={() => {
-                  this.state.activeIndex === index
-                    ? this.setState({ activeIndex: null })
-                    : this.setState({ activeIndex: index });
-                }}
-              >
-                <i className='dropdown icon'></i>
-                <i className='middle aligned icon me-2'>
-                  {(originalRow - 2).toString().padStart(3, '0')}
-                </i>
-                <i className={`large middle aligned icon ${genderClass}`}></i>
-                <div className='ui breadcrumb'>
-                  <div className='d-inline ms-2'>{active[1]}</div>
-                  <i className='right angle icon divider'></i>
-                  <div className={`d-inline ${membershipTextColor}`}>
-                    ({active[3]})
-                  </div>
-                </div>
+        <React.Fragment key={index}>
+          <div
+            ref={this.refs[active[0]]}
+            className={`title ${activeClass} ${rowColor}`}
+            onClick={() => {
+              this.state.activeIndex === index
+                ? this.setState({ activeIndex: null })
+                : this.setState({ activeIndex: index });
+            }}
+          >
+            <i className='dropdown icon'></i>
+            <i className='middle aligned icon me-2'>
+              {(originalRow - 2).toString().padStart(3, '0')}
+            </i>
+            <i className={`large middle aligned icon ${genderClass}`}></i>
+            <div className='ui breadcrumb'>
+              <div className='d-inline ms-2'>{active[1]}</div>
+              <i className='right angle icon divider'></i>
+              <div className={`d-inline ${membershipTextColor}`}>
+                ({active[3]})
               </div>
-              <div className={`content ${activeClass}`}>
-                <div className='ui celled list'>
-                  <div className={`item ${rowColor}`}>
-                    {this.renderEdit(originalRow, active)}
-                    <div className='content'>
-                      <div className='description mb-1'>
-                        User Name: {active[1]}
-                      </div>
-                      <div className='description'>
-                        Mobile Number: {active[0]}
-                      </div>
-                      <div className='description'>
-                        E-Mail Address: {active[2]}
-                      </div>
-                      <div className={`description ${membershipTextColor}`}>
-                        Membership: {active[3]}
-                      </div>
-                      {active[4] && (
-                        <div className='description'>
-                          Expiry Date: {active[4]}
-                        </div>
-                      )}
-                      {active[5] && (
-                        <div className='description'>
-                          Remain Days: {active[5]}
-                        </div>
-                      )}
-                      {active[6] && (
-                        <div className='description'>
-                          Hours Package: {active[6]}
-                        </div>
-                      )}
-                      <div className='description'>
-                        Registration Date/Time: {active[7]}
-                      </div>
-                      {active[8] && (
-                        <div className='description'>
-                          Remaining Hours: {active[8]}
-                        </div>
-                      )}
-                      {active[9] && (
-                        <div className='description'>
-                          Remaining of Ten Days: {active[9]}
-                        </div>
-                      )}
-                      {active[10] && (
-                        <div className='description'>
-                          Invitations: {active[10]}
-                        </div>
-                      )}
-                      <div className='description'>Rating: {active[11]}</div>
-                      <div className='description'>Gender: {active[12]}</div>
-                      <div className='description'>Offers: {active[13]}</div>
+            </div>
+          </div>
+          <div className={`content ${activeClass}`}>
+            <div className='ui celled list'>
+              <div className={`item ${rowColor}`}>
+                {this.renderEdit(originalRow, active)}
+                <div className='content'>
+                  <div className='description mb-1'>User Name: {active[1]}</div>
+                  <div className='description'>Mobile Number: {active[0]}</div>
+                  <div className='description'>E-Mail Address: {active[2]}</div>
+                  <div className={`description ${membershipTextColor}`}>
+                    Membership: {active[3]}
+                  </div>
+                  {active[4] && (
+                    <div className='description'>Expiry Date: {active[4]}</div>
+                  )}
+                  {active[5] && (
+                    <div className='description'>Remain Days: {active[5]}</div>
+                  )}
+                  {active[6] && (
+                    <div className='description'>
+                      Hours Package: {active[6]}
                     </div>
+                  )}
+                  <div className='description'>
+                    Registration Date/Time: {active[7]}
                   </div>
+                  {active[8] && (
+                    <div className='description'>
+                      Remaining Hours: {active[8]}
+                    </div>
+                  )}
+                  {active[9] && (
+                    <div className='description'>
+                      Remaining of Ten Days: {active[9]}
+                    </div>
+                  )}
+                  {active[10] && (
+                    <div className='description'>Invitations: {active[10]}</div>
+                  )}
+                  <div className='description'>Rating: {active[11]}</div>
+                  <div className='description'>Gender: {active[12]}</div>
+                  <div className='description'>Offers: {active[13]}</div>
                 </div>
               </div>
-            </motion.div>
-          )}
-        </InView>
+            </div>
+          </div>
+        </React.Fragment>
       );
     });
   };
