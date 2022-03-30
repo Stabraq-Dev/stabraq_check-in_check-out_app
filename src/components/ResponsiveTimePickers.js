@@ -25,7 +25,7 @@ export default function ResponsiveTimePickers({
           value={value}
           onChange={(newValue) => {
             setValue(newValue);
-            onTimeChange(newValue.toLocaleTimeString());
+            onTimeChange(newValue.toLocaleTimeString('en-US'));
           }}
           renderInput={(params) => <TextField {...params} />}
         />
