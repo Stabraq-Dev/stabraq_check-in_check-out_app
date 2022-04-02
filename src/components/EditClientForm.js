@@ -50,7 +50,7 @@ const EditClientForm = ({
           updates: {
             // ...update remainDays to the result of this function
             remainDays: (expiryDateValue, allValues) => {
-              const dateOne = new Date().toLocaleDateString();
+              const dateOne = new Date().toLocaleDateString('en-US');
               const dateTwo = expiryDateValue;
               const diffDays = checkDayDiffWithMinus(dateOne, dateTwo);
               const final = expiryDateValue === '' ? '' : diffDays.toString();

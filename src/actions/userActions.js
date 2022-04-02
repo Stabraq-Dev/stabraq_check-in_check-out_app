@@ -201,10 +201,16 @@ export const doCreateNewSheet = () => async (dispatch, getState) => {
   dispatch({ type: SHEET_DATE, payload: sheetDate[0][0] });
 
   const dateOne = sheetDate[0][0];
-  const dateTwo = new Date().toLocaleDateString();
+  const dateTwo = new Date().toLocaleDateString('en-US', {
+    timeZone: 'Africa/Cairo',
+  });
   const diffDays = await checkDayDiff(dateOne, dateTwo);
 
-  if (diffDays >= 1) {
+  let day = new Date().toLocaleString('en-US', { timeZone: 'Africa/Cairo' });
+
+  let hrsFromMidnight = new Date(day).getHours();
+
+  if (diffDays >= 1 && hrsFromMidnight > 3) {
     const newSheetId = await executeBatchUpdateAddSheet(sheetDate[0][0]);
     await dispatch(doCheckResponse(newSheetId));
     const errorNewSheetId = getState().app.error;
