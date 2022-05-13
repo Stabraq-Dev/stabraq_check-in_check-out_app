@@ -170,7 +170,7 @@ export class ActiveSheet extends Component {
       <div className='col d-flex align-items-center justify-content-end my-1'>
         <Link
           to={`/preferences/main/clients-list/?mobile=${mobile}`}
-          className='ui button positive'
+          className='ui button secondary'
         >
           Profile
         </Link>
