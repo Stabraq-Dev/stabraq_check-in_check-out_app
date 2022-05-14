@@ -22,6 +22,7 @@ import {
   NUMBER_TO_CHECK_EXISTS_RANGE,
   TOTAL_COST_EXCEL_FORMULA,
   TOTAL_USERS_EXCEL_FORMULA,
+  UPDATE_CLIENT_CHECK_IN_RANGE,
   UPDATE_EDIT_CLIENT_RANGE,
 } from '../ranges';
 
@@ -657,6 +658,38 @@ export const executeValuesAppendUpdateCheckIn = async (
     return response;
   } catch (err) {
     console.error('Execute error executeValuesAppendUpdateCheckIn', err);
+  }
+};
+
+export const executeValuesUpdateClientCheckIn = async (
+  rowNumber,
+  username,
+  mobile,
+  email,
+  membership
+) => {
+  try {
+    await axiosAuth(SHEET_ID);
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
+
+    const range = UPDATE_CLIENT_CHECK_IN_RANGE(rowNumber);
+    const valueInputOption = 'USER_ENTERED';
+    const response = await googleSheetsAPI.put(
+      `${SHEET_ID}/values/${range}`,
+      {
+        majorDimension: 'COLUMNS',
+        values: [[username], [`'${mobile}`], [email], [membership]],
+      },
+      { params: { valueInputOption: valueInputOption } }
+    );
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log('Response executeValuesUpdateClientCheckIn', response);
+    }
+
+    return response;
+  } catch (err) {
+    console.error('Execute error executeValuesUpdateClientCheckIn', err);
   }
 };
 

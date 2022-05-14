@@ -66,6 +66,7 @@ import {
   executeValuesAppendUpdateCheckOut,
   executeValuesAppendDeleteCheckOut,
   executeValuesUpdateEditClient,
+  executeValuesUpdateClientCheckIn,
 } from '../functions/executeFunc';
 
 import history from '../history';
@@ -627,6 +628,19 @@ export const doOnEditClientFormSubmit =
 
     dispatch(doLoading(true));
     await executeValuesUpdateEditClient(formValues, rowNumber);
+    await executeValuesUpdate(formValues.mobile);
+    const valuesMatched = await getSheetValuesBatchGet(VALUES_MATCHED_RANGES);
+    await executeValuesUpdate('');
+    if (valuesMatched[14]) {
+      const { username, mobile, email, membership } = formValues;
+      await executeValuesUpdateClientCheckIn(
+        valuesMatched[14],
+        username,
+        mobile,
+        email,
+        membership
+      );
+    }
     dispatch(doLoading(false));
 
     if (showMyModal) {

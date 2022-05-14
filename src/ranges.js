@@ -11,6 +11,9 @@ export const APPEND_CHECKOUT_RANGE = (rowNumber) => {
 export const APPEND_UPDATE_CHECK_IN_RANGE = (rowNumber) => {
   return `Data!F${rowNumber}`;
 };
+export const UPDATE_CLIENT_CHECK_IN_RANGE = (rowNumber) => {
+  return `Data!A${rowNumber}:D${rowNumber}`;
+};
 export const APPEND_UPDATE_CHECK_OUT_RANGE = (rowNumber) => {
   return `Data!G${rowNumber}`;
 };
