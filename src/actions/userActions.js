@@ -631,7 +631,7 @@ export const doOnEditClientFormSubmit =
     await executeValuesUpdate(formValues.mobile);
     const valuesMatched = await getSheetValuesBatchGet(VALUES_MATCHED_RANGES);
     await executeValuesUpdate('');
-    if (valuesMatched[14]) {
+    if (valuesMatched[14] !== 'NOT_CHECKED_IN') {
       const { username, mobile, email, membership } = formValues;
       await executeValuesUpdateClientCheckIn(
         valuesMatched[14],
