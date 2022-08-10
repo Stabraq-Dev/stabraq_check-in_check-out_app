@@ -17,52 +17,56 @@ export const authenticate = async (sheetID) => {
 //   return doc;
 // };
 
+let tokenClient;
+export let tokenInitd = false;
+
+export const gsiInit = async () => {
+  tokenClient = await window.google.accounts.oauth2.initTokenClient({
+    client_id: process.env.REACT_APP_CLIENT_ID,
+    scope:
+      'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file',
+    callback: async (tokenResponse) => {
+      await tokenResponse.access_token;
+    },
+  });
+};
+
+export const gapiStart = async () => {
+  try {
+    const response = await window.gapi.client.init({});
+    await window.gapi.client.load('sheets', 'v4');
+    await window.gapi.client.load('drive', 'v3');
+    console.log('Discovery Document Loaded');
+    return response;
+  } catch (err) {
+    console.log('Error: ' + err.result.error.message);
+  }
+};
+
+export const gapiLoad = async () => {
+  await window.gapi.load('client', gapiStart);
+};
+
 export const loadAuth = async () => {
   try {
-    await window.gapi.load('client:auth2', async () => {
-      const auth = await window.gapi.auth2.init({
-        client_id: process.env.REACT_APP_CLIENT_ID,
-      });
-      return auth;
-    });
+    await gsiInit();
+    await gapiLoad();
   } catch (error) {
     console.error(error);
   }
 };
 
-export const authInstance = async () => {
+export const getToken = async () => {
   try {
-    const response = await window.gapi.auth2.getAuthInstance().signIn({
-      scope:
-        'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file',
-    });
-    console.log('Sign-in successful');
-    return response;
-  } catch (err) {
-    console.error('Error signing in', err);
-  }
-};
-
-export const loadClient = async () => {
-  try {
-    await window.gapi.client.setApiKey(process.env.REACT_APP_API_KEY);
-    await window.gapi.client.load(
-      'https://sheets.googleapis.com/$discovery/rest?version=v4'
-    );
-    console.log('GAPI client loaded for API');
-  } catch (err) {
-    console.error('Error loading GAPI client for API', err);
-  }
-};
-
-export const loadClientForDrive = async () => {
-  try {
-    await window.gapi.client.setApiKey(process.env.REACT_APP_API_KEY);
-    await window.gapi.client.load(
-      'https://content.googleapis.com/discovery/v1/apis/drive/v3/rest'
-    );
-    console.log('GAPI client loaded for API (Drive)');
-  } catch (err) {
-    console.error('Error loading GAPI client for API (Drive)', err);
+    await tokenClient.requestAccessToken({ prompt: '' });
+    tokenClient.callback = async (resp) => {
+      if (resp.error !== undefined) {
+        throw resp;
+      } else {
+        tokenInitd = true;
+      }
+    };
+  } catch (error) {
+    console.error(error);
   }
 };

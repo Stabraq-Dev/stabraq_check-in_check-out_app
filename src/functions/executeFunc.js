@@ -1,4 +1,3 @@
-import { authInstance, loadClient, loadClientForDrive } from '../api/auth';
 import { axiosAuth } from '../api/googleSheetsAPI';
 import {
   calculateUserData,
@@ -862,8 +861,6 @@ export const getWorkSheetData = async (sheetID) => {
 
 export const executeAddNewWorkSheet = async (title) => {
   try {
-    await authInstance();
-    await loadClient();
     const response = await window.gapi.client.sheets.spreadsheets.create({
       resource: {
         properties: {
@@ -888,8 +885,6 @@ export const executeAddNewWorkSheet = async (title) => {
 
 export const executeChangeWorkSheetPermission = async (fileId) => {
   try {
-    await authInstance();
-    await loadClientForDrive();
     const response = await window.gapi.client.drive.permissions.create({
       fileId: fileId,
       resource: {

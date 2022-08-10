@@ -93,6 +93,7 @@ import {
   SINGLE_CLIENT_RANGE,
   VALUES_MATCHED_RANGES,
 } from '../ranges';
+import { getToken, tokenInitd } from '../api/auth';
 
 export const doCheckedIn = (checkedInStatus) => {
   return {
@@ -250,13 +251,29 @@ export const doCreateNewSheet = () => async (dispatch, getState) => {
   const diffMonths = await checkMonthDiff(dateOne, dateTwo);
 
   if (diffMonths >= 1 && hrsFromMidnight >= 3) {
-    const workSheetTitle = await changeYearMonthFormat(dateTwo);
-    const newWorkSheetId = await executeAddNewWorkSheet(workSheetTitle);
-    await executeChangeWorkSheetPermission(newWorkSheetId);
-    await executeValuesUpdateCheckOut({
-      value: newWorkSheetId,
-      range: CURR_MONTH_WORKSHEET_RANGE,
-    });
+    if (tokenInitd === false) {
+      await getToken();
+    }
+
+    const checkFlag = async () => {
+      if (tokenInitd === false) {
+        window.setTimeout(
+          checkFlag,
+          100
+        ); /* this checks the flag every 100 milliseconds*/
+      } else {
+        /* do something*/
+        const workSheetTitle = await changeYearMonthFormat(dateTwo);
+        const newWorkSheetId = await executeAddNewWorkSheet(workSheetTitle);
+        await executeChangeWorkSheetPermission(newWorkSheetId);
+        await executeValuesUpdateCheckOut({
+          value: newWorkSheetId,
+          range: CURR_MONTH_WORKSHEET_RANGE,
+        });
+      }
+    };
+
+    checkFlag();
   }
 };
 
