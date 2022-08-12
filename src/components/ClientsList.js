@@ -143,7 +143,7 @@ export class ClientsList extends Component {
             }}
           >
             <i className='dropdown icon'></i>
-            <i className='middle aligned icon me-2'>
+            <i className='middle aligned icon me-3'>
               {(originalRow - 2).toString().padStart(3, '0')}
             </i>
             <i className={`large middle aligned icon ${genderClass}`}></i>
