@@ -14,6 +14,7 @@ import {
 import FilterClientsBy from './FilterClientsBy';
 import ListSorting from './ListSorting';
 import LoadingSpinner from './LoadingSpinner';
+import Pagination from './Pagination';
 
 const buttons = [
   { name: 'sortBySheet', sortIndex: 999, value: 'Sheet' },
@@ -25,7 +26,7 @@ const buttons = [
 ];
 
 export class ClientsList extends Component {
-  state = { activeIndex: null };
+  state = { activeIndex: null, currentPage: 1, clientsPerPage: 100 };
   componentDidMount() {
     this.mobile = new URLSearchParams(window.location.search).get('mobile');
     this.btnRef = React.createRef();
@@ -44,7 +45,7 @@ export class ClientsList extends Component {
       prevProps.sortList.sortBy !== this.props.sortList.sortBy ||
       prevProps.orderListAscending !== this.props.orderListAscending
     ) {
-      this.setState({ activeIndex: null });
+      this.setState({ activeIndex: null, currentPage: 1 });
     }
   }
 
@@ -239,6 +240,22 @@ export class ClientsList extends Component {
     );
   }
 
+  renderPaginationBar(finalClientsList) {
+    // Change page
+    const paginate = (pageNumber) => this.setState({ currentPage: pageNumber });
+    return (
+      <div className={`ui segment center aligned active-bg-color`}>
+        <div className='ui center aligned header'>
+          <Pagination
+            clientsPerPage={this.state.clientsPerPage}
+            totalClients={finalClientsList.length}
+            paginate={paginate}
+          />
+        </div>
+      </div>
+    );
+  }
+
   render() {
     if (this.props.loading) {
       return <LoadingSpinner />;
@@ -251,6 +268,14 @@ export class ClientsList extends Component {
         : clientsListSorted.length > 0
         ? clientsListSorted
         : clientsList;
+    // Get current clients
+    const indexOfLastClient =
+      this.state.currentPage * this.state.clientsPerPage;
+    const indexOfFirstClient = indexOfLastClient - this.state.clientsPerPage;
+    const finalClientsListPage = finalClientsList.slice(
+      indexOfFirstClient,
+      indexOfLastClient
+    );
 
     return (
       <>
@@ -260,7 +285,7 @@ export class ClientsList extends Component {
             <FilterClientsBy />
           </div>
           {this.renderListCount()}
-          {this.renderList(finalClientsList)}
+          {this.renderList(finalClientsListPage)}
           <button
             ref={this.btnRef}
             onClick={this.onGotoTopBtn}
@@ -270,6 +295,7 @@ export class ClientsList extends Component {
             Top
           </button>
         </div>
+        {this.renderPaginationBar(finalClientsList)}
       </>
     );
   }
