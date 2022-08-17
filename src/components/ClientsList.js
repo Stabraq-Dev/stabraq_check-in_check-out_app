@@ -72,14 +72,15 @@ export class ClientsList extends Component {
 
   onScroll = async () => {
     await this.props.doGetClientsList();
+    const { clientsList } = this.props;
+    const userIndex = clientsList.findIndex((x) => x[0] === this.mobile);
+    const userCurrentPage = Math.ceil(userIndex / this.state.clientsPerPage);
+    this.setState({ activeIndex: userIndex + 3, currentPage: userCurrentPage });
+
     this.refs[this.mobile].current.scrollIntoView({
       behavior: 'smooth',
       block: 'center',
     });
-
-    const { clientsList } = this.props;
-    const userIndex = clientsList.findIndex((x) => x[0] === this.mobile);
-    this.setState({ activeIndex: userIndex });
   };
 
   getOriginalRow = (mobile) => {
@@ -125,21 +126,22 @@ export class ClientsList extends Component {
         }
       };
 
+      const originalRow = this.getOriginalRow(active[0]);
       const membershipTextColor = getColor(active[3]);
-      const rowColor = index % 2 === 0 ? 'row-color' : '';
-      const activeClass = this.state.activeIndex === index ? 'active' : '';
+      const rowColor = originalRow % 2 === 0 ? 'row-color' : '';
+      const activeClass =
+        this.state.activeIndex === originalRow ? 'active' : '';
       const genderClass = active[12] === 'Male' ? 'user' : 'user outline';
 
-      const originalRow = this.getOriginalRow(active[0]);
       return (
         <React.Fragment key={index}>
           <div
             ref={this.refs[active[0]]}
             className={`title ${activeClass} ${rowColor}`}
             onClick={() => {
-              this.state.activeIndex === index
+              this.state.activeIndex === originalRow
                 ? this.setState({ activeIndex: null })
-                : this.setState({ activeIndex: index });
+                : this.setState({ activeIndex: originalRow });
             }}
           >
             <i className='dropdown icon'></i>
@@ -250,6 +252,7 @@ export class ClientsList extends Component {
             clientsPerPage={this.state.clientsPerPage}
             totalClients={finalClientsList.length}
             paginate={paginate}
+            currentPage={this.state.currentPage}
           />
         </div>
       </div>

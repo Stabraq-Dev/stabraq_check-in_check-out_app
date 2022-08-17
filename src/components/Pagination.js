@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
-const Pagination = ({ clientsPerPage, totalClients, paginate }) => {
+const Pagination = ({
+  clientsPerPage,
+  totalClients,
+  paginate,
+  currentPage,
+}) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const pageNumbers = [];
 
   for (let i = 1; i <= Math.ceil(totalClients / clientsPerPage); i++) {
     pageNumbers.push(i);
   }
+
+  useEffect(() => {
+    setActiveIndex(currentPage - 1);
+  }, [currentPage]);
 
   const renderPaginate = () => {
     return pageNumbers.map((number, index) => {
@@ -31,7 +40,9 @@ const Pagination = ({ clientsPerPage, totalClients, paginate }) => {
 
   return (
     <nav>
-      <ul className='pagination justify-content-center flex-wrap'>{renderPaginate()}</ul>
+      <ul className='pagination justify-content-center flex-wrap'>
+        {renderPaginate()}
+      </ul>
     </nav>
   );
 };
