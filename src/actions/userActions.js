@@ -198,6 +198,25 @@ export const doClearSorting = () => async (dispatch) => {
   });
 };
 
+export const changeExpiredMemberToNotMember =
+  () => async (dispatch, getState) => {
+    await dispatch(doGetClientsList());
+    const { clientsList } = getState().user;
+    clientsList.forEach(async (element, index) => {
+      if (element[5].includes('-')) {
+        element[3] = 'NOT_MEMBER';
+        const indexToRemove = [4, 5, 6, 8, 9, 10];
+        indexToRemove.forEach((i) => {
+          element[i] = '';
+        });
+
+        const formValues = element;
+        const rowNumber = index + 3;
+        await executeValuesUpdateEditClient(formValues, rowNumber);
+      }
+    });
+  };
+
 export const doCreateNewSheet = () => async (dispatch, getState) => {
   const sheetDate = await getSheetValues(DATA_SHEET_DATE_RANGE);
   dispatch({ type: SHEET_DATE, payload: sheetDate[0][0] });
@@ -212,7 +231,7 @@ export const doCreateNewSheet = () => async (dispatch, getState) => {
 
   let hrsFromMidnight = new Date(day).getHours();
 
-  if (diffDays >= 1 && hrsFromMidnight >= 3) {
+  if (diffDays >= 1 && hrsFromMidnight >= 1) {
     const newSheetId = await executeBatchUpdateAddSheet(sheetDate[0][0]);
     await dispatch(doCheckResponse(newSheetId));
     const errorNewSheetId = getState().app.error;
@@ -246,6 +265,7 @@ export const doCreateNewSheet = () => async (dispatch, getState) => {
         );
       });
     }
+    await dispatch(changeExpiredMemberToNotMember());
   }
 
   const diffMonths = await checkMonthDiff(dateOne, dateTwo);
