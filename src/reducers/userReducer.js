@@ -24,6 +24,7 @@ import {
   ORDER_LIST,
   CLIENTS_LIST_SORTED,
 } from '../actions/types';
+import { mapArrayDataObject } from '../functions/helperFunc';
 
 const valuesMatchedObj = {
   mobileNumber: '',
@@ -287,12 +288,6 @@ export default (state = INITIAL_STATE, action) => {
     default:
       return state;
   }
-};
-
-const mapArrayDataObject = (payload, keys) => {
-  let result = {};
-  keys.forEach((key, i) => (result[key] = payload[i]));
-  return result;
 };
 
 const changeData = (state, payload, keyToChange) => {

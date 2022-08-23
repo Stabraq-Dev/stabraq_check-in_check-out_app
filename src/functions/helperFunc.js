@@ -137,3 +137,9 @@ export const calculateUserData = (formValues, lastBlankRow) => {
     invitations,
   };
 };
+
+export const mapArrayDataObject = (payload, keys) => {
+  let result = {};
+  keys.forEach((key, i) => (result[key] = payload[i]));
+  return result;
+};
