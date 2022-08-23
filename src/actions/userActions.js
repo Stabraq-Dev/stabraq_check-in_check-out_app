@@ -75,6 +75,7 @@ import {
   checkDayDiff,
   checkMonthDiff,
   getByValue,
+  mapArrayDataObject,
 } from '../functions/helperFunc';
 
 import {
@@ -210,8 +211,26 @@ export const changeExpiredMemberToNotMember =
           element[i] = '';
         });
 
-        const formValues = element;
+        const formValuesKeys = [
+          'mobile',
+          'username',
+          'email',
+          'membership',
+          'expiryDate',
+          'remainDays',
+          'hoursPackages',
+          'registrationDateTime',
+          'remainingHours',
+          'remainingOfTenDays',
+          'invitations',
+          'rating',
+          'gender',
+          'offers',
+        ];
+
+        const formValues = mapArrayDataObject(element, formValuesKeys);
         const rowNumber = index + 3;
+
         await executeValuesUpdateEditClient(formValues, rowNumber);
       }
     });
