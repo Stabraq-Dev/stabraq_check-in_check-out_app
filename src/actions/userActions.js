@@ -289,7 +289,7 @@ export const doCreateNewSheet = () => async (dispatch, getState) => {
 
   const diffMonths = await checkMonthDiff(dateOne, dateTwo);
 
-  if (diffMonths >= 1 && hrsFromMidnight >= 3) {
+  if (diffMonths >= 1 && hrsFromMidnight >= 1) {
     if (tokenInitd === false) {
       await getToken();
     }
