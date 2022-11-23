@@ -56,7 +56,7 @@ const App = ({ doCheckSignedIn }) => {
   };
 
   const renderSlowInternet = () => {
-    if (downlink > 0 && downlink < 1)
+    if (downlink > 0 && downlink < 0.1)
       return <MyAlert bodyContent='SLOW INTERNET CONNECTION' />;
   };
 
