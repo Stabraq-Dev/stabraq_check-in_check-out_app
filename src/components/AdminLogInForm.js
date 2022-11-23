@@ -6,6 +6,7 @@ import { checkForUserName } from '../functions/validation';
 import { doLogIn, doLogOut } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
 import history from '../history';
+import Footer from './Footer';
 
 const AdminLogInForm = ({
   initialValues,
@@ -85,39 +86,42 @@ const AdminLogInForm = ({
   }
 
   return (
-    <Form
-      initialValues={initialValues}
-      onSubmit={onSubmit}
-      validate={async (formValues) => {
-        const errors = {};
-        const { username, password } = formValues;
+    <div>
+      <Form
+        initialValues={initialValues}
+        onSubmit={onSubmit}
+        validate={async (formValues) => {
+          const errors = {};
+          const { username, password } = formValues;
 
-        const validUserName = await checkForUserName(username);
+          const validUserName = await checkForUserName(username);
 
-        if (validUserName) {
-          errors.username = validUserName;
-        }
+          if (validUserName) {
+            errors.username = validUserName;
+          }
 
-        if (!password) {
-          errors.password = 'You must enter a password';
-        }
+          if (!password) {
+            errors.password = 'You must enter a password';
+          }
 
-        return errors;
-      }}
-      render={({ handleSubmit }) => (
-        <form onSubmit={handleSubmit} className='ui form error'>
-          <Field name='username' component={renderInput} label='User Name' />
-          <Field
-            name='password'
-            component={renderInput}
-            label='Password'
-            type='password'
-          />
-          <div className='mt-3 text-center'>{renderWrongUserPass()}</div>
-          <div className='mt-3 text-center'>{renderSubmitButton()}</div>
-        </form>
-      )}
-    ></Form>
+          return errors;
+        }}
+        render={({ handleSubmit }) => (
+          <form onSubmit={handleSubmit} className='ui form error'>
+            <Field name='username' component={renderInput} label='User Name' />
+            <Field
+              name='password'
+              component={renderInput}
+              label='Password'
+              type='password'
+            />
+            <div className='mt-3 text-center'>{renderWrongUserPass()}</div>
+            <div className='mt-3 text-center'>{renderSubmitButton()}</div>
+          </form>
+        )}
+      ></Form>
+      <Footer />
+    </div>
   );
 };
 

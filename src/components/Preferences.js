@@ -13,6 +13,7 @@ import QRCodeGenerator from './QRCodeGenerator';
 import ActiveSheet from './ActiveSheet';
 import ClientsList from './ClientsList';
 import EditClient from './EditClient';
+import Footer from './Footer';
 
 function Preferences({ isSignedIn, doRedirectToSignIn }) {
   if (isSignedIn) {
@@ -47,6 +48,10 @@ function Preferences({ isSignedIn, doRedirectToSignIn }) {
             <Route
               path='/preferences/main/edit-client'
               component={EditClient}
+            ></Route>
+            <Route
+              path='/preferences'
+              component={Footer}
             ></Route>
           </div>
         </Router>
