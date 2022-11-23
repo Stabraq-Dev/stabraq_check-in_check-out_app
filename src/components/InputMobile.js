@@ -30,6 +30,7 @@ export class InputMobile extends Component {
           onBlur={onFormChange}
           maxLength={11}
           placeholder='01xxxxxxxxx'
+          autoComplete='off'
         />
         {this.renderError()}
       </div>
