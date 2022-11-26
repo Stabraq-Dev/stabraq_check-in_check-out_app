@@ -23,6 +23,7 @@ import {
   SORT_LIST,
   ORDER_LIST,
   CLIENTS_LIST_SORTED,
+  USER_PREV_HRS,
 } from '../actions/types';
 import { mapArrayDataObject } from '../functions/helperFunc';
 
@@ -103,6 +104,7 @@ const INITIAL_STATE = {
     index: null,
   },
   orderListAscending: true,
+  userPrevHrs: 0,
 };
 
 let valuesMatchedKeys = [
@@ -189,6 +191,8 @@ export default (state = INITIAL_STATE, action) => {
         ...state,
         durationCost: mapArrayDataObject(action.payload, durationCostKeys),
       };
+    case USER_PREV_HRS:
+      return { ...state, userPrevHrs: action.payload };
     case CHECK_IN_OUT_STATUS:
       return { ...state, checkInOutStatus: action.payload };
     case CHECKED_IN_STATUS:

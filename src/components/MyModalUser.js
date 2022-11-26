@@ -6,6 +6,7 @@ import {
   doRevealLogo,
   doDeleteUserCheckIn,
   doDeleteUserCheckOut,
+  doSignInAgain,
 } from '../actions';
 import history from '../history';
 
@@ -129,6 +130,10 @@ export class MyModalUser extends Component {
             <DefaultBody
               message={`Are you sure you want to\ndelete user Check Out?`}
             />
+          );
+        case 'ON_CONFIRM_SIGN_IN_AGAIN_SUBMIT':
+          return (
+            <DefaultBody message={`Are you sure you want to\nSign In Again?`} />
           );
         case 'ON_DELETE_CHECK_IN_SUBMIT':
           return <DefaultBody message='Check In Deleted Successfully' />;
@@ -268,19 +273,28 @@ export class MyModalUser extends Component {
    * @a renderYesAction
    */
   renderYesAction = () => {
-    const { submitType, doDeleteUserCheckIn, doDeleteUserCheckOut } =
-      this.props;
+    const {
+      submitType,
+      doDeleteUserCheckIn,
+      doDeleteUserCheckOut,
+      doSignInAgain,
+    } = this.props;
     const deleteUserCheckIn = async () => {
       await doDeleteUserCheckIn();
     };
     const deleteUserCheckOut = async () => {
       await doDeleteUserCheckOut();
     };
+    const signInAgain = async () => {
+      await doSignInAgain();
+    };
     switch (submitType) {
       case 'ON_CONFIRM_DELETE_CHECK_IN_SUBMIT':
         return deleteUserCheckIn;
       case 'ON_CONFIRM_DELETE_CHECK_OUT_SUBMIT':
         return deleteUserCheckOut;
+      case 'ON_CONFIRM_SIGN_IN_AGAIN_SUBMIT':
+        return signInAgain;
       default:
         return null;
     }
@@ -295,7 +309,8 @@ export class MyModalUser extends Component {
       return 'error-bg';
     } else if (
       submitType === 'ON_CONFIRM_DELETE_CHECK_IN_SUBMIT' ||
-      submitType === 'ON_CONFIRM_DELETE_CHECK_OUT_SUBMIT'
+      submitType === 'ON_CONFIRM_DELETE_CHECK_OUT_SUBMIT' ||
+      submitType === 'ON_CONFIRM_SIGN_IN_AGAIN_SUBMIT'
     ) {
       return 'bg-warning';
     } else {
@@ -366,4 +381,5 @@ export default connect(mapStateToProps, {
   doRevealLogo,
   doDeleteUserCheckIn,
   doDeleteUserCheckOut,
+  doSignInAgain,
 })(MyModalUser);

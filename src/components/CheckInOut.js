@@ -5,6 +5,7 @@ import {
   doCheckByMobile,
   doConfirmDeleteUserCheckIn,
   doConfirmDeleteUserCheckOut,
+  doConfirmSignInAgain,
   doUpdateCheckIn,
   doUpdateCheckOut,
 } from '../actions';
@@ -46,6 +47,10 @@ class CheckInOut extends React.Component {
 
   onDeleteCheckOut = () => {
     this.props.doConfirmDeleteUserCheckOut();
+  };
+
+  onCheckInAgain = () => {
+    this.props.doConfirmSignInAgain();
   };
 
   onEditCheckIn = () => {
@@ -223,6 +228,22 @@ class CheckInOut extends React.Component {
         >
           <i className='right arrow icon me-1' />
           Check In
+        </button>
+      );
+  };
+
+  renderCheckInAgainButton = () => {
+    if (this.props.checkedOut === 'CHECKED_OUT')
+      return (
+        <button
+          className='ui primary button stabraq-bg ms-3 mt-1'
+          name='checkIn'
+          value='CHECK_IN'
+          onClick={this.onCheckInAgain}
+          type='submit'
+        >
+          <i className='right arrow icon me-1' />
+          Check In Again
         </button>
       );
   };
@@ -631,6 +652,7 @@ class CheckInOut extends React.Component {
         {this.renderEditCheckOutButton()}
         {this.renderUpdateCheckOutButton()}
         {this.renderDeleteCheckOutButton()}
+        {this.renderCheckInAgainButton()}
       </div>
     );
   }
@@ -682,6 +704,7 @@ export default connect(mapStateToProps, {
   doCheckByMobile,
   doConfirmDeleteUserCheckIn,
   doConfirmDeleteUserCheckOut,
+  doConfirmSignInAgain,
   doUpdateCheckIn,
   doUpdateCheckOut,
 })(CheckInOut);

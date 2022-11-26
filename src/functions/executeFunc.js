@@ -10,14 +10,11 @@ import {
   APPEND_CHECKOUT_RANGE,
   APPEND_UPDATE_CHECK_IN_RANGE,
   APPEND_UPDATE_CHECK_OUT_RANGE,
-  APPROX_DURATION_EXCEL_FORMULA,
   CLIENTS_SHEET_APPEND_RANGE,
   COMMENTS_SHEET_APPEND_RANGE,
-  COST_EXCEL_FORMULA,
   DATA_SHEET_APPEND_RANGE,
   DATA_SHEET_BATCH_CLEAR_RANGES,
   DATA_SHEET_DATE_RANGE,
-  DURATION_EXCEL_FORMULA,
   NUMBER_TO_CHECK_EXISTS_RANGE,
   TOTAL_COST_EXCEL_FORMULA,
   TOTAL_USERS_EXCEL_FORMULA,
@@ -528,32 +525,14 @@ export const executeValuesAppendCheckIn = async (
 
 export const executeValuesAppendCheckOut = async (
   rowNumber,
-  membership,
-  hrRate,
-  fullDayRate,
-  roomChecked,
-  privateRoomRate,
-  trainingRoomRate,
-  invite
+  checkOutTime,
+  duration,
+  approxDuration,
+  cost
 ) => {
   try {
     await axiosAuth(SHEET_ID);
     const googleSheetsAPI = await axiosAuth(SHEET_ID);
-
-    const duration = DURATION_EXCEL_FORMULA(rowNumber);
-
-    const approxDuration = APPROX_DURATION_EXCEL_FORMULA(membership, rowNumber);
-
-    const cost = COST_EXCEL_FORMULA(
-      roomChecked,
-      rowNumber,
-      membership,
-      privateRoomRate,
-      trainingRoomRate,
-      invite,
-      fullDayRate,
-      hrRate
-    );
 
     const range = APPEND_CHECKOUT_RANGE(rowNumber);
     const valueInputOption = 'USER_ENTERED';
@@ -562,7 +541,7 @@ export const executeValuesAppendCheckOut = async (
       {
         majorDimension: 'COLUMNS',
         values: [
-          [new Date().toLocaleTimeString('en-US')],
+          [checkOutTime],
           [duration],
           [approxDuration],
           [cost],

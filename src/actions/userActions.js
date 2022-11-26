@@ -38,6 +38,9 @@ import {
   SORT_LIST,
   ORDER_LIST,
   CLIENTS_LIST_SORTED,
+  ON_CONFIRM_SIGN_IN_AGAIN_SUBMIT,
+  ON_SIGN_IN_AGAIN_SUBMIT,
+  USER_PREV_HRS,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -71,18 +74,23 @@ import {
 
 import history from '../history';
 import {
+  calcApproxDuration,
+  calcCost,
   changeYearMonthFormat,
   checkDayDiff,
   checkMonthDiff,
+  checkTimeDiffHrMinSec,
   getByValue,
   mapArrayDataObject,
 } from '../functions/helperFunc';
 
 import {
+  APPROX_DURATION_EXCEL_FORMULA,
   CLIENTS_SHEET_CLIENTS_RANGE,
   CURR_MONTH_WORKSHEET_RANGE,
   DATA_SHEET_ACTIVE_RANGE,
   DATA_SHEET_DATE_RANGE,
+  DURATION_EXCEL_FORMULA,
   DURATION_RANGE,
   HOURS_DAILY_RATES_RANGE,
   INVITATIONS_RANGE,
@@ -150,6 +158,13 @@ export const doCalcDurationCost = (resData) => {
   return {
     type: CALC_DURATION_COST,
     payload: resData,
+  };
+};
+
+export const doUserPrevHrs = (userPrevHrs) => {
+  return {
+    type: USER_PREV_HRS,
+    payload: userPrevHrs,
   };
 };
 
@@ -551,6 +566,45 @@ export const doDeleteUserCheckOut = () => async (dispatch, getState) => {
   await dispatch(doShowMyModal(true));
 };
 
+export const doConfirmSignInAgain = () => async (dispatch, getState) => {
+  dispatch(submitType(ON_CONFIRM_SIGN_IN_AGAIN_SUBMIT));
+  const { showMyModal } = getState().app;
+  if (showMyModal) {
+    await dispatch(doShowMyModal(false));
+  }
+  await dispatch(doShowMyModal(true));
+};
+
+export const doSignInAgain = () => async (dispatch, getState) => {
+  dispatch(doLoading(true));
+  dispatch(submitType(ON_SIGN_IN_AGAIN_SUBMIT));
+  dispatch(doLoading(false));
+
+  const keysToExtract = [
+    'mobileNumber',
+    'userName',
+    'eMailAddress',
+    'membership',
+    'expiryDate',
+    'remainDays',
+    'hoursPackage',
+    'registrationDateTime',
+    'remainingHours',
+    'remainingOfTenDays',
+    'invitations',
+    'rating',
+    'gender',
+    'clientRowNumber',
+  ];
+  const valuesMatchedExtracted = keysToExtract.map(
+    (k) => getState().user.valuesMatched[k]
+  );
+  const notCheckedIn = Array(8).fill('NOT_CHECKED_IN');
+  const valuesMatched = [...valuesMatchedExtracted, ...notCheckedIn];
+
+  dispatch({ type: VALUES_MATCHED, payload: valuesMatched });
+};
+
 /**
  *
  * @o doSearchByMobile
@@ -756,6 +810,7 @@ export const doCheckInOut =
         roomChecked,
         invite,
         inviteByMobile,
+        checkInTime,
       } = getState().user.valuesMatched;
       const {
         trainingRoomRate,
@@ -781,15 +836,53 @@ export const doCheckInOut =
         const trainingRoomRateFinal =
           roomChecked === 'TRAINING_ROOM' ? trainingRoomRate : '';
 
-        await executeValuesAppendCheckOut(
-          rowNumber,
-          membership,
-          hrRate,
-          fullDayRate,
+        // Check if the user checked in multiple times
+        if (membership === 'NOT_MEMBER') {
+          await dispatch(doGetActiveUsersList());
+          const { nonActiveUsersList } = getState().user;
+          const userPrevSignedIn = nonActiveUsersList.filter(
+            (value) => value[1] === mobileNumber
+          );
+
+          if (userPrevSignedIn.length > 0) {
+            const userPrevHrs = userPrevSignedIn.reduce(
+              (a, c) => parseFloat(a) + parseFloat(c[8]),
+              0
+            );
+            await dispatch(doUserPrevHrs(userPrevHrs));
+          }
+        }
+
+        const checkOutTime = new Date().toLocaleTimeString('en-US');
+
+        const durationCalc = checkTimeDiffHrMinSec(checkInTime, checkOutTime);
+        const { hours, minutes } = durationCalc;
+
+        const duration = DURATION_EXCEL_FORMULA(rowNumber);
+        const approxDuration =
+          membership === 'HOURS_MEMBERSHIP'
+            ? APPROX_DURATION_EXCEL_FORMULA(rowNumber)
+            : calcApproxDuration(hours, minutes);
+
+        const { userPrevHrs } = getState().user;
+        const cost = calcCost(
+          approxDuration,
           roomChecked,
+          membership,
           privateRoomRateFinal,
           trainingRoomRateFinal,
-          invite
+          invite,
+          fullDayRate,
+          hrRate,
+          userPrevHrs
+        );
+
+        await executeValuesAppendCheckOut(
+          rowNumber,
+          checkOutTime,
+          duration,
+          approxDuration,
+          cost
         );
 
         const range = DURATION_RANGE(rowNumber);

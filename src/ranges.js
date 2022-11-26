@@ -59,31 +59,10 @@ export const COMMENTS_SHEET_APPEND_RANGE = 'Comments!A2';
 export const DURATION_EXCEL_FORMULA = (rowNumber) => {
   return `=TEXT(G${rowNumber}-F${rowNumber},"h:mm")`;
 };
-export const APPROX_DURATION_EXCEL_FORMULA = (membership, rowNumber) => {
-  return membership === 'HOURS_MEMBERSHIP'
-    ? `=(HOUR(H${rowNumber})+(MINUTE(H${rowNumber}))/100)`
-    : `=IF(H${rowNumber}*24<1,1,IF(OR(AND(H${rowNumber}*24-INT(H${rowNumber}*24)<=0.17),AND(H${rowNumber}*24-INT(H${rowNumber}*24)>0.5,H${rowNumber}*24-INT(H${rowNumber}*24)<=0.66)),FLOOR(H${rowNumber},"00:30")*24,CEILING(H${rowNumber},"00:30")*24))`;
+export const APPROX_DURATION_EXCEL_FORMULA = (rowNumber) => {
+  return `=(HOUR(H${rowNumber})+(MINUTE(H${rowNumber}))/100)`;
 };
-export const COST_EXCEL_FORMULA = (
-  roomChecked,
-  rowNumber,
-  membership,
-  privateRoomRate,
-  trainingRoomRate,
-  invite,
-  fullDayRate,
-  hrRate
-) => {
-  return roomChecked === 'PRIVATE_ROOM'
-    ? `=I${rowNumber}*${privateRoomRate}`
-    : roomChecked === 'TRAINING_ROOM'
-    ? `=I${rowNumber}*${trainingRoomRate}`
-    : membership === 'NOT_MEMBER' && invite === 'NO'
-    ? `=IF(I${rowNumber}>=${
-        fullDayRate / hrRate
-      },${fullDayRate},I${rowNumber}*${hrRate})`
-    : '';
-};
+
 export const REMAIN_DAYS_EXCEL_FORMULA = (lastBlankRow) => {
   return `=IF(E${lastBlankRow}>TODAY(),DATEDIF(TODAY(),E${lastBlankRow},"d"),(-1*DATEDIF(E${lastBlankRow},TODAY(),"d")))`;
 };

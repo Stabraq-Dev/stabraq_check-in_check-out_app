@@ -69,6 +69,37 @@ export const checkDayDiffWithMinus = (dataDateOne, dataDateTwo) => {
   return diffDays;
 };
 
+export const checkTimeDiffHrMinSec = (dataDateOne, dataDateTwo) => {
+  const day = new Date().toLocaleDateString('en-US');
+  const oldDate = new Date(`${day} ${dataDateOne}`);
+  const newDate = new Date(`${day} ${dataDateTwo}`);
+  const ms = Math.abs(newDate - oldDate);
+  const HHMMSS = new Date(ms).toISOString().substring(11, 19);
+  const [hours, minutes, seconds] = HHMMSS.split(':');
+
+  return { HHMMSS, hours, minutes, seconds };
+};
+
+export const calcApproxDuration = (hours, minutes) => {
+  const hr = parseInt(hours);
+  const min = parseInt(minutes);
+
+  if (hr < 1) {
+    return 1;
+  }
+
+  if (hr >= 1) {
+    if (min >= 10 && min <= 40) {
+      return hr + 0.5;
+    }
+    if (min > 40) {
+      return hr + 1;
+    }
+  }
+
+  return hr;
+};
+
 export const getByValue = async (arr, value) => {
   let result = [];
 
@@ -142,4 +173,44 @@ export const mapArrayDataObject = (payload, keys) => {
   let result = {};
   keys.forEach((key, i) => (result[key] = payload[i]));
   return result;
+};
+
+export const calcCost = (
+  approxDuration,
+  roomChecked,
+  membership,
+  privateRoomRateFinal,
+  trainingRoomRateFinal,
+  invite,
+  fullDayRate,
+  hrRate,
+  userPrevHrs
+) => {
+  const fullDayHrs = fullDayRate / hrRate;
+  if (roomChecked === 'PRIVATE_ROOM') {
+    return approxDuration * privateRoomRateFinal;
+  } else if (roomChecked === 'TRAINING_ROOM') {
+    return approxDuration * trainingRoomRateFinal;
+  } else if (membership === 'NOT_MEMBER' && invite === 'NO') {
+    if (approxDuration >= fullDayHrs) {
+      return fullDayRate;
+    } else if (approxDuration + userPrevHrs > fullDayHrs) {
+      const newHrs = fullDayHrs - userPrevHrs;
+      const newHrsMin = newHrs < 0 ? 0 : newHrs;
+      return newHrsMin * hrRate;
+    } else {
+      return approxDuration * hrRate;
+    }
+  } else {
+    return '';
+  }
+  // return roomChecked === 'PRIVATE_ROOM'
+  //   ? approxDuration * privateRoomRateFinal
+  //   : roomChecked === 'TRAINING_ROOM'
+  //   ? approxDuration * trainingRoomRateFinal
+  //   : membership === 'NOT_MEMBER' && invite === 'NO'
+  //   ? approxDuration >= fullDayRate / hrRate
+  //     ? fullDayRate
+  //     : approxDuration * hrRate
+  //   : '';
 };
