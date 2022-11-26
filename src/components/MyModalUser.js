@@ -34,6 +34,7 @@ export class MyModalUser extends Component {
       cost,
       error,
       invite,
+      userNameInvitation,
     } = this.props;
 
     const DefaultBody = ({ message }) => {
@@ -143,6 +144,18 @@ export class MyModalUser extends Component {
           return <DefaultBody message='Check In Updated Successfully' />;
         case 'ON_UPDATE_CHECK_OUT_SUBMIT':
           return <DefaultBody message='Check Out Updated Successfully' />;
+        case 'ON_INVITATIONS_EXPIRED':
+          return (
+            <DefaultBody
+              message={`${userNameInvitation}\nNo Invitations Due to All Used`}
+            />
+          );
+        case 'ON_NO_INVITATIONS':
+          return (
+            <DefaultBody
+              message={`${userNameInvitation}\nDon't Have Invitations`}
+            />
+          );
         default:
           return null;
       }
@@ -264,6 +277,18 @@ export class MyModalUser extends Component {
         } else {
           return goToHome;
         }
+      case 'ON_INVITATIONS_EXPIRED':
+        if (error) {
+          return goToCheckInOut;
+        } else {
+          return goToCheckInOut;
+        }
+      case 'ON_NO_INVITATIONS':
+        if (error) {
+          return goToCheckInOut;
+        } else {
+          return goToCheckInOut;
+        }
       default:
         return null;
     }
@@ -352,6 +377,7 @@ const mapStateToProps = (state) => {
   const { showMyModal, submitType, mobileNumber, error } = state.app;
   const { numberExists, checkInOutStatus } = state.user;
   const { duration, approxDuration, cost } = state.user.durationCost;
+  const userNameInvitation = state.user.inviteValuesMatched.userName;
 
   return {
     showMyModal,
@@ -373,6 +399,7 @@ const mapStateToProps = (state) => {
     approxDuration,
     cost,
     invite,
+    userNameInvitation,
   };
 };
 

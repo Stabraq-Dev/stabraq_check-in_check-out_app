@@ -41,6 +41,8 @@ import {
   ON_CONFIRM_SIGN_IN_AGAIN_SUBMIT,
   ON_SIGN_IN_AGAIN_SUBMIT,
   USER_PREV_HRS,
+  ON_INVITATIONS_EXPIRED,
+  ON_NO_INVITATIONS,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -603,6 +605,24 @@ export const doSignInAgain = () => async (dispatch, getState) => {
   const valuesMatched = [...valuesMatchedExtracted, ...notCheckedIn];
 
   dispatch({ type: VALUES_MATCHED, payload: valuesMatched });
+};
+
+export const doInvitationsExpired = () => async (dispatch, getState) => {
+  dispatch(submitType(ON_INVITATIONS_EXPIRED));
+  const { showMyModal } = getState().app;
+  if (showMyModal) {
+    await dispatch(doShowMyModal(false));
+  }
+  await dispatch(doShowMyModal(true));
+};
+
+export const doNoInvitations = () => async (dispatch, getState) => {
+  dispatch(submitType(ON_NO_INVITATIONS));
+  const { showMyModal } = getState().app;
+  if (showMyModal) {
+    await dispatch(doShowMyModal(false));
+  }
+  await dispatch(doShowMyModal(true));
 };
 
 /**

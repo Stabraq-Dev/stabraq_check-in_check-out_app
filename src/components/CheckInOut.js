@@ -8,6 +8,8 @@ import {
   doConfirmSignInAgain,
   doUpdateCheckIn,
   doUpdateCheckOut,
+  doInvitationsExpired,
+  doNoInvitations,
 } from '../actions';
 import { checkForMobNum } from '../functions/validation';
 import history from '../history';
@@ -166,6 +168,26 @@ class CheckInOut extends React.Component {
       this.state.ratingValue === 0 && this.props.rating > 0
         ? this.props.rating
         : this.state.ratingValue;
+
+    if (
+      this.props.membershipInvitation !== 'GREEN' ||
+      this.props.membershipInvitation !== 'ORANGE'
+    ) {
+      this.props.doNoInvitations();
+      this.setState({ invitationByMobile: '' });
+      this.setState({ inviteNumberExists: '', inviteUserName: '' });
+      return;
+    }
+    if (
+      this.state.invitationChecked &&
+      this.props.inviteNumberExists === 'EXISTS' &&
+      this.props.invitations <= 0
+    ) {
+      this.props.doInvitationsExpired();
+      this.setState({ invitationByMobile: '' });
+      this.setState({ inviteNumberExists: '', inviteUserName: '' });
+      return;
+    }
 
     this.props.doCheckInOut(
       event.target.value,
@@ -675,7 +697,8 @@ const mapStateToProps = (state) => {
   const { trainingRoomRate, privateRoomRate, sharedHourRate, girlsHourRate } =
     state.user.hoursDailyRates;
   const { inviteNumberExists } = state.user;
-  const { userName } = state.user.inviteValuesMatched;
+  const { userName, invitations } = state.user.inviteValuesMatched;
+  const { membershipInvitation } = state.user.inviteValuesMatched.membership;
   return {
     loading,
     mobileNumber,
@@ -696,6 +719,8 @@ const mapStateToProps = (state) => {
     girlsHourRate,
     inviteNumberExists,
     userName,
+    invitations,
+    membershipInvitation,
   };
 };
 
@@ -707,4 +732,6 @@ export default connect(mapStateToProps, {
   doConfirmSignInAgain,
   doUpdateCheckIn,
   doUpdateCheckOut,
+  doInvitationsExpired,
+  doNoInvitations,
 })(CheckInOut);
