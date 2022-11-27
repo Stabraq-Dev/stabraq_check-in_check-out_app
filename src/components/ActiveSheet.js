@@ -150,7 +150,9 @@ export class ActiveSheet extends Component {
                 </div>
               )}
               {active[12] && (
-                <div className='description'>Invitation: {active[12]}</div>
+                <div className='description'>
+                  Invitation: {active[12]} {active[14]}
+                </div>
               )}
             </div>
           </div>
