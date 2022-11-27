@@ -169,6 +169,28 @@ class CheckInOut extends React.Component {
         ? this.props.rating
         : this.state.ratingValue;
 
+    const membershipNoInvitation = [
+      'NOT_MEMBER',
+      '10_DAYS',
+      'HOURS_MEMBERSHIP',
+    ];
+
+    if (
+      this.state.invitationChecked &&
+      membershipNoInvitation.includes(this.props.membershipInvitation)
+    ) {
+      this.props.doNoInvitations();
+      return;
+    }
+
+    if (
+      this.state.invitationChecked &&
+      this.props.inviteNumberExists === 'EXISTS' &&
+      this.props.invitations <= 0
+    ) {
+      this.props.doInvitationsExpired();
+      return;
+    }
 
     this.props.doCheckInOut(
       event.target.value,
@@ -679,7 +701,8 @@ const mapStateToProps = (state) => {
     state.user.hoursDailyRates;
   const { inviteNumberExists } = state.user;
   const { userName, invitations } = state.user.inviteValuesMatched;
-  const { membershipInvitation } = state.user.inviteValuesMatched.membership;
+  const membershipInvitation = state.user.inviteValuesMatched.membership;
+
   return {
     loading,
     mobileNumber,
