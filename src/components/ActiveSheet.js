@@ -112,6 +112,15 @@ export class ActiveSheet extends Component {
         sortBy === 'Membership' ? 'fw-bold' : 'description';
       const inClass = sortBy === 'Check In Time' ? 'fw-bold' : 'description';
       const outClass = sortBy === 'Check Out Time' ? 'fw-bold' : 'description';
+      // const one = Date.parse(
+      //   `${new Date().toLocaleDateString('en-US')} ${active[5]}`
+      // );
+      // const two = Date.parse(
+      //   `${new Date().toLocaleDateString(
+      //     'en-US'
+      //   )} ${new Date().toLocaleTimeString('en-US')}`
+      // );
+      // const untilNow = (Math.abs(two - one) / 36e5).toFixed(1);
       return (
         <div className={`row ${rowColor}`} key={index}>
           <div className='col m-2'>
@@ -125,6 +134,9 @@ export class ActiveSheet extends Component {
                 {active[3]}
               </div>
               <div className={inClass}>In: {active[5]}</div>
+              {/* {!active[6] && active[3] === 'NOT_MEMBER' && (
+                <div className='description'>Until Now: {untilNow}</div>
+              )} */}
               {active[6] && <div className={outClass}>Out: {active[6]}</div>}
               {active[8] && (
                 <div className='description'>Duration: {active[8]} HR</div>
