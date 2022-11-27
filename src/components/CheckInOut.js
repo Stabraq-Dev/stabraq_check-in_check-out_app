@@ -169,25 +169,6 @@ class CheckInOut extends React.Component {
         ? this.props.rating
         : this.state.ratingValue;
 
-    if (
-      this.props.membershipInvitation !== 'GREEN' ||
-      this.props.membershipInvitation !== 'ORANGE'
-    ) {
-      this.props.doNoInvitations();
-      this.setState({ invitationByMobile: '' });
-      this.setState({ inviteNumberExists: '', inviteUserName: '' });
-      return;
-    }
-    if (
-      this.state.invitationChecked &&
-      this.props.inviteNumberExists === 'EXISTS' &&
-      this.props.invitations <= 0
-    ) {
-      this.props.doInvitationsExpired();
-      this.setState({ invitationByMobile: '' });
-      this.setState({ inviteNumberExists: '', inviteUserName: '' });
-      return;
-    }
 
     this.props.doCheckInOut(
       event.target.value,
