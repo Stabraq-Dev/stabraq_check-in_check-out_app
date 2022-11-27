@@ -24,12 +24,14 @@ const buttons = [
 ];
 
 export class ActiveSheet extends Component {
-  state = { totalCost: '', updateSort: false };
+  state = { totalCost: '', updateSort: false, timeNow: 0 };
 
   componentDidMount() {
     this.props.doGetActiveUsersList();
     this.setState({ totalCost: '' });
     this.props.doSortList('Check In Time', 5);
+    this.tick();
+    this.interval = setInterval(() => this.tick(), 60000);
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -50,6 +52,15 @@ export class ActiveSheet extends Component {
   componentWillUnmount() {
     this.props.doClearActiveUsersList();
     this.props.doClearSorting();
+    clearInterval(this.interval);
+  }
+
+  tick() {
+    const localDate = new Date().toLocaleDateString('en-US');
+    const localTime = new Date().toLocaleTimeString('en-US');
+    this.setState(() => ({
+      timeNow: Date.parse(`${localDate} ${localTime}`),
+    }));
   }
 
   renderFilterActiveUsers = () => {
@@ -112,15 +123,14 @@ export class ActiveSheet extends Component {
         sortBy === 'Membership' ? 'fw-bold' : 'description';
       const inClass = sortBy === 'Check In Time' ? 'fw-bold' : 'description';
       const outClass = sortBy === 'Check Out Time' ? 'fw-bold' : 'description';
-      // const one = Date.parse(
-      //   `${new Date().toLocaleDateString('en-US')} ${active[5]}`
-      // );
-      // const two = Date.parse(
-      //   `${new Date().toLocaleDateString(
-      //     'en-US'
-      //   )} ${new Date().toLocaleTimeString('en-US')}`
-      // );
-      // const untilNow = (Math.abs(two - one) / 36e5).toFixed(1);
+
+      const localDate = new Date().toLocaleDateString('en-US');
+      const one = Date.parse(`${localDate} ${active[5]}`);
+      const two = this.state.timeNow;
+      const untilNow = (Math.abs(two - one) / 36e5).toFixed(1);
+
+      const untilNowHM = new Date(two - one).toISOString().substring(11, 16);
+
       return (
         <div className={`row ${rowColor}`} key={index}>
           <div className='col m-2'>
@@ -134,9 +144,6 @@ export class ActiveSheet extends Component {
                 {active[3]}
               </div>
               <div className={inClass}>In: {active[5]}</div>
-              {/* {!active[6] && active[3] === 'NOT_MEMBER' && (
-                <div className='description'>Until Now: {untilNow}</div>
-              )} */}
               {active[6] && <div className={outClass}>Out: {active[6]}</div>}
               {active[8] && (
                 <div className='description'>Duration: {active[8]} HR</div>
@@ -152,6 +159,11 @@ export class ActiveSheet extends Component {
               {active[12] && (
                 <div className='description'>
                   Invitation: {active[12]} {active[14]}
+                </div>
+              )}
+              {!active[6] && active[3] === 'NOT_MEMBER' && (
+                <div className='description'>
+                  Until Now: {untilNowHM} / {untilNow}
                 </div>
               )}
             </div>
