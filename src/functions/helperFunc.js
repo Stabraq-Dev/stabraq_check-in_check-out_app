@@ -194,7 +194,7 @@ export const calcCost = (
   } else if (membership === 'NOT_MEMBER' && invite === 'NO') {
     if (approxDuration >= fullDayHrs) {
       return fullDayRate;
-    } else if (approxDuration + userPrevHrs > fullDayHrs) {
+    } else if (userPrevHrs > 0 && approxDuration + userPrevHrs > fullDayHrs) {
       const newHrs = fullDayHrs - userPrevHrs;
       const newHrsMin = newHrs < 0 ? 0 : newHrs;
       return newHrsMin * hrRate;
