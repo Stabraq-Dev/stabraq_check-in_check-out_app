@@ -8,6 +8,9 @@ export const DURATION_RANGE = (rowNumber) => {
 export const APPEND_CHECKOUT_RANGE = (rowNumber) => {
   return `Data!G${rowNumber}`;
 };
+export const APPEND_CHECKOUT_USER_ID_RANGE = (rowNumber) => {
+  return `Data!P${rowNumber}`;
+};
 export const APPEND_UPDATE_CHECK_IN_RANGE = (rowNumber) => {
   return `Data!F${rowNumber}`;
 };

@@ -46,9 +46,15 @@ export const doLogIn = (formValues) => async (dispatch, getState) => {
 
   switch (isSignedIn[0]) {
     case 'TRUE':
-      dispatch(signIn());
+      dispatch(signIn(username));
       dispatch(wrongUserPass(false));
-      localStorage.setItem('user', Date.now() + 7200000);
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          user: Date.now() + 21600000,
+          userId: username,
+        })
+      );
       const { fromURL } = getState().auth;
       if (fromURL) {
         history.push(fromURL);
@@ -68,9 +74,12 @@ export const doLogIn = (formValues) => async (dispatch, getState) => {
 };
 
 export const doCheckSignedIn = () => async (dispatch) => {
-  const user = localStorage.getItem('user');
+  const userLocal = localStorage.getItem('user');
+  const { user, userId } =
+    userLocal !== null ? JSON.parse(userLocal) : { user: '', userId: '' };
+
   if (user > Date.now()) {
-    dispatch(signIn());
+    dispatch(signIn(userId));
   } else {
     dispatch(signOut());
   }

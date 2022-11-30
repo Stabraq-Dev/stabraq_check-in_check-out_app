@@ -87,6 +87,7 @@ import {
 } from '../functions/helperFunc';
 
 import {
+  // APPEND_CHECKOUT_USER_ID_RANGE,
   APPROX_DURATION_EXCEL_FORMULA,
   CLIENTS_SHEET_CLIENTS_RANGE,
   CURR_MONTH_WORKSHEET_RANGE,
@@ -828,6 +829,7 @@ export const doCheckInOut =
       }
     } else {
       /* CHECK_OUT */
+      // const { userId } = getState().auth;
       const {
         checkedOut,
         membership,
@@ -958,6 +960,11 @@ export const doCheckInOut =
           value: ratingValue,
           range: RATING_RANGE(clientRowNumber),
         });
+
+        // await executeValuesUpdateCheckOut({
+        //   value: userId,
+        //   range: APPEND_CHECKOUT_USER_ID_RANGE(rowNumber),
+        // });
 
         if (commentText) {
           const { mobileNumber } = getState().user.valuesMatched;
