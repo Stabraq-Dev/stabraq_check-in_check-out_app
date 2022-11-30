@@ -244,7 +244,12 @@ export class ClientsList extends Component {
 
   renderPaginationBar(finalClientsList) {
     // Change page
-    const paginate = (pageNumber) => this.setState({ currentPage: pageNumber });
+    const paginate = (pageNumber) => {
+      this.setState({ currentPage: pageNumber });
+      setTimeout(() => {
+        window.scrollTo(0, document.body.scrollHeight);
+      }, 1);
+    };
     return (
       <div className={`ui segment center aligned active-bg-color`}>
         <div className='ui center aligned header'>
