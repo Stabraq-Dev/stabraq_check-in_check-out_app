@@ -221,7 +221,13 @@ export const changeExpiredMemberToNotMember =
     await dispatch(doGetClientsList());
     const { clientsList } = getState().user;
     clientsList.forEach(async (element, index) => {
-      if (element[5].includes('-')) {
+      const remainDays = element[5];
+      const remainingOfTenDays = element[9];
+      const checkRemainDays = remainDays.includes('-');
+      const checkRemainingOfTenDays =
+        remainingOfTenDays !== '' && remainingOfTenDays <= 0;
+
+      if (checkRemainDays || checkRemainingOfTenDays) {
         element[3] = 'NOT_MEMBER';
         const indexToRemove = [4, 5, 6, 8, 9, 10];
         indexToRemove.forEach((i) => {
@@ -229,20 +235,20 @@ export const changeExpiredMemberToNotMember =
         });
 
         const formValuesKeys = [
-          'mobile',
-          'username',
-          'email',
-          'membership',
-          'expiryDate',
-          'remainDays',
-          'hoursPackages',
-          'registrationDateTime',
-          'remainingHours',
-          'remainingOfTenDays',
-          'invitations',
-          'rating',
-          'gender',
-          'offers',
+          'mobile', // 0
+          'username', // 1
+          'email', // 2
+          'membership', // 3
+          'expiryDate', // 4
+          'remainDays', // 5
+          'hoursPackages', // 6
+          'registrationDateTime', // 7
+          'remainingHours', // 8
+          'remainingOfTenDays', // 9
+          'invitations', // 10
+          'rating', // 11
+          'gender', // 12
+          'offers', // 13
         ];
 
         const formValues = mapArrayDataObject(element, formValuesKeys);
