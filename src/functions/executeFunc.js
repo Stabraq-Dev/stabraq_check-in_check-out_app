@@ -862,14 +862,14 @@ export const executeAddNewWorkSheet = async (title) => {
   }
 };
 
-export const executeChangeWorkSheetPermission = async (fileId) => {
+export const executeChangeWorkSheetPermission = async (fileId, email) => {
   try {
     const response = await window.gapi.client.drive.permissions.create({
       fileId: fileId,
       resource: {
         role: 'writer',
         type: 'user',
-        emailAddress: GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        emailAddress: email ? email : GOOGLE_SERVICE_ACCOUNT_EMAIL,
       },
     });
 

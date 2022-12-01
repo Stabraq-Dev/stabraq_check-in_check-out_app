@@ -329,6 +329,10 @@ export const doCreateNewSheet = () => async (dispatch, getState) => {
         const workSheetTitle = await changeYearMonthFormat(dateTwo);
         const newWorkSheetId = await executeAddNewWorkSheet(workSheetTitle);
         await executeChangeWorkSheetPermission(newWorkSheetId);
+        await executeChangeWorkSheetPermission(
+          newWorkSheetId,
+          'abdalrahman.yousrii@gmail.com'
+        );
         await executeValuesUpdateCheckOut({
           value: newWorkSheetId,
           range: CURR_MONTH_WORKSHEET_RANGE,
