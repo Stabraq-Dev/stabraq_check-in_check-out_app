@@ -83,6 +83,7 @@ const EditClientForm = ({
                 JSON.stringify(initialValues) === JSON.stringify(allValues)
                   ? initialValues.expiryDate
                   : expiryDate;
+              doSetDatePicker(final);
               return final;
             },
             remainDays: (membershipValue, allValues) => {
@@ -149,7 +150,6 @@ const EditClientForm = ({
     return (
       <ResponsiveDatePickers
         label={label}
-        initValue={initialValues.expiryDate}
         onDateChange={(newTime) => {
           onChange(newTime);
         }}

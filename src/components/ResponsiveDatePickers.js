@@ -9,21 +9,17 @@ import { doSetDatePicker } from '../actions';
 
 const ResponsiveDatePickers = ({
   label,
-  initValue,
   onDateChange,
   doSetDatePicker,
   pickedDate,
 }) => {
-  const initValueDate = initValue === '' ? new Date() : initValue;
   useEffect(() => {
-    // Anything in here is fired on component mount.
-    doSetDatePicker(initValueDate);
+    doSetDatePicker(pickedDate);
     return () => {
-      // Anything in here is fired on component unmount.
       doSetDatePicker(new Date());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pickedDate]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
