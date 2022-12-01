@@ -22,13 +22,11 @@ export const changeDateFormat = async (inputDate) => {
 export const changeYearMonthFormat = async (inputDate) => {
   let date = new Date(inputDate);
 
-  const shortMonthName = new Intl.DateTimeFormat('en-US', { month: 'short' })
-    .format;
-
   let year = date.getFullYear();
-  let month = shortMonthName(date);
+  let monthDigit = date.toLocaleDateString('en-US', { month: '2-digit' });
+  let monthShort = date.toLocaleDateString('en-US', { month: 'short' });
 
-  let dateString = year + '-' + month;
+  let dateString = `${year}-${monthDigit}-${monthShort}`;
 
   return dateString;
 };
