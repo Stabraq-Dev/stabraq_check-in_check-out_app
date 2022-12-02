@@ -22,6 +22,10 @@ class SearchBar extends React.Component {
     if (this.mobile) {
       this.urlSearch();
     }
+    this.localMobile = JSON.parse(sessionStorage.getItem('mobile'));
+    if (this.localMobile) {
+      this.setState({ mobileNumber: this.localMobile });
+    }
   }
 
   componentWillUnmount() {

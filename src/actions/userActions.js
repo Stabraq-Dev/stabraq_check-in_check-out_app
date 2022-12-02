@@ -643,6 +643,7 @@ export const doNoInvitations = () => async (dispatch, getState) => {
  */
 
 export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
+  sessionStorage.setItem('mobile', JSON.stringify(mobile));
   if (!navigator.onLine) return;
   const { showMyModal } = getState().app;
 
@@ -658,6 +659,9 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
   await dispatch(doCreateNewSheet());
   const { error } = getState().app;
   if (error.code === 400 || error.code === 500) return;
+  if (error === '') {
+    sessionStorage.removeItem('mobile');
+  }
   // Search for the user by mobile number
   const res = await executeValuesUpdate(mobile);
   dispatch(doCheckResponse(res));
