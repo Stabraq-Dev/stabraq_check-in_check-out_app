@@ -160,7 +160,6 @@ export class ClientsList extends Component {
           <div className={`content ${activeClass}`}>
             <div className='ui celled list'>
               <div className={`item ${rowColor}`}>
-                {this.renderEdit(originalRow, active)}
                 <div className='content'>
                   <div className='description mb-1'>User Name: {active[1]}</div>
                   <div className='description'>Mobile Number: {active[0]}</div>
@@ -199,6 +198,8 @@ export class ClientsList extends Component {
                   <div className='description'>Gender: {active[12]}</div>
                   <div className='description'>Offers: {active[13]}</div>
                 </div>
+                {this.renderEdit(originalRow, active)}
+                {this.renderSearch(active[0])}
               </div>
             </div>
           </div>
@@ -209,16 +210,29 @@ export class ClientsList extends Component {
 
   renderEdit(row, active) {
     return (
-      <div className='right floated content mt-2'>
+      <div className='right floated content'>
         <Link
           to={`/preferences/main/edit-client/?row=${row}`}
-          className='ui button positive'
+          className='ui button primary'
           onClick={() => {
             this.props.setClientStateToEdit(active);
             this.props.fromURL();
           }}
         >
           Edit
+        </Link>
+      </div>
+    );
+  }
+
+  renderSearch(mobile) {
+    return (
+      <div className='right floated content'>
+        <Link
+          to={`/preferences/main/user/?mobile=${mobile}`}
+          className='ui button positive'
+        >
+          Search
         </Link>
       </div>
     );
