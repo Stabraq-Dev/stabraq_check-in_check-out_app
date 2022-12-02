@@ -13,10 +13,14 @@ import { renderSelectOptions } from './react-final-form/renderSelectOptions';
 import { renderInput } from './react-final-form/renderInput';
 import { renderRadio } from './react-final-form/renderRadio';
 import { validate } from './react-final-form/validate';
+const localFormValues = JSON.parse(sessionStorage.getItem('formValues'));
 
-const initialValues = JSON.parse(sessionStorage.getItem('formValues'));
-
-const NewUserForm = ({ doShowMyModal, loading, doOnNewUserFormSubmit }) => {
+const NewUserForm = ({
+  doShowMyModal,
+  loading,
+  mobileNumber,
+  doOnNewUserFormSubmit,
+}) => {
   useEffect(() => {
     // Anything in here is fired on component mount.
     return () => {
@@ -66,6 +70,15 @@ const NewUserForm = ({ doShowMyModal, loading, doOnNewUserFormSubmit }) => {
 
     doOnNewUserFormSubmit(formValues);
   };
+
+  const searchVal = {
+    username: '',
+    membership: 'NOT_MEMBER',
+    gender: '',
+    mobile: mobileNumber,
+  };
+
+  const initialValues = localFormValues ? localFormValues : searchVal;
 
   return (
     <Form
@@ -131,9 +144,10 @@ const NewUserForm = ({ doShowMyModal, loading, doOnNewUserFormSubmit }) => {
 };
 
 const mapStateToProps = (state) => {
-  const { loading } = state.app;
+  const { loading, mobileNumber } = state.app;
   return {
     loading,
+    mobileNumber,
   };
 };
 
