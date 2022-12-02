@@ -199,6 +199,7 @@ export class ClientsList extends Component {
                   <div className='description'>Offers: {active[13]}</div>
                 </div>
                 {this.renderEdit(originalRow, active)}
+                {this.renderQRCodeButton(active[0])}
                 {this.renderSearch(active[0])}
               </div>
             </div>
@@ -233,6 +234,18 @@ export class ClientsList extends Component {
           className='ui button positive'
         >
           Search
+        </Link>
+      </div>
+    );
+  }
+  renderQRCodeButton(mobile) {
+    return (
+      <div className='right floated content'>
+        <Link
+          to={`/preferences/main/qr-code-gen/?mobile=${mobile}`}
+          className='ui button orange'
+        >
+          QR Code
         </Link>
       </div>
     );
