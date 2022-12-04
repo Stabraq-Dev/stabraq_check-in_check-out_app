@@ -2,7 +2,11 @@ import React, { useEffect } from 'react';
 import { Form, Field } from 'react-final-form';
 import { connect } from 'react-redux';
 
-import { doOnNewUserFormSubmit, doShowMyModal } from '../actions';
+import {
+  doOnNewUserFormSubmit,
+  doShowMyModal,
+  searchMobileNumber,
+} from '../actions';
 import LoadingSpinner from './LoadingSpinner';
 import {
   genderOptions,
@@ -19,12 +23,14 @@ const NewUserForm = ({
   doShowMyModal,
   loading,
   mobileNumber,
+  searchMobileNumber,
   doOnNewUserFormSubmit,
 }) => {
   useEffect(() => {
     // Anything in here is fired on component mount.
     return () => {
       // Anything in here is fired on component unmount.
+      searchMobileNumber('');
       doShowMyModal(false);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -154,4 +160,5 @@ const mapStateToProps = (state) => {
 export default connect(mapStateToProps, {
   doOnNewUserFormSubmit,
   doShowMyModal,
+  searchMobileNumber,
 })(NewUserForm);
