@@ -10,10 +10,11 @@ import NewUserForm from './NewUserForm';
 import CheckInOut from './CheckInOut';
 import MyModalUser from './MyModalUser';
 import QRCodeGenerator from './QRCodeGenerator';
-import ActiveSheet from './ActiveSheet';
+import Active from './Active';
 import ClientsList from './ClientsList';
 import EditClient from './EditClient';
 import Footer from './Footer';
+import ActiveHistory from './ActiveHistory';
 
 function Preferences({ isSignedIn, doRedirectToSignIn }) {
   if (isSignedIn) {
@@ -39,11 +40,15 @@ function Preferences({ isSignedIn, doRedirectToSignIn }) {
             ></Route>
             <Route
               path='/preferences/main/active-sheet'
-              component={ActiveSheet}
+              component={Active}
             ></Route>
             <Route
               path='/preferences/main/clients-list'
               component={ClientsList}
+            ></Route>
+            <Route
+              path='/preferences/main/active-history'
+              component={ActiveHistory}
             ></Route>
             <Route
               path='/preferences/main/edit-client'

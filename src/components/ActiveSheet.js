@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import {
-  doGetActiveUsersList,
   doOrderSortActiveUsersList,
   doSortActiveUsersList,
   doSortList,
@@ -12,8 +11,8 @@ import {
   doClearSorting,
 } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
-import { getSheetValues } from '../functions/executeFunc';
-import { DATA_SHEET_TOTAL_COST_RANGE } from '../ranges';
+import { getWorkBookWorkSheetValues } from '../functions/executeFunc';
+import { VAR_SHEET_TOTAL_COST_RANGE } from '../ranges';
 import FilterByMembership from './FilterByMembership';
 import ListSorting from './ListSorting';
 
@@ -27,7 +26,6 @@ export class ActiveSheet extends Component {
   state = { totalCost: '', updateSort: false, timeNow: 0 };
 
   componentDidMount() {
-    this.props.doGetActiveUsersList();
     this.setState({ totalCost: '' });
     this.props.doSortList('Check In Time', 5);
     this.tick();
@@ -205,7 +203,9 @@ export class ActiveSheet extends Component {
   }
 
   onGetTotalCost = async () => {
-    const totalCost = await getSheetValues(DATA_SHEET_TOTAL_COST_RANGE);
+    const workSheetId = this.props.activeSheetTitle.selectedMonth;
+    const range = VAR_SHEET_TOTAL_COST_RANGE(this.props.activeSheetTitle.title);
+    const totalCost = await getWorkBookWorkSheetValues(workSheetId, range);
     this.setState({ totalCost: totalCost[0][0] });
   };
 
@@ -309,6 +309,7 @@ export class ActiveSheet extends Component {
 const mapStateToProps = (state) => {
   const { loading } = state.app;
   const {
+    activeSheetTitle,
     activeUsersList,
     nonActiveUsersList,
     activeSheetFilteredBy,
@@ -319,6 +320,7 @@ const mapStateToProps = (state) => {
   } = state.user;
   return {
     loading,
+    activeSheetTitle,
     activeUsersList,
     nonActiveUsersList,
     activeSheetFilteredBy,
@@ -330,7 +332,6 @@ const mapStateToProps = (state) => {
 };
 
 export default connect(mapStateToProps, {
-  doGetActiveUsersList,
   doSortActiveUsersList,
   doOrderSortActiveUsersList,
   doSortList,

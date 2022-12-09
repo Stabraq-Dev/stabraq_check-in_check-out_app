@@ -43,6 +43,10 @@ import {
   USER_PREV_HRS,
   ON_INVITATIONS_EXPIRED,
   ON_NO_INVITATIONS,
+  ALL_CHECKED_IN_USERS,
+  LIST_ALL_FILES_FILTERED,
+  LIST_ALL_SHEETS_FILTERED,
+  ACTIVE_SHEET_TITLE,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -72,6 +76,8 @@ import {
   executeValuesAppendDeleteCheckOut,
   executeValuesUpdateEditClient,
   executeValuesUpdateClientCheckIn,
+  executeGetAllFilesList,
+  getWorkBookWorkSheetValues,
 } from '../functions/executeFunc';
 
 import history from '../history';
@@ -91,7 +97,6 @@ import {
   APPROX_DURATION_EXCEL_FORMULA,
   CLIENTS_SHEET_CLIENTS_RANGE,
   CURR_MONTH_WORKSHEET_RANGE,
-  DATA_SHEET_ACTIVE_RANGE,
   DATA_SHEET_DATE_RANGE,
   DURATION_EXCEL_FORMULA,
   DURATION_RANGE,
@@ -104,8 +109,10 @@ import {
   REMAINING_OF_TEN_DAYS_RANGE,
   SINGLE_CLIENT_RANGE,
   VALUES_MATCHED_RANGES,
+  VAR_SHEET_ACTIVE_RANGE,
 } from '../ranges';
 import { getToken, tokenInitd } from '../api/auth';
+import { checkAuthorizedUser } from './authActions';
 
 export const doCheckedIn = (checkedInStatus) => {
   return {
@@ -132,6 +139,13 @@ export const doCheckInOutStatus = (checkInOutStatus) => {
   return {
     type: CHECK_IN_OUT_STATUS,
     payload: checkInOutStatus,
+  };
+};
+
+export const doSetActiveSheetTitle = (activeSheetTitle) => {
+  return {
+    type: ACTIVE_SHEET_TITLE,
+    payload: activeSheetTitle,
   };
 };
 
@@ -344,6 +358,102 @@ export const doCreateNewSheet = () => async (dispatch, getState) => {
   }
 };
 
+export const checkAuthorization = () => async (dispatch, getState) => {
+  await dispatch(checkAuthorizedUser(false));
+  if (tokenInitd === false) {
+    await getToken();
+  }
+
+  const checkFlag = async () => {
+    if (tokenInitd === false) {
+      window.setTimeout(
+        checkFlag,
+        100
+      ); /* this checks the flag every 100 milliseconds*/
+    } else {
+      /* do something*/
+      await dispatch(checkAuthorizedUser(true));
+      dispatch(doLoading(false));
+    }
+  };
+
+  checkFlag();
+};
+
+export const doGetAllWorkSheetsList = () => async (dispatch, getState) => {
+  await dispatch(checkAuthorization());
+  const interval = setInterval(() => tick(), 100);
+  const tick = async () => {
+    const { authorizedUser } = getState().auth;
+    if (authorizedUser) {
+      clearInterval(interval);
+      dispatch(doLoading(true));
+      const list = await executeGetAllFilesList();
+      const listAllFiles = list.result.files;
+      const listAllFilesFiltered = listAllFiles
+        .filter((value) => value.name.includes('20'))
+        .map((value, index) => {
+          const { name, id } = value;
+          return { key: index + 1, value: id, text: name };
+        })
+        .reverse();
+
+      const firstOption = { key: 0, value: '', text: '...Select...' };
+      const finalOptions = [firstOption, ...listAllFilesFiltered];
+
+      await dispatch({
+        type: LIST_ALL_FILES_FILTERED,
+        payload: finalOptions,
+      });
+      dispatch(doLoading(false));
+    }
+  };
+};
+
+export const doGetAllSheetsList = (month) => async (dispatch, getState) => {
+  const sheetData = month ? await getWorkSheetData(month) : '';
+  const sheetDataFiltered = sheetData
+    ? sheetData
+        .filter((value) => value.properties.title.includes('20'))
+        .map((value, index) => {
+          const { title, sheetId } = value.properties;
+          return { key: index + 1, value: sheetId, text: title };
+        })
+    : '';
+
+  const firstOption = { key: 0, value: '', text: '...Select...' };
+  const finalOptions = [firstOption, ...sheetDataFiltered];
+
+  await dispatch({
+    type: LIST_ALL_SHEETS_FILTERED,
+    payload: finalOptions,
+  });
+};
+
+export const doSetDayAsActiveHistory =
+  (id, selectedMonth) => async (dispatch, getState) => {
+    const { listAllSheetsFiltered } = getState().user;
+    const title = listAllSheetsFiltered.filter(
+      (value) => value.value === parseInt(id)
+    )[0].text;
+
+    await dispatch(doSetActiveSheetTitle({ title, selectedMonth }));
+    const range = VAR_SHEET_ACTIVE_RANGE(title);
+    const allCheckedInUsers = await getWorkBookWorkSheetValues(
+      selectedMonth,
+      range
+    );
+    await dispatch({ type: ALL_CHECKED_IN_USERS, payload: allCheckedInUsers });
+    await dispatch(doGetActiveUsersList());
+  };
+
+export const doClearActiveHistoryLists = () => async (dispatch, getState) => {
+  await dispatch(doClearActiveUsersList());
+  await dispatch({ type: ALL_CHECKED_IN_USERS, payload: [] });
+  await dispatch({ type: LIST_ALL_FILES_FILTERED, payload: [] });
+  await dispatch({ type: LIST_ALL_SHEETS_FILTERED, payload: [] });
+};
+
 export const doCheckResponse = (res) => async (dispatch, getState) => {
   const { showMyModal } = getState().app;
 
@@ -360,10 +470,18 @@ export const doCheckResponse = (res) => async (dispatch, getState) => {
   }
 };
 
-export const doGetActiveUsersList = () => async (dispatch) => {
+export const doGetAllCheckedInUsers = (range) => async (dispatch) => {
+  dispatch(doLoading(true));
+  const allCheckedInUsers = await getSheetValues(range);
+  await dispatch({ type: ALL_CHECKED_IN_USERS, payload: allCheckedInUsers });
+  dispatch(doLoading(false));
+};
+
+export const doGetActiveUsersList = () => async (dispatch, getState) => {
   if (!navigator.onLine) return;
   dispatch(doLoading(true));
-  const allCheckedInUsers = await getSheetValues(DATA_SHEET_ACTIVE_RANGE);
+
+  const { allCheckedInUsers } = getState().user;
   if (allCheckedInUsers) {
     const activeUsers = allCheckedInUsers.filter(
       (value) => value[10] !== 'CHECKED_OUT'

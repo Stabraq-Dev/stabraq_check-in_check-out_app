@@ -24,6 +24,10 @@ import {
   ORDER_LIST,
   CLIENTS_LIST_SORTED,
   USER_PREV_HRS,
+  ALL_CHECKED_IN_USERS,
+  LIST_ALL_FILES_FILTERED,
+  LIST_ALL_SHEETS_FILTERED,
+  ACTIVE_SHEET_TITLE,
 } from '../actions/types';
 import { mapArrayDataObject } from '../functions/helperFunc';
 
@@ -75,6 +79,8 @@ const INITIAL_STATE = {
     girlsHourRate: '',
     girlsFullDayRate: '',
   },
+  activeSheetTitle: '',
+  allCheckedInUsers: [],
   activeUsersList: [],
   nonActiveUsersList: [],
   activeSheetFilteredBy: '',
@@ -104,6 +110,8 @@ const INITIAL_STATE = {
     index: null,
   },
   orderListAscending: true,
+  listAllFilesFiltered: [],
+  listAllSheetsFiltered: [],
   userPrevHrs: 0,
 };
 
@@ -231,6 +239,16 @@ export default (state = INITIAL_STATE, action) => {
           hoursDailyRatesKeys
         ),
       };
+    case ALL_CHECKED_IN_USERS:
+      return {
+        ...state,
+        allCheckedInUsers: action.payload,
+      };
+    case ACTIVE_SHEET_TITLE:
+      return {
+        ...state,
+        activeSheetTitle: action.payload,
+      };
     case ACTIVE_USERS_LIST:
       return {
         ...state,
@@ -288,6 +306,16 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         orderListAscending: action.payload,
+      };
+    case LIST_ALL_FILES_FILTERED:
+      return {
+        ...state,
+        listAllFilesFiltered: action.payload,
+      };
+    case LIST_ALL_SHEETS_FILTERED:
+      return {
+        ...state,
+        listAllSheetsFiltered: action.payload,
       };
     default:
       return state;

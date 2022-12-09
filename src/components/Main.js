@@ -10,10 +10,13 @@ import {
   doReveal,
   doLogOut,
   doClearPrevUserState,
+  doGetAllCheckedInUsers,
+  doGetAllWorkSheetsList,
   doGetActiveUsersList,
   doGetClientsList,
   doCheckSignedIn,
 } from '../actions';
+import { DATA_SHEET_ACTIVE_RANGE } from '../ranges';
 
 const revealAll = [
   'HEADER-TEXT',
@@ -22,6 +25,7 @@ const revealAll = [
   'QR-CODE-GEN-BTN',
   'ACTIVE-USERS-BTN',
   'CLIENTS-BTN',
+  'ACTIVE-HISTORY-USERS-BTN',
 ];
 
 class Main extends React.Component {
@@ -45,6 +49,7 @@ class Main extends React.Component {
       'QR-CODE-GEN-BTN',
       'ACTIVE-USERS-BTN',
       'CLIENTS-BTN',
+      'ACTIVE-HISTORY-USERS-BTN',
     ]);
     await doReveal(revealAll);
     await doShowCheckInOut(true);
@@ -57,6 +62,7 @@ class Main extends React.Component {
       'QR-CODE-GEN-BTN',
       'ACTIVE-USERS-BTN',
       'CLIENTS-BTN',
+      'ACTIVE-HISTORY-USERS-BTN',
     ]);
     await doReveal(revealAll);
     await doShowCheckInOut(false);
@@ -68,18 +74,22 @@ class Main extends React.Component {
       'NEW-USER-BTN',
       'ACTIVE-USERS-BTN',
       'CLIENTS-BTN',
+      'ACTIVE-HISTORY-USERS-BTN',
     ]);
     await doReveal(revealAll);
   };
   onFormSubmitActiveUsers = async () => {
-    const { doReveal, doGetActiveUsersList } = this.props;
+    const { doReveal, doGetAllCheckedInUsers, doGetActiveUsersList } =
+      this.props;
     await doReveal([
       'USER-BTN',
       'NEW-USER-BTN',
       'QR-CODE-GEN-BTN',
       'CLIENTS-BTN',
+      'ACTIVE-HISTORY-USERS-BTN',
     ]);
     await doReveal(revealAll);
+    await doGetAllCheckedInUsers(DATA_SHEET_ACTIVE_RANGE);
     await doGetActiveUsersList();
   };
   onFormSubmitClients = async () => {
@@ -89,11 +99,27 @@ class Main extends React.Component {
       'NEW-USER-BTN',
       'QR-CODE-GEN-BTN',
       'ACTIVE-USERS-BTN',
+      'ACTIVE-HISTORY-USERS-BTN',
     ]);
     await doReveal(revealAll);
     await doGetClientsList();
   };
 
+  onFormSubmitActiveHistory = async () => {
+    const {
+      doReveal,
+      doGetAllWorkSheetsList,
+    } = this.props;
+    await doReveal([
+      'USER-BTN',
+      'NEW-USER-BTN',
+      'QR-CODE-GEN-BTN',
+      'ACTIVE-USERS-BTN',
+      'CLIENTS-BTN',
+    ]);
+    await doReveal(revealAll);
+    await doGetAllWorkSheetsList();
+  };
   render() {
     const { reveal, doLogOut } = this.props;
     return (
@@ -146,7 +172,7 @@ class Main extends React.Component {
             </Link>
           </LightSpeed>
         </div>
-        <div className='col-md-6 col-sm-4 col-xs-12 mt-3 text-center'>
+        <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
           <LightSpeed right when={reveal.includes('ACTIVE-USERS-BTN')}>
             <Link to='/preferences/main/active-sheet'>
               <button
@@ -160,7 +186,7 @@ class Main extends React.Component {
             </Link>
           </LightSpeed>
         </div>
-        <div className='col-md-6 col-sm-4 col-xs-12 mt-3 text-center'>
+        <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
           <LightSpeed left when={reveal.includes('CLIENTS-BTN')}>
             <Link to='/preferences/main/clients-list'>
               <button
@@ -174,8 +200,22 @@ class Main extends React.Component {
             </Link>
           </LightSpeed>
         </div>
+        <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
+          <LightSpeed right when={reveal.includes('ACTIVE-HISTORY-USERS-BTN')}>
+            <Link to='/preferences/main/active-history'>
+              <button
+                className='ui text-stabraq button bg-dark'
+                type='button'
+                onClick={this.onFormSubmitActiveHistory}
+              >
+                <i className='user circle icon' />
+                History
+              </button>
+            </Link>
+          </LightSpeed>
+        </div>
         <Bounce bottom>
-          <div className='col-md-12 col-sm-4 col-xs-12 mt-3 text-end align-self-center'>
+          <div className='col-md-12 col-sm-12 col-xs-12 mt-3 text-end align-self-center'>
             <button className='ui red button' onClick={() => doLogOut()}>
               <i className='sign-out icon' />
               Sign Out
@@ -200,6 +240,8 @@ export default connect(mapStateToProps, {
   doReveal,
   doLogOut,
   doClearPrevUserState,
+  doGetAllCheckedInUsers,
+  doGetAllWorkSheetsList,
   doGetActiveUsersList,
   doGetClientsList,
   doCheckSignedIn,

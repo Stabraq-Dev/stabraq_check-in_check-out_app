@@ -775,6 +775,29 @@ export const getSheetValues = async (range) => {
   }
 };
 
+export const getWorkBookWorkSheetValues = async (workSheetId, range) => {
+  try {
+    const finalWorkSheetId = workSheetId ? workSheetId : SHEET_ID;
+    const googleSheetsAPI = await axiosAuth(finalWorkSheetId);
+
+    const response = await googleSheetsAPI.get(
+      `${finalWorkSheetId}/values/${range}`
+    );
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log(
+        'Response getWorkBookWorkSheetValues',
+        range,
+        response.data.values
+      );
+    }
+
+    return response.data.values;
+  } catch (err) {
+    console.error('Execute error getWorkBookWorkSheetValues', err);
+  }
+};
+
 export const getSheetValuesBatchGet = async (ranges) => {
   try {
     const googleSheetsAPI = await axiosAuth(SHEET_ID);
@@ -881,6 +904,24 @@ export const executeChangeWorkSheetPermission = async (fileId, email) => {
   } catch (err) {
     console.error(
       'Execute error executeChangeWorkSheetPermission',
+      err.response.data.error
+    );
+    return err.response.data.error;
+  }
+};
+
+export const executeGetAllFilesList = async () => {
+  try {
+    const response = await window.gapi.client.drive.files.list({});
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log('Response executeGetAllFilesList', response);
+    }
+
+    return response;
+  } catch (err) {
+    console.error(
+      'Execute error executeGetAllFilesList',
       err.response.data.error
     );
     return err.response.data.error;

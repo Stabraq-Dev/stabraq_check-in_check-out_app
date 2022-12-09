@@ -13,6 +13,7 @@ const revealAll = [
   'QR-CODE-GEN-BTN',
   'ACTIVE-USERS-BTN',
   'CLIENTS-BTN',
+  'ACTIVE-HISTORY-USERS-BTN',
 ];
 
 function Splash({

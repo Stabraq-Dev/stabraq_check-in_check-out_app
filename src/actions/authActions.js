@@ -1,4 +1,4 @@
-import { SIGN_IN, SIGN_OUT, WRONG_USER_PASS, FROM_URL } from './types';
+import { SIGN_IN, SIGN_OUT, WRONG_USER_PASS, FROM_URL, AUTHORIZED_USER } from './types';
 import history from '../history';
 
 import { doLoading } from './appActions';
@@ -32,6 +32,13 @@ export const wrongUserPass = (userPassStatus) => {
   return {
     type: WRONG_USER_PASS,
     payload: userPassStatus,
+  };
+};
+
+export const checkAuthorizedUser = (authStatus) => {
+  return {
+    type: AUTHORIZED_USER,
+    payload: authStatus,
   };
 };
 
