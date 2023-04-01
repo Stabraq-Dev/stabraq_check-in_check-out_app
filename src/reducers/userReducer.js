@@ -28,6 +28,7 @@ import {
   LIST_ALL_FILES_FILTERED,
   LIST_ALL_SHEETS_FILTERED,
   ACTIVE_SHEET_TITLE,
+  USER_HISTORY_DATA,
 } from '../actions/types';
 import { mapArrayDataObject } from '../functions/helperFunc';
 
@@ -113,6 +114,7 @@ const INITIAL_STATE = {
   listAllFilesFiltered: [],
   listAllSheetsFiltered: [],
   userPrevHrs: 0,
+  userHistoryData: [],
 };
 
 let valuesMatchedKeys = [
@@ -316,6 +318,11 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         listAllSheetsFiltered: action.payload,
+      };
+    case USER_HISTORY_DATA:
+      return {
+        ...state,
+        userHistoryData: action.payload,
       };
     default:
       return state;

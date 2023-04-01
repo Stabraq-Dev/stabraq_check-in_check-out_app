@@ -8,6 +8,7 @@ import {
   doGetAllSheetsList,
   doSetDayAsActiveHistory,
   doClearActiveHistoryLists,
+  doGetUserHistory,
 } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -21,6 +22,9 @@ export const ActiveHistory = ({
   listAllSheetsFiltered,
   doClearActiveHistoryLists,
   allCheckedInUsers,
+  doGetUserHistory,
+  userHistoryData,
+  mobileNumber,
 }) => {
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedDay, setSelectedDay] = useState('');
@@ -49,6 +53,10 @@ export const ActiveHistory = ({
   const onMonthChange = async (month) => {
     setSelectedMonth(month);
     await doGetAllSheetsList(month);
+  };
+
+  const onFilterByMobile = async () => {
+    await doGetUserHistory(mobileNumber, selectedMonth);
   };
 
   const onSubmitDay = async (formValues) => {
@@ -83,6 +91,46 @@ export const ActiveHistory = ({
       ></Form>
     );
   };
+
+  const renderFilterByMobile = () => {
+    return (
+      <button
+        className='ui primary button stabraq-bg'
+        onClick={onFilterByMobile}
+        type='submit'
+      >
+        <i className='chevron circle right icon me-1' />
+        Get History of {mobileNumber}
+      </button>
+    );
+  };
+  const renderRecords = (record) => {
+    return record.map((ele, idx) => {
+      return ele.map((e, i) => {
+        return <td key={i}>{e}</td>;
+      });
+    });
+  };
+  const renderUserHistoryData = () => {
+    return userHistoryData.map((ele, idx) => {
+      return (
+        <div key={idx} className='table-responsive'>
+          <table className='table table-striped table-hover'>
+            <thead>
+              <tr>
+                <th scope='col'>{ele.day}</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>{renderRecords(ele.record)}</tr>
+            </tbody>
+          </table>
+        </div>
+      );
+    });
+  };
+
   const renderFilterByDay = () => {
     return (
       <Form
@@ -108,7 +156,9 @@ export const ActiveHistory = ({
   return (
     <>
       {renderFilterByMonth()}
+      {selectedMonth && mobileNumber && renderFilterByMobile()}
       {listAllSheetsFiltered.length > 1 && renderFilterByDay()}
+      {userHistoryData.length > 0 && renderUserHistoryData()}
       {allCheckedInUsers.length > 0 && selectedMonth && selectedDay && (
         <ActiveSheet />
       )}
@@ -118,14 +168,21 @@ export const ActiveHistory = ({
 
 const mapStateToProps = (state) => {
   const { loading } = state.app;
-  const { listAllFilesFiltered, listAllSheetsFiltered, allCheckedInUsers } =
-    state.user;
+  const {
+    listAllFilesFiltered,
+    listAllSheetsFiltered,
+    allCheckedInUsers,
+    userHistoryData,
+  } = state.user;
+  const { mobileNumber } = state.user.valuesMatched;
 
   return {
     loading,
     listAllFilesFiltered,
     listAllSheetsFiltered,
     allCheckedInUsers,
+    userHistoryData,
+    mobileNumber,
   };
 };
 
@@ -134,4 +191,5 @@ export default connect(mapStateToProps, {
   doGetAllSheetsList,
   doSetDayAsActiveHistory,
   doClearActiveHistoryLists,
+  doGetUserHistory,
 })(ActiveHistory);

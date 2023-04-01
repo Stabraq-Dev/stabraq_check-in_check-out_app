@@ -47,6 +47,7 @@ import {
   LIST_ALL_FILES_FILTERED,
   LIST_ALL_SHEETS_FILTERED,
   ACTIVE_SHEET_TITLE,
+  USER_HISTORY_DATA,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -78,6 +79,7 @@ import {
   executeValuesUpdateClientCheckIn,
   executeGetAllFilesList,
   getWorkBookWorkSheetValues,
+  getSheetValuesWorkSheetBatchGet,
 } from '../functions/executeFunc';
 
 import history from '../history';
@@ -445,6 +447,26 @@ export const doSetDayAsActiveHistory =
     );
     await dispatch({ type: ALL_CHECKED_IN_USERS, payload: allCheckedInUsers });
     await dispatch(doGetActiveUsersList());
+  };
+
+export const doGetUserHistory =
+  (mobile, selectedMonth) => async (dispatch, getState) => {
+    const { listAllSheetsFiltered } = getState().user;
+    const ranges = listAllSheetsFiltered
+      .map((value) => VAR_SHEET_ACTIVE_RANGE(value.text))
+      .filter((val, idx) => idx > 0);
+    const data = await getSheetValuesWorkSheetBatchGet(selectedMonth, ranges);
+
+    const filterData = data
+      .map((value) => {
+        const record = value.values
+          ? value.values.filter((val) => val[1] === mobile)
+          : [];
+        const day = value.range.split('!')[0];
+        return { record, day };
+      })
+      .filter((v) => v.record.length > 0);
+      await dispatch({ type: USER_HISTORY_DATA, payload: filterData });
   };
 
 export const doClearActiveHistoryLists = () => async (dispatch, getState) => {

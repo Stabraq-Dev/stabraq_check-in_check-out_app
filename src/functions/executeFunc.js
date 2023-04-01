@@ -823,6 +823,32 @@ export const getSheetValuesBatchGet = async (ranges) => {
   }
 };
 
+export const getSheetValuesWorkSheetBatchGet = async (sheetId, ranges) => {
+  try {
+    const googleSheetsAPI = await axiosAuth(sheetId);
+
+    const response = await googleSheetsAPI.get(`${sheetId}/values:batchGet`, {
+      params: {
+        majorDimension: 'ROWS',
+        ranges: ranges,
+      },
+      paramsSerializer: (params) =>
+        qs.stringify(params, { arrayFormat: 'repeat' }),
+    });
+
+    if (global.config.debuggingMode === 'TRUE') {
+      console.log(
+        'Response getSheetValuesWorkSheetBatchGet',
+        response.data.valueRanges
+      );
+    }
+
+    return response.data.valueRanges;
+  } catch (err) {
+    console.error('Execute error getSheetValuesWorkSheetBatchGet', err);
+  }
+};
+
 export const getSheetValuesAdminAuth = async (range) => {
   try {
     const googleSheetsAPI = await axiosAuth(AUTH_SHEET_ID);
