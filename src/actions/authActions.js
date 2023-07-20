@@ -1,5 +1,10 @@
-import { SIGN_IN, SIGN_OUT, WRONG_USER_PASS, FROM_URL, AUTHORIZED_USER } from './types';
-import history from '../history';
+import {
+  SIGN_IN,
+  SIGN_OUT,
+  WRONG_USER_PASS,
+  FROM_URL,
+  AUTHORIZED_USER,
+} from './types';
 
 import { doLoading } from './appActions';
 
@@ -24,7 +29,7 @@ export const signOut = () => {
 export const fromURL = () => {
   return {
     type: FROM_URL,
-    payload: history.location.pathname + history.location.search,
+    payload: window.location.pathname + window.location.search,
   };
 };
 
@@ -62,12 +67,12 @@ export const doLogIn = (formValues) => async (dispatch, getState) => {
           userId: username,
         })
       );
-      const { fromURL } = getState().auth;
-      if (fromURL) {
-        history.push(fromURL);
-      } else {
-        history.push('/preferences/main');
-      }
+      // const { fromURL } = getState().auth;
+      // if (fromURL) {
+      //   history.push(fromURL);
+      // } else {
+      //   history.push('/preferences/main');
+      // }
       break;
     case 'FALSE':
       dispatch(wrongUserPass(true));
@@ -95,10 +100,10 @@ export const doCheckSignedIn = () => async (dispatch) => {
 export const doLogOut = () => async (dispatch) => {
   localStorage.removeItem('user');
   dispatch(signOut());
-  history.push('/dashboard');
+  // history.push('/dashboard');
 };
 
 export const doRedirectToSignIn = () => async (dispatch) => {
   dispatch(fromURL());
-  history.push('/dashboard');
+  // history.push('/dashboard');
 };

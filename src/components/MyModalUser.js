@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
 import MyModal from './MyModal';
 import { connect } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import {
   doShowMyModal,
   doRevealLogo,
@@ -8,14 +8,14 @@ import {
   doDeleteUserCheckOut,
   doSignInAgain,
 } from '../actions';
-import history from '../history';
 
-export class MyModalUser extends Component {
+export const MyModalUser = (props) => {
+  const navigate = useNavigate();
   /**
    *
    * @a renderBody
    */
-  renderBody() {
+  const renderBody = () => {
     const {
       submitType,
       numberExists,
@@ -35,7 +35,7 @@ export class MyModalUser extends Component {
       error,
       invite,
       userNameInvitation,
-    } = this.props;
+    } = props;
 
     const DefaultBody = ({ message }) => {
       return (
@@ -160,12 +160,12 @@ export class MyModalUser extends Component {
           return null;
       }
     }
-  }
+  };
   /**
    *
    * @a renderAction
    */
-  renderAction = () => {
+  const renderAction = () => {
     const {
       submitType,
       numberExists,
@@ -174,24 +174,24 @@ export class MyModalUser extends Component {
       mobileNumber,
       error,
       doRevealLogo,
-    } = this.props;
+    } = props;
 
     const goToHome = async () => {
-      history.push('/');
+      navigate('/');
       await doRevealLogo(false);
       await doRevealLogo(true);
     };
     const goToUser = () => {
-      history.push('/preferences/main/user');
+      navigate('/preferences/main/user');
     };
     const goToNewUser = () => {
-      history.push('/preferences/main/new-user');
+      navigate('/preferences/main/new-user');
     };
     const goToCheckInOut = () => {
-      history.push('/preferences/main/user/check-in-out');
+      navigate('/preferences/main/user/check-in-out');
     };
     const goToClientsList = () => {
-      history.push('/preferences/main/clients-list');
+      navigate('/preferences/main/clients-list');
     };
 
     switch (submitType) {
@@ -216,10 +216,10 @@ export class MyModalUser extends Component {
         switch (numberExists) {
           case 'EXISTS':
             return () =>
-              history.push(`/preferences/main/user/?mobile=${mobileNumber}`);
+              navigate(`/preferences/main/user/?mobile=${mobileNumber}`);
           default:
             return () =>
-              history.push(
+              navigate(
                 // `/preferences/main/qr-code-gen/?mobile=${mobileNumber}`
                 `/preferences/main/user/?mobile=${mobileNumber}`
               );
@@ -297,13 +297,13 @@ export class MyModalUser extends Component {
    *
    * @a renderYesAction
    */
-  renderYesAction = () => {
+  const renderYesAction = () => {
     const {
       submitType,
       doDeleteUserCheckIn,
       doDeleteUserCheckOut,
       doSignInAgain,
-    } = this.props;
+    } = props;
     const deleteUserCheckIn = async () => {
       await doDeleteUserCheckIn();
     };
@@ -328,8 +328,8 @@ export class MyModalUser extends Component {
    *
    * @a renderBodyBackground
    */
-  renderBodyBackground() {
-    const { error, submitType } = this.props;
+  const renderBodyBackground = () => {
+    const { error, submitType } = props;
     if (error) {
       return 'error-bg';
     } else if (
@@ -341,25 +341,24 @@ export class MyModalUser extends Component {
     } else {
       return 'stabraq-bg';
     }
-  }
+  };
   /**
    *
    * @q React render
    */
-  render() {
-    if (this.props.showMyModal) {
-      return (
-        <MyModal
-          body={this.renderBody()}
-          closeAction={this.renderAction()}
-          bodyBackground={this.renderBodyBackground()}
-          yesAction={this.renderYesAction()}
-        />
-      );
-    }
-    return null;
+
+  if (props.showMyModal) {
+    return (
+      <MyModal
+        body={renderBody()}
+        closeAction={renderAction()}
+        bodyBackground={renderBodyBackground()}
+        yesAction={renderYesAction()}
+      />
+    );
   }
-}
+  return null;
+};
 
 const mapStateToProps = (state) => {
   const {

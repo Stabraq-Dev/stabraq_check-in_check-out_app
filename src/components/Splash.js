@@ -2,8 +2,8 @@ import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import Flip from 'react-reveal/Flip';
+import { useLocation } from 'react-router-dom';
 
-import history from '../history';
 import { doShrinkLogo, doRevealLogo, doReveal } from '../actions';
 
 const revealAll = [
@@ -24,23 +24,23 @@ function Splash({
   revealLogo,
   doReveal,
 }) {
+  const location = useLocation();
   useEffect(() => {
     doShrinkLogo(false);
     doRevealLogo(true);
   });
 
   const shrinkLogoClass =
-    shrinkLogo || history.location.pathname !== '/' ? 'shrink-logo' : '';
-  const centerLogoClass =
-    history.location.pathname === '/' ? 'center-logo' : '';
+    shrinkLogo || location.pathname !== '/' ? 'shrink-logo' : '';
+  const centerLogoClass = location.pathname === '/' ? 'center-logo' : '';
 
   const redirectTo = () => {
-    if (history.location.pathname === '/') {
+    if (location.pathname === '/') {
       return '/preferences/main';
-    } else if (history.location.pathname === '/preferences/main') {
+    } else if (location.pathname === '/preferences/main') {
       return '/';
     } else {
-      return history.location.pathname.replace(/\/([^/]+)\/?$/, '');
+      return location.pathname.replace(/\/([^/]+)\/?$/, '');
     }
   };
 
@@ -54,7 +54,7 @@ function Splash({
             await doRevealLogo(false);
             await doShrinkLogo(true);
             await doRevealLogo(true);
-            if (history.location.pathname === '/preferences/main') {
+            if (location.pathname === '/preferences/main') {
               await doReveal([]);
               await doReveal(revealAll);
             }

@@ -1,14 +1,14 @@
 import { GoogleSpreadsheet } from 'google-spreadsheet';
+import { JWT } from 'google-auth-library';
 
 export const authenticate = async (sheetID) => {
-  const doc = new GoogleSpreadsheet(sheetID);
-  await doc.useServiceAccountAuth({
-    private_key: process.env.REACT_APP_GOOGLE_PRIVATE_KEY.replace(
-      /\\n/gm,
-      '\n'
-    ),
-    client_email: process.env.REACT_APP_GOOGLE_SERVICE_ACCOUNT_EMAIL,
+  const serviceAccountAuth = new JWT({
+    email: process.env.REACT_APP_GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    key: process.env.REACT_APP_GOOGLE_PRIVATE_KEY.replace(/\\n/gm, '\n'),
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
+
+  const doc = new GoogleSpreadsheet(sheetID, serviceAccountAuth);
 
   return doc;
 };

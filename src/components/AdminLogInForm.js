@@ -1,11 +1,11 @@
 import React from 'react';
 import { Form, Field } from 'react-final-form';
 import { connect } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 
 import { checkForUserName } from '../functions/validation';
 import { doLogIn, doLogOut } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
-import history from '../history';
 import Footer from './Footer';
 
 const AdminLogInForm = ({
@@ -16,6 +16,7 @@ const AdminLogInForm = ({
   doLogIn,
   doLogOut,
 }) => {
+  const navigate = useNavigate();
   const renderError = ({ error, touched }) => {
     if (touched && error) {
       return (
@@ -69,7 +70,7 @@ const AdminLogInForm = ({
         <h1>You already signed in</h1>
         <button
           className='ui primary button stabraq-bg'
-          onClick={() => history.push('/preferences/main')}
+          onClick={() => navigate('/preferences/main')}
           type='submit'
         >
           Go to Main page

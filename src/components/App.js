@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Router, Route, Switch } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import '../styles.css';
 
-import history from '../history';
 import { axiosAuth } from '../api/googleSheetsAPI';
 import Splash from './Splash';
 import Preferences from './Preferences';
@@ -68,21 +67,15 @@ const App = ({ doCheckSignedIn }) => {
     <div className='container-fluid myOverflowHidden'>
       {renderNoInternet()}
       {renderSlowInternet()}
-      <Router history={history}>
+      <div className='ui container mt-3'>
         <div>
           <Splash />
-          <div className='ui container mt-3'>
-            <Switch>
-              <Route path='/dashboard'>
-                <AdminLogInForm />
-              </Route>
-              <Route path='/preferences'>
-                <Preferences />
-              </Route>
-            </Switch>
-          </div>
+          <Routes>
+            <Route path='/dashboard' element={<AdminLogInForm />} />
+            <Route path='/preferences' element={<Preferences />} />
+          </Routes>
         </div>
-      </Router>
+      </div>
     </div>
   );
 };

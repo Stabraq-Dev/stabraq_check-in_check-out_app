@@ -1,9 +1,8 @@
 import React from 'react';
-import { Router, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { doRedirectToSignIn } from '../actions';
 
-import history from '../history';
 import Main from './Main';
 import SearchBar from './SearchBar';
 import NewUserForm from './NewUserForm';
@@ -20,46 +19,35 @@ function Preferences({ isSignedIn, doRedirectToSignIn }) {
   if (isSignedIn) {
     return (
       <React.Fragment>
-        <Router history={history}>
-          <div>
-            <Route path='/preferences/main' component={Main}></Route>
-            <Route path='/preferences/main/user' component={SearchBar}></Route>
-            <Route
-              path='/preferences/main/user/check-in-out'
-              exact
-              component={CheckInOut}
-            ></Route>
-            <Route
-              path='/preferences/main/new-user'
-              exact
-              component={NewUserForm}
-            ></Route>
-            <Route
-              path='/preferences/main/qr-code-gen'
-              component={QRCodeGenerator}
-            ></Route>
-            <Route
-              path='/preferences/main/active-sheet'
-              component={Active}
-            ></Route>
-            <Route
-              path='/preferences/main/clients-list'
-              component={ClientsList}
-            ></Route>
-            <Route
-              path='/preferences/main/active-history'
-              component={ActiveHistory}
-            ></Route>
-            <Route
-              path='/preferences/main/edit-client'
-              component={EditClient}
-            ></Route>
-            <Route
-              path='/preferences'
-              component={Footer}
-            ></Route>
-          </div>
-        </Router>
+        <Routes>
+          <Route path='/preferences/main' component={Main} />
+          <Route path='/preferences/main/user' component={SearchBar} />
+          <Route
+            path='/preferences/main/user/check-in-out'
+            exact
+            component={CheckInOut}
+          />
+          <Route
+            path='/preferences/main/new-user'
+            exact
+            component={NewUserForm}
+          />
+          <Route
+            path='/preferences/main/qr-code-gen'
+            component={QRCodeGenerator}
+          />
+          <Route path='/preferences/main/active-sheet' component={Active} />
+          <Route
+            path='/preferences/main/clients-list'
+            component={ClientsList}
+          />
+          <Route
+            path='/preferences/main/active-history'
+            component={ActiveHistory}
+          />
+          <Route path='/preferences/main/edit-client' component={EditClient} />
+          <Route path='/preferences' component={Footer} />
+        </Routes>
         <MyModalUser />
       </React.Fragment>
     );
