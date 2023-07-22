@@ -1,4 +1,5 @@
 import React from 'react';
+import { Outlet } from 'react-router-dom';
 
 import { checkForMobNum } from '../functions/validation';
 import { connect } from 'react-redux';
@@ -38,7 +39,7 @@ class SearchBar extends React.Component {
   };
 
   urlSearch = async () => {
-    await axiosAuth();
+    await axiosAuth(import.meta.env.VITE_SHEET_ID);
     await this.onURLSearchSet(this.mobile);
     await this.checkForErrors();
     await this.search();
@@ -90,18 +91,21 @@ class SearchBar extends React.Component {
 
   render() {
     return (
-      <div className='ui segment'>
-        <form onSubmit={this.onFormSubmit} className='ui form error'>
-          <InputMobile
-            value={this.state.mobileNumber}
-            label='Search By Mobile Number'
-            icon='mobile alternate'
-            onFormChange={this.onFormChange}
-            errorMessage={this.state.errorMessage}
-          />
-          <div className='mt-3 text-center'>{this.renderSubmitButton()}</div>
-        </form>
-      </div>
+      <>
+        <div className='ui segment'>
+          <form onSubmit={this.onFormSubmit} className='ui form error'>
+            <InputMobile
+              value={this.state.mobileNumber}
+              label='Search By Mobile Number'
+              icon='mobile alternate'
+              onFormChange={this.onFormChange}
+              errorMessage={this.state.errorMessage}
+            />
+            <div className='mt-3 text-center'>{this.renderSubmitButton()}</div>
+          </form>
+        </div>
+        <Outlet />
+      </>
     );
   }
 }

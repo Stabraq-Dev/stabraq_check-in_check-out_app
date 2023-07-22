@@ -100,10 +100,8 @@ export const doCheckSignedIn = () => async (dispatch) => {
 export const doLogOut = () => async (dispatch) => {
   localStorage.removeItem('user');
   dispatch(signOut());
-  // history.push('/dashboard');
 };
 
 export const doRedirectToSignIn = () => async (dispatch) => {
   dispatch(fromURL());
-  // history.push('/dashboard');
 };

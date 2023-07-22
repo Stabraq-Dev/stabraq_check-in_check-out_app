@@ -5,8 +5,8 @@ export const axiosAuth = async (sheetID) => {
   try {
     const getNewToken = async () => {
       const doc = await authenticate(sheetID);
-      const NEW_ACCESS_TOKEN = await doc.jwtClient.credentials.access_token;
-      const new_expiry_date = await doc.jwtClient.credentials.expiry_date;
+      const NEW_ACCESS_TOKEN = await doc.auth.credentials.access_token;
+      const new_expiry_date = await doc.auth.credentials.expiry_date;
       // sessionStorage.clear();
       sessionStorage.setItem('token', NEW_ACCESS_TOKEN);
       sessionStorage.setItem('expiry_date', new_expiry_date);

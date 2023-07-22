@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -9,6 +9,17 @@ import { axiosAuth } from '../api/googleSheetsAPI';
 import Splash from './Splash';
 import Preferences from './Preferences';
 import AdminLogInForm from './AdminLogInForm';
+import Main from './Main';
+import SearchBar from './SearchBar';
+import NewUserForm from './NewUserForm';
+import CheckInOut from './CheckInOut';
+import QRCodeGenerator from './QRCodeGenerator';
+import Active from './Active';
+import ClientsList from './ClientsList';
+import EditClient from './EditClient';
+import Footer from './Footer';
+import ActiveHistory from './ActiveHistory';
+
 import { doCheckSignedIn } from '../actions/index';
 import { connect } from 'react-redux';
 import MyAlert from './MyAlert';
@@ -25,7 +36,7 @@ const App = ({ doCheckSignedIn }) => {
   });
 
   const load = async () => {
-    await axiosAuth();
+    await axiosAuth(import.meta.env.VITE_SHEET_ID);
     await doCheckSignedIn();
     await loadAuth();
   };
@@ -71,9 +82,23 @@ const App = ({ doCheckSignedIn }) => {
         <div>
           <Splash />
           <Routes>
-            <Route path='/dashboard' element={<AdminLogInForm />} />
-            <Route path='/preferences' element={<Preferences />} />
+            <Route path='/' element={<></>} />
+            <Route path='dashboard' element={<AdminLogInForm />} />
+            <Route path='preferences' element={<Preferences />}>
+              <Route path='main' element={<Main />}>
+                <Route path='user' element={<SearchBar />}>
+                  <Route path='check-in-out' element={<CheckInOut />} />
+                </Route>
+                <Route path='new-user' element={<NewUserForm />} />
+                <Route path='qr-code-gen' element={<QRCodeGenerator />} />
+                <Route path='active-sheet' element={<Active />} />
+                <Route path='clients-list' element={<ClientsList />} />
+                <Route path='active-history' element={<ActiveHistory />} />
+                <Route path='edit-client' element={<EditClient />} />
+              </Route>
+            </Route>
           </Routes>
+          <Footer />
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
-import Flip from 'react-reveal/Flip';
+import { Flip } from 'react-awesome-reveal';
 import { useLocation } from 'react-router-dom';
 
 import { doShrinkLogo, doRevealLogo, doReveal } from '../actions';
@@ -45,7 +45,7 @@ function Splash({
   };
 
   return (
-    <Link to={isSignedIn ? redirectTo : '/dashboard'}>
+    <Link to={isSignedIn ? redirectTo() : '/dashboard'}>
       <div className={`text-center ${centerLogoClass}`}>
         <button
           className='btn me-2 no-btn-focus'

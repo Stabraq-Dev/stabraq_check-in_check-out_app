@@ -3,13 +3,13 @@ import { JWT } from 'google-auth-library';
 
 export const authenticate = async (sheetID) => {
   const serviceAccountAuth = new JWT({
-    email: process.env.REACT_APP_GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    key: process.env.REACT_APP_GOOGLE_PRIVATE_KEY.replace(/\\n/gm, '\n'),
+    email: import.meta.env.VITE_GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    key: import.meta.env.VITE_GOOGLE_PRIVATE_KEY.replace(/\\n/gm, '\n'),
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
   });
 
   const doc = new GoogleSpreadsheet(sheetID, serviceAccountAuth);
-
+  await doc.loadInfo();
   return doc;
 };
 
@@ -22,7 +22,7 @@ export let tokenInitd = false;
 
 export const gsiInit = async () => {
   tokenClient = await window.google.accounts.oauth2.initTokenClient({
-    client_id: process.env.REACT_APP_CLIENT_ID,
+    client_id: import.meta.env.VITE_CLIENT_ID,
     scope:
       'https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/drive https://www.googleapis.com/auth/drive.file',
     callback: async (tokenResponse) => {

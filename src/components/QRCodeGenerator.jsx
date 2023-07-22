@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { QRCode } from 'react-qrcode-logo';
 import html2canvas from 'html2canvas';
 import InputMobile from './InputMobile';

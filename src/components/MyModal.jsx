@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from 'bootstrap';
-import Bounce from 'react-reveal/Bounce';
+import {Bounce} from 'react-awesome-reveal';
 
 class MyModal extends React.Component {
   componentDidMount() {

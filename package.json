@@ -1,8 +1,15 @@
 {
   "name": "stabraq_check-in_check-out_app",
   "private": true,
-  "version": "0.1.1",
+  "version": "0.0.0",
+  "type": "module",
   "homepage": "https://stabraq-logbook.netlify.app",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
+  },
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
@@ -22,59 +29,30 @@
     "final-form": "^4.20.9",
     "final-form-calculate": "^1.3.2",
     "framer-motion": "^10.12.18",
+    "gaxios": "^6.0.2",
     "google-auth-library": "^8.9.0",
     "google-spreadsheet": "^4.0.2",
     "html2canvas": "^1.4.1",
-    "lodash": "^4.17.21",
-    "path": "^0.12.7",
     "qs": "^6.11.2",
     "react": "^18.2.0",
+    "react-awesome-reveal": "^4.2.5",
     "react-dom": "^18.2.0",
-    "react-error-overlay": "^6.0.11",
     "react-final-form": "^6.5.9",
     "react-icons": "^4.10.1",
     "react-intersection-observer": "^9.5.2",
     "react-qrcode-logo": "^2.9.0",
-    "react-redux": "^8.1.1",
-    "react-router": "^6.14.2",
-    "react-router-dom": "^6.14.1",
-    "react-scripts": "^4.0.3",
-    "react-simple-star-rating": "^5.1.7",
-    "redux": "^4.2.1",
-    "redux-thunk": "^2.4.2",
-    "web-vitals": "^3.4.0"
+    "react-router-dom": "^6.14.2",
+    "react-simple-star-rating": "^5.1.7"
   },
   "devDependencies": {
-    "@babel/plugin-proposal-private-property-in-object": "",
-    "buffer": "^6.0.3",
-    "crypto": "^1.0.1",
-    "stream": "^0.0.2",
-    "util": "^0.12.5"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.0.3",
+    "eslint": "^8.45.0",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.3",
+    "vite": "^4.4.5",
+    "vite-plugin-node-polyfills": "^0.9.0"
   }
 }

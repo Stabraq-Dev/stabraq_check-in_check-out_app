@@ -77,7 +77,7 @@ export class ClientsList extends Component {
     const userCurrentPage = Math.ceil(userIndex / this.state.clientsPerPage);
     this.setState({ activeIndex: userIndex + 3, currentPage: userCurrentPage });
 
-    this.refs[this.mobile].current.scrollIntoView({
+    this.ref[this.mobile].current.scrollIntoView({
       behavior: 'smooth',
       block: 'center',
     });
@@ -102,7 +102,7 @@ export class ClientsList extends Component {
 
   renderList = (list) => {
     const { clientsList } = this.props;
-    this.refs = clientsList.reduce((acc, value) => {
+    this.ref = clientsList.reduce((acc, value) => {
       acc[value[0]] = React.createRef();
       return acc;
     }, {});
@@ -136,7 +136,7 @@ export class ClientsList extends Component {
       return (
         <React.Fragment key={index}>
           <div
-            ref={this.refs[active[0]]}
+            ref={this.ref[active[0]]}
             className={`title ${activeClass} ${rowColor}`}
             onClick={() => {
               this.state.activeIndex === originalRow

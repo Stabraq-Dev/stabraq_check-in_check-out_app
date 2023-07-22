@@ -1,4 +1,3 @@
-import React from 'react';
 import { Form, Field } from 'react-final-form';
 import { connect } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -6,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { checkForUserName } from '../functions/validation';
 import { doLogIn, doLogOut } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
-import Footer from './Footer';
 
 const AdminLogInForm = ({
   initialValues,
@@ -77,7 +75,10 @@ const AdminLogInForm = ({
         </button>
         <button
           className='ui red button'
-          onClick={() => doLogOut()}
+          onClick={() => {
+            doLogOut();
+            navigate('/dashboard');
+          }}
           type='submit'
         >
           Log out
@@ -121,7 +122,6 @@ const AdminLogInForm = ({
           </form>
         )}
       ></Form>
-      <Footer />
     </div>
   );
 };

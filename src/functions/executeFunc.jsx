@@ -3,7 +3,7 @@ import {
   calculateUserData,
   changeDateFormat,
   getData,
-} from '../functions/helperFunc';
+} from './helperFunc';
 import '../config';
 import qs from 'qs';
 import {
@@ -22,10 +22,10 @@ import {
   UPDATE_EDIT_CLIENT_RANGE,
 } from '../ranges';
 
-const SHEET_ID = process.env.REACT_APP_SHEET_ID;
-const AUTH_SHEET_ID = process.env.REACT_APP_AUTH_SHEET_ID;
+const SHEET_ID = import.meta.env.VITE_SHEET_ID;
+const AUTH_SHEET_ID = import.meta.env.VITE_AUTH_SHEET_ID;
 const GOOGLE_SERVICE_ACCOUNT_EMAIL =
-  process.env.REACT_APP_GOOGLE_SERVICE_ACCOUNT_EMAIL;
+import.meta.env.VITE_GOOGLE_SERVICE_ACCOUNT_EMAIL;
 
 export const executeValuesUpdate = async (val) => {
   try {
