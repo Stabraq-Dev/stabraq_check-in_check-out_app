@@ -151,9 +151,6 @@ export const doSetActiveSheetTitle = (activeSheetTitle) => {
 };
 
 export const searchMobileNumber = (mobile) => {
-  // if (history.location.pathname === '/preferences/main/user/check-in-out') {
-  //   history.push('/preferences/main/user');
-  // }
   return {
     type: SEARCH_BY_MOBILE,
     payload: mobile,
@@ -788,10 +785,6 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
 
   dispatch(submitType(ON_SEARCH_SUBMIT));
   dispatch(doClearPrevUserState());
-
-  // if (history.location.pathname === '/preferences/main/user/check-in-out') {
-  //   history.push('/preferences/main/user');
-  // }
 
   dispatch(doLoading(true));
   // Check to Add new Sheet for new day

@@ -1,4 +1,10 @@
-import { AUTHORIZED_USER, FROM_URL, SIGN_IN, SIGN_OUT, WRONG_USER_PASS } from '../actions/types';
+import {
+  AUTHORIZED_USER,
+  FROM_URL,
+  SIGN_IN,
+  SIGN_OUT,
+  WRONG_USER_PASS,
+} from '../actions/types';
 
 const INITIAL_STATE = {
   isSignedIn: null,
@@ -8,7 +14,6 @@ const INITIAL_STATE = {
   authorizedUser: null,
 };
 
-/* eslint import/no-anonymous-default-export: [2, {"allowArrowFunction": true}] */
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case SIGN_IN:

@@ -27,9 +27,10 @@ export const signOut = () => {
 };
 
 export const fromURL = () => {
+  const URL = window.location.pathname + window.location.search
   return {
     type: FROM_URL,
-    payload: window.location.pathname + window.location.search,
+    payload: URL,
   };
 };
 
@@ -67,12 +68,6 @@ export const doLogIn = (formValues) => async (dispatch, getState) => {
           userId: username,
         })
       );
-      // const { fromURL } = getState().auth;
-      // if (fromURL) {
-      //   history.push(fromURL);
-      // } else {
-      //   history.push('/preferences/main');
-      // }
       break;
     case 'FALSE':
       dispatch(wrongUserPass(true));
@@ -83,6 +78,7 @@ export const doLogIn = (formValues) => async (dispatch, getState) => {
   }
 
   dispatch(doLoading(false));
+  return isSignedIn
 };
 
 export const doCheckSignedIn = () => async (dispatch) => {
