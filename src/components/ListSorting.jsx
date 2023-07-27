@@ -1,4 +1,3 @@
-import { Component } from 'react';
 import { connect } from 'react-redux';
 import {
   doSortList,
@@ -8,39 +7,39 @@ import {
   doOrderSortClientsList,
 } from '../actions';
 
-export class ListSorting extends Component {
-  sortList = (event, index) => {
-    const { clientsList } = this.props;
-    this.props.doSortList(event.target.value, index);
-    this.props.doOrderList(true);
+const ListSorting = (props) => {
+  const sortList = (event, index) => {
+    const { clientsList } = props;
+    props.doSortList(event.target.value, index);
+    props.doOrderList(true);
     if (clientsList.length > 0) {
-      this.props.doSortClientsList(index);
+      props.doSortClientsList(index);
     }
   };
 
-  orderList = () => {
+  const orderList = () => {
     const {
       orderListAscending,
       activeUsersList,
       nonActiveUsersList,
       clientsList,
-    } = this.props;
+    } = props;
 
-    this.props.doOrderList(!orderListAscending);
+    props.doOrderList(!orderListAscending);
 
     if (orderListAscending) {
       if (activeUsersList.length > 0 || nonActiveUsersList.length > 0) {
-        this.props.doOrderSortActiveUsersList();
+        props.doOrderSortActiveUsersList();
       }
     }
     if (clientsList.length > 0) {
-      this.props.doOrderSortClientsList();
+      props.doOrderSortClientsList();
     }
   };
 
-  renderSortButtons = () => {
-    return this.props.buttons.map((active, index) => {
-      const { sortBy } = this.props.sortList;
+  const renderSortButtons = () => {
+    return props.buttons.map((active, index) => {
+      const { sortBy } = props.sortList;
       const { name, sortIndex, value } = active;
       const activeClass = sortBy === value ? 'bg-dark' : 'stabraq-bg';
       return (
@@ -49,7 +48,7 @@ export class ListSorting extends Component {
           className={`ui primary button ${activeClass} me-3 mt-1`}
           name={name}
           onClick={(e) => {
-            this.sortList(e, sortIndex);
+            sortList(e, sortIndex);
           }}
           type='submit'
           value={value}
@@ -60,8 +59,8 @@ export class ListSorting extends Component {
     });
   };
 
-  renderSortBar = () => {
-    const { orderListAscending } = this.props;
+  const renderSortBar = () => {
+    const { orderListAscending } = props;
     const orderClass = orderListAscending
       ? 'sort amount down'
       : 'sort amount up';
@@ -71,11 +70,11 @@ export class ListSorting extends Component {
     return (
       <div className='ui segment text-center'>
         <div className='text-start fw-bold'>Sort By</div>
-        {this.renderSortButtons()}
+        {renderSortButtons()}
         <button
           className={`ui primary button ${activeClass} me-3 mt-1`}
           name='ascending'
-          onClick={this.orderList}
+          onClick={orderList}
           type='submit'
           value='ascending'
         >
@@ -86,10 +85,8 @@ export class ListSorting extends Component {
     );
   };
 
-  render() {
-    return <div>{this.renderSortBar()}</div>;
-  }
-}
+  return <div>{renderSortBar()}</div>;
+};
 
 const mapStateToProps = (state) => {
   const {

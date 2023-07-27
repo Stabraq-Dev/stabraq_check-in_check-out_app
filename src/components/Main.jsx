@@ -34,6 +34,7 @@ const Main = (props) => {
     return () => {
       props.doReveal([]);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

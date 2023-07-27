@@ -1,4 +1,3 @@
-import { Component } from 'react';
 import { connect } from 'react-redux';
 
 import {
@@ -10,33 +9,33 @@ import LoadingSpinner from './LoadingSpinner';
 
 import ActiveSheet from './ActiveSheet';
 import { DATA_SHEET_ACTIVE_RANGE, DATA_SHEET_ACTIVE_TITLE } from '../ranges';
+import { useEffect } from 'react';
 
-export class Active extends Component {
-  componentDidMount() {
-    this.onStar();
-  }
+const Active = (props) => {
+  useEffect(() => {
+    onStar();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  onStar = async () => {
-    await this.props.doSetActiveSheetTitle({
+  const onStar = async () => {
+    await props.doSetActiveSheetTitle({
       title: DATA_SHEET_ACTIVE_TITLE,
       selectedMonth: '',
     });
-    await this.props.doGetAllCheckedInUsers(DATA_SHEET_ACTIVE_RANGE);
-    await this.props.doGetActiveUsersList();
+    await props.doGetAllCheckedInUsers(DATA_SHEET_ACTIVE_RANGE);
+    await props.doGetActiveUsersList();
   };
 
-  render() {
-    if (this.props.loading) {
-      return <LoadingSpinner />;
-    }
-
-    return (
-      <>
-        <ActiveSheet />
-      </>
-    );
+  if (props.loading) {
+    return <LoadingSpinner />;
   }
-}
+
+  return (
+    <>
+      <ActiveSheet />
+    </>
+  );
+};
 
 const mapStateToProps = (state) => {
   const { loading } = state.app;

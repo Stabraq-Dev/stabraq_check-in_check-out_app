@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
@@ -22,53 +22,67 @@ const buttons = [
   { name: 'sortByCheckInTime', sortIndex: 5, value: 'Check In Time' },
 ];
 
-export class ActiveSheet extends Component {
-  state = { totalCost: '', updateSort: false, timeNow: 0 };
+const ActiveSheet = (props) => {
+  const {
+    activeUsersList,
+    nonActiveUsersList,
+    activeSheetFilteredBy,
+    activeUsersListFiltered,
+    nonActiveUsersListFiltered,
+  } = props;
 
-  componentDidMount() {
-    this.setState({ totalCost: '' });
-    this.props.doSortList('Check In Time', 5);
-    this.tick();
-    this.interval = setInterval(() => this.tick(), 60000);
-  }
+  const [state, setState] = useState({
+    totalCost: '',
+    updateSort: false,
+    timeNow: 0,
+    interval: null,
+  });
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevProps.nonActiveUsersList !== this.props.nonActiveUsersList) {
-      this.setState({ totalCost: '' });
+  useEffect(() => {
+    setState({ ...state, totalCost: '' });
+    props.doSortList('Check In Time', 5);
+    setState({ ...state, interval: setInterval(() => tick(), 60000) });
+    tick();
+    return () => {
+      // props.doClearActiveUsersList();
+      props.doClearSorting();
+      clearInterval(state.interval);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    // if (nonActiveUsersList) {
+    //   setState({ ...state, totalCost: '' });
+    // }
+
+    // if (props.sortList.sortBy) {
+    //   setState({ ...state, updateSort: true });
+    // }
+
+    const { index } = props.sortList;
+    if (state.updateSort) {
+      props.doSortActiveUsersList(index);
     }
+  });
 
-    if (prevProps.sortList.sortBy !== this.props.sortList.sortBy) {
-      this.setState({ updateSort: true });
-    }
-
-    const { index } = this.props.sortList;
-    if (this.state.updateSort) {
-      this.props.doSortActiveUsersList(index);
-    }
-  }
-
-  componentWillUnmount() {
-    this.props.doClearActiveUsersList();
-    this.props.doClearSorting();
-    clearInterval(this.interval);
-  }
-
-  tick() {
+  function tick() {
     const localDate = new Date().toLocaleDateString('en-US');
     const localTime = new Date().toLocaleTimeString('en-US');
-    this.setState(() => ({
+    setState(() => ({
+      ...state,
       timeNow: Date.parse(`${localDate} ${localTime}`),
     }));
   }
 
-  renderFilterActiveUsers = () => {
-    const { activeUsersList, nonActiveUsersList } = this.props;
+  const renderFilterActiveUsers = () => {
+    const { activeUsersList, nonActiveUsersList } = props;
 
     if (activeUsersList.length > 0 || nonActiveUsersList.length > 0) {
       return <FilterByMembership />;
     }
   };
-  renderCountActiveUsers = ({ list, type }) => {
+  const renderCountActiveUsers = ({ list, type }) => {
     const usersText = list.length === 1 ? 'User' : 'Users';
     const bgColor =
       type === 'Active' ? 'active-bg-color' : 'non-active-bg-color';
@@ -82,8 +96,8 @@ export class ActiveSheet extends Component {
       );
   };
 
-  renderList = ({ list, type }) => {
-    const { activeSheetFilteredBy } = this.props;
+  const renderList = ({ list, type }) => {
+    const { activeSheetFilteredBy } = props;
     if (list.length === 0) {
       return (
         <div className='ui segment'>
@@ -111,7 +125,7 @@ export class ActiveSheet extends Component {
             return '';
         }
       };
-      const sortBy = this.props.sortList.sortBy;
+      const sortBy = props.sortList.sortBy;
       const membershipTextColor = getColor(active[3]);
       const rowColor =
         index % 2 === 0
@@ -124,7 +138,7 @@ export class ActiveSheet extends Component {
 
       const localDate = new Date().toLocaleDateString('en-US');
       const one = Date.parse(`${localDate} ${active[5]}`);
-      const two = this.state.timeNow;
+      const two = state.timeNow;
       const untilNow = (Math.abs(two - one) / 36e5).toFixed(1);
 
       const untilNowHM = new Date(two - one).toISOString().substring(11, 16);
@@ -168,8 +182,8 @@ export class ActiveSheet extends Component {
           </div>
           <div className='col d-flex align-items-center justify-content-end'>
             <div className='row'>
-              {this.renderEditClient(active[1])}
-              {this.renderSearch(active[1])}
+              {renderEditClient(active[1])}
+              {renderSearch(active[1])}
             </div>
           </div>
         </div>
@@ -177,7 +191,7 @@ export class ActiveSheet extends Component {
     });
   };
 
-  renderSearch(mobile) {
+  const renderSearch = (mobile) => {
     return (
       <div className='col d-flex align-items-center justify-content-end my-1'>
         <Link
@@ -188,8 +202,8 @@ export class ActiveSheet extends Component {
         </Link>
       </div>
     );
-  }
-  renderEditClient(mobile) {
+  };
+  const renderEditClient = (mobile) => {
     return (
       <div className='col d-flex align-items-center justify-content-end my-1'>
         <Link
@@ -200,17 +214,17 @@ export class ActiveSheet extends Component {
         </Link>
       </div>
     );
-  }
-
-  onGetTotalCost = async () => {
-    const workSheetId = this.props.activeSheetTitle.selectedMonth;
-    const range = VAR_SHEET_TOTAL_COST_RANGE(this.props.activeSheetTitle.title);
-    const totalCost = await getWorkBookWorkSheetValues(workSheetId, range);
-    this.setState({ totalCost: totalCost[0][0] });
   };
 
-  renderActiveSortBar = () => {
-    const { activeUsersList, activeSheetFilteredBy } = this.props;
+  const onGetTotalCost = async () => {
+    const workSheetId = props.activeSheetTitle.selectedMonth;
+    const range = VAR_SHEET_TOTAL_COST_RANGE(props.activeSheetTitle.title);
+    const totalCost = await getWorkBookWorkSheetValues(workSheetId, range);
+    setState({ ...state, totalCost: totalCost[0][0] });
+  };
+
+  const renderActiveSortBar = () => {
+    const { activeUsersList, activeSheetFilteredBy } = props;
 
     if (activeUsersList.length > 0 && !activeSheetFilteredBy.filterBy)
       return (
@@ -220,7 +234,7 @@ export class ActiveSheet extends Component {
       );
   };
 
-  renderNonActiveSortBar = () => {
+  const renderNonActiveSortBar = () => {
     const nonActiveButtons = [
       ...buttons,
       {
@@ -230,7 +244,7 @@ export class ActiveSheet extends Component {
       },
     ];
 
-    const { nonActiveUsersList, activeSheetFilteredBy } = this.props;
+    const { nonActiveUsersList, activeSheetFilteredBy } = props;
 
     if (nonActiveUsersList.length > 0 && !activeSheetFilteredBy.filterBy)
       return (
@@ -240,8 +254,8 @@ export class ActiveSheet extends Component {
       );
   };
 
-  renderGetTotalCostButtons = () => {
-    const { nonActiveUsersList } = this.props;
+  const renderGetTotalCostButtons = () => {
+    const { nonActiveUsersList } = props;
 
     if (nonActiveUsersList.length > 0)
       return (
@@ -249,62 +263,51 @@ export class ActiveSheet extends Component {
           <button
             className={`ui primary button mt-1`}
             name='getTotalCost'
-            onClick={this.onGetTotalCost}
+            onClick={onGetTotalCost}
             type='submit'
             value='GET_TOTAL_COST'
           >
             Get Total Cost
           </button>
-          {this.renderTotalCost()}
+          {renderTotalCost()}
         </div>
       );
   };
 
-  renderTotalCost = () => {
-    if (this.state.totalCost)
+  const renderTotalCost = () => {
+    if (state.totalCost)
       return (
-        <div className='description'>
-          Total Cost: {this.state.totalCost} EGP
-        </div>
+        <div className='description'>Total Cost: {state.totalCost} EGP</div>
       );
   };
 
-  render() {
-    const {
-      activeUsersList,
-      nonActiveUsersList,
-      activeSheetFilteredBy,
-      activeUsersListFiltered,
-      nonActiveUsersListFiltered,
-    } = this.props;
-    const finalActiveList = activeSheetFilteredBy.filterBy
-      ? activeUsersListFiltered
-      : activeUsersList;
-    const finalNonActiveList = activeSheetFilteredBy.filterBy
-      ? nonActiveUsersListFiltered
-      : nonActiveUsersList;
+  const finalActiveList = activeSheetFilteredBy.filterBy
+    ? activeUsersListFiltered
+    : activeUsersList;
+  const finalNonActiveList = activeSheetFilteredBy.filterBy
+    ? nonActiveUsersListFiltered
+    : nonActiveUsersList;
 
-    const activeProps = { list: finalActiveList, type: 'Active' };
-    const nonActiveProps = { list: finalNonActiveList, type: 'Non-Active' };
+  const activeProps = { list: finalActiveList, type: 'Active' };
+  const nonActiveProps = { list: finalNonActiveList, type: 'Non-Active' };
 
-    if (this.props.loading) {
-      return <LoadingSpinner />;
-    }
-
-    return (
-      <>
-        {this.renderFilterActiveUsers()}
-        {this.renderCountActiveUsers(activeProps)}
-        {this.renderActiveSortBar()}
-        <div className='ui celled list'>{this.renderList(activeProps)}</div>
-        {this.renderCountActiveUsers(nonActiveProps)}
-        {this.renderNonActiveSortBar()}
-        <div className='ui celled list'>{this.renderList(nonActiveProps)}</div>
-        {this.renderGetTotalCostButtons()}
-      </>
-    );
+  if (props.loading) {
+    return <LoadingSpinner />;
   }
-}
+
+  return (
+    <>
+      {renderFilterActiveUsers()}
+      {renderCountActiveUsers(activeProps)}
+      {renderActiveSortBar()}
+      <div className='ui celled list'>{renderList(activeProps)}</div>
+      {renderCountActiveUsers(nonActiveProps)}
+      {renderNonActiveSortBar()}
+      <div className='ui celled list'>{renderList(nonActiveProps)}</div>
+      {renderGetTotalCostButtons()}
+    </>
+  );
+};
 
 const mapStateToProps = (state) => {
   const { loading } = state.app;

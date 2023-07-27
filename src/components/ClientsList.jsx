@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 
@@ -25,71 +25,77 @@ const buttons = [
   { name: 'sortByGender', sortIndex: 12, value: 'Gender' },
 ];
 
-export class ClientsList extends Component {
-  state = { activeIndex: null, currentPage: 1, clientsPerPage: 100 };
-  componentDidMount() {
-    this.mobile = new URLSearchParams(window.location.search).get('mobile');
-    this.btnRef = React.createRef();
-    this.onStart();
-    this.props.doSortList('Sheet', 999);
-  }
+export const ClientsList = (props) => {
+  const [mobile, setMobile] = useState('');
+  const [activeIndex, setActiveIndex] = useState();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [clientsPerPage, setClientsPerPage] = useState(100);
+  const btnRef = useRef(0);
+  const refs = useRef([]);
 
-  componentDidUpdate(prevProps) {
-    if (this.btnRef.current !== null) {
-      window.addEventListener('scroll', this.handleScroll);
+  useEffect(() => {
+    const mobileURL = new URLSearchParams(window.location.search).get('mobile');
+    setMobile(mobileURL);
+    props.doSortList('Sheet', 999);
+
+    if (btnRef.current !== null) {
+      window.addEventListener('scroll', handleScroll);
     }
+    // setActiveIndex(null);
+    // setCurrentPage(1);
 
-    if (
-      prevProps.clientsListFiltered.length !==
-        this.props.clientsListFiltered.length ||
-      prevProps.sortList.sortBy !== this.props.sortList.sortBy ||
-      prevProps.orderListAscending !== this.props.orderListAscending
-    ) {
-      this.setState({ activeIndex: null, currentPage: 1 });
+    onStart();
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      props.doClearSorting();
+      props.doClearClientsList();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useLayoutEffect(() => {
+    if (mobile) {
+      onScroll();
     }
-  }
+  });
 
-  componentWillUnmount() {
-    window.removeEventListener('scroll', this.handleScroll);
-    this.props.doClearSorting();
-    this.props.doClearClientsList();
-  }
-
-  handleScroll = () => {
-    const btn = this.btnRef.current;
-    document.body.scrollTop > 400 || document.documentElement.scrollTop > 400
-      ? (btn.style.display = 'block')
-      : (btn.style.display = 'none');
+  const handleScroll = () => {
+    const btn = btnRef.current;
+    if (btn) {
+      document.body.scrollTop > 400 || document.documentElement.scrollTop > 400
+        ? (btn.style.display = 'block')
+        : (btn.style.display = 'none');
+    }
   };
 
-  onStart = async () => {
-    await this.props.doGetClientsList();
-    await this.props.doSortClientsList(999);
-    if (this.mobile) {
-      await this.onScroll();
-    }
+  const onStart = async () => {
+    await props.doGetClientsList();
+    await props.doSortClientsList(999);
   };
 
-  onScroll = async () => {
-    await this.props.doGetClientsList();
-    const { clientsList } = this.props;
-    const userIndex = clientsList.findIndex((x) => x[0] === this.mobile);
-    const userCurrentPage = Math.ceil(userIndex / this.state.clientsPerPage);
-    this.setState({ activeIndex: userIndex + 3, currentPage: userCurrentPage });
+  const onScroll = async () => {
+    // await props.doGetClientsList();
+    const { clientsList } = props;
+    const userIndex = clientsList.findIndex((x) => x[0] === mobile);
+    const userCurrentPage = Math.ceil(userIndex / clientsPerPage);
 
-    this.ref[this.mobile].current.scrollIntoView({
+    setActiveIndex(userIndex + 3);
+    setCurrentPage(userCurrentPage);
+
+    refs.current[mobile]?.scrollIntoView({
       behavior: 'smooth',
       block: 'center',
     });
   };
 
-  getOriginalRow = (mobile) => {
-    const { clientsList } = this.props;
+  const getOriginalRow = (mobile) => {
+    const { clientsList } = props;
     const row = clientsList.findIndex((x) => x[0] === mobile) + 3;
     return row;
   };
 
-  onGotoTopBtn = () => {
+  const onGotoTopBtn = () => {
     document.body.scrollIntoView({
       behavior: 'smooth',
       block: 'start',
@@ -100,13 +106,7 @@ export class ClientsList extends Component {
     });
   };
 
-  renderList = (list) => {
-    const { clientsList } = this.props;
-    this.ref = clientsList.reduce((acc, value) => {
-      acc[value[0]] = React.createRef();
-      return acc;
-    }, {});
-
+  const renderList = (list) => {
     return list.map((active, index) => {
       const getColor = (value) => {
         switch (value) {
@@ -126,22 +126,23 @@ export class ClientsList extends Component {
         }
       };
 
-      const originalRow = this.getOriginalRow(active[0]);
+      const originalRow = getOriginalRow(active[0]);
       const membershipTextColor = getColor(active[3]);
       const rowColor = originalRow % 2 === 0 ? 'row-color' : '';
-      const activeClass =
-        this.state.activeIndex === originalRow ? 'active' : '';
+      const activeClass = activeIndex === originalRow ? 'active' : '';
       const genderClass = active[12] === 'Male' ? 'user' : 'user outline';
 
       return (
-        <React.Fragment key={index}>
+        <div key={index}>
           <div
-            ref={this.ref[active[0]]}
+            ref={(element) => {
+              refs.current[active[0]] = element;
+            }}
             className={`title ${activeClass} ${rowColor}`}
             onClick={() => {
-              this.state.activeIndex === originalRow
-                ? this.setState({ activeIndex: null })
-                : this.setState({ activeIndex: originalRow });
+              activeIndex === originalRow
+                ? setActiveIndex(null)
+                : setActiveIndex(originalRow);
             }}
           >
             <i className='dropdown icon'></i>
@@ -198,35 +199,35 @@ export class ClientsList extends Component {
                   <div className='description'>Gender: {active[12]}</div>
                   <div className='description'>Offers: {active[13]}</div>
                 </div>
-                {this.renderEdit(originalRow, active)}
-                {this.renderQRCodeButton(active[0])}
-                {this.renderSearch(active[0])}
+                {renderEdit(originalRow, active)}
+                {renderQRCodeButton(active[0])}
+                {renderSearch(active[0])}
               </div>
             </div>
           </div>
-        </React.Fragment>
+        </div>
       );
     });
   };
 
-  renderEdit(row, active) {
+  const renderEdit = (row, active) => {
     return (
       <div className='right floated content'>
         <Link
           to={`/preferences/main/edit-client/?row=${row}`}
           className='ui button primary'
           onClick={() => {
-            this.props.setClientStateToEdit(active);
-            this.props.fromURL();
+            props.setClientStateToEdit(active);
+            props.fromURL();
           }}
         >
           Edit
         </Link>
       </div>
     );
-  }
+  };
 
-  renderSearch(mobile) {
+  const renderSearch = (mobile) => {
     return (
       <div className='right floated content'>
         <Link
@@ -237,8 +238,8 @@ export class ClientsList extends Component {
         </Link>
       </div>
     );
-  }
-  renderQRCodeButton(mobile) {
+  };
+  const renderQRCodeButton = (mobile) => {
     return (
       <div className='right floated content'>
         <Link
@@ -249,10 +250,10 @@ export class ClientsList extends Component {
         </Link>
       </div>
     );
-  }
+  };
 
-  renderListCount() {
-    const { clientsList, clientsListFiltered } = this.props;
+  const renderListCount = () => {
+    const { clientsList, clientsListFiltered } = props;
     const usersText = clientsListFiltered.length <= 1 ? 'User' : 'Users';
     const filteredText =
       clientsList.length === clientsListFiltered.length ? ' ' : ' Filtered ';
@@ -267,12 +268,12 @@ export class ClientsList extends Component {
         </div>
       </div>
     );
-  }
+  };
 
-  renderPaginationBar(finalClientsList) {
+  const renderPaginationBar = (finalClientsList) => {
     // Change page
     const paginate = (pageNumber) => {
-      this.setState({ currentPage: pageNumber });
+      setCurrentPage(pageNumber);
       setTimeout(() => {
         window.scrollTo(0, document.body.scrollHeight);
       }, 1);
@@ -281,60 +282,57 @@ export class ClientsList extends Component {
       <div className={`ui segment center aligned active-bg-color`}>
         <div className='ui center aligned header'>
           <Pagination
-            clientsPerPage={this.state.clientsPerPage}
+            clientsPerPage={clientsPerPage}
             totalClients={finalClientsList.length}
             paginate={paginate}
-            currentPage={this.state.currentPage}
+            currentPage={currentPage}
           />
         </div>
       </div>
     );
+  };
+
+  if (props.loading) {
+    return <LoadingSpinner />;
   }
+  const { clientsList, clientsListFiltered, clientsListSorted } = props;
 
-  render() {
-    if (this.props.loading) {
-      return <LoadingSpinner />;
-    }
-    const { clientsList, clientsListFiltered, clientsListSorted } = this.props;
+  const finalClientsList =
+    clientsListFiltered.length !== clientsList.length
+      ? clientsListFiltered
+      : clientsListSorted.length > 0
+      ? clientsListSorted
+      : clientsList;
+  // Get current clients
+  const indexOfLastClient = currentPage * clientsPerPage;
+  const indexOfFirstClient = indexOfLastClient - clientsPerPage;
+  const finalClientsListPage = finalClientsList.slice(
+    indexOfFirstClient,
+    indexOfLastClient
+  );
 
-    const finalClientsList =
-      clientsListFiltered.length !== clientsList.length
-        ? clientsListFiltered
-        : clientsListSorted.length > 0
-        ? clientsListSorted
-        : clientsList;
-    // Get current clients
-    const indexOfLastClient =
-      this.state.currentPage * this.state.clientsPerPage;
-    const indexOfFirstClient = indexOfLastClient - this.state.clientsPerPage;
-    const finalClientsListPage = finalClientsList.slice(
-      indexOfFirstClient,
-      indexOfLastClient
-    );
-
-    return (
-      <>
-        <div className='ui styled fluid accordion mb-3'>
-          <div className='ui segment'>
-            <ListSorting buttons={buttons} />
-            <FilterClientsBy />
-          </div>
-          {this.renderListCount()}
-          {this.renderList(finalClientsListPage)}
-          <button
-            ref={this.btnRef}
-            onClick={this.onGotoTopBtn}
-            className='goToTopBtn'
-            data-tip='Go to top'
-          >
-            Top
-          </button>
+  return (
+    <>
+      <div className='ui styled fluid accordion mb-3'>
+        <div className='ui segment'>
+          <ListSorting buttons={buttons} />
+          <FilterClientsBy />
         </div>
-        {this.renderPaginationBar(finalClientsList)}
-      </>
-    );
-  }
-}
+        {renderListCount()}
+        {renderList(finalClientsListPage)}
+        <button
+          ref={btnRef}
+          onClick={onGotoTopBtn}
+          className='goToTopBtn'
+          data-tip='Go to top'
+        >
+          Top
+        </button>
+      </div>
+      {renderPaginationBar(finalClientsList)}
+    </>
+  );
+};
 
 const mapStateToProps = (state) => {
   const { loading } = state.app;

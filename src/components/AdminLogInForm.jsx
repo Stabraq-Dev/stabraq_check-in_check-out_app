@@ -11,6 +11,7 @@ const AdminLogInForm = ({
   loading,
   wrongUserPass,
   isSignedIn,
+  fromURL,
   doLogIn,
   doLogOut,
 }) => {
@@ -58,8 +59,16 @@ const AdminLogInForm = ({
     }
   };
 
-  const onSubmit = (formValues) => {
-    doLogIn(formValues);
+  const onSubmit = async (formValues) => {
+    const signedIn = await doLogIn(formValues);
+
+    if (signedIn[0] === 'TRUE') {
+      if (fromURL) {
+        navigate(fromURL);
+      } else {
+        navigate('/preferences/main');
+      }
+    }
   };
 
   if (isSignedIn) {
@@ -127,12 +136,13 @@ const AdminLogInForm = ({
 };
 
 const mapStateToProps = (state) => {
-  const { isSignedIn, wrongUserPass } = state.auth;
+  const { isSignedIn, wrongUserPass, fromURL } = state.auth;
   const { loading } = state.app;
   return {
     loading,
     wrongUserPass,
     isSignedIn,
+    fromURL,
   };
 };
 

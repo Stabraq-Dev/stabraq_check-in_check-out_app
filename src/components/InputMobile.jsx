@@ -1,8 +1,6 @@
-import React, { Component } from 'react';
-
-export class InputMobile extends Component {
-  renderError = () => {
-    const error = this.props.errorMessage;
+const InputMobile = (props) => {
+  const renderError = () => {
+    const error = props.errorMessage;
 
     if (error) {
       return (
@@ -13,29 +11,27 @@ export class InputMobile extends Component {
     }
   };
 
-  render() {
-    const { value, label, icon, onFormChange, errorMessage } = this.props;
-    const className = `field ${errorMessage ? 'error' : ''}`;
-    return (
-      <div className={className}>
-        <label>
-          <i className={`${icon} icon`} />
-          {label}
-        </label>
-        <input
-          type='tel'
-          name='mobile'
-          value={value}
-          onChange={onFormChange}
-          onBlur={onFormChange}
-          maxLength={11}
-          placeholder='01xxxxxxxxx'
-          autoComplete='off'
-        />
-        {this.renderError()}
-      </div>
-    );
-  }
-}
+  const { value, label, icon, onFormChange, errorMessage } = props;
+  const className = `field ${errorMessage ? 'error' : ''}`;
+  return (
+    <div className={className}>
+      <label>
+        <i className={`${icon} icon`} />
+        {label}
+      </label>
+      <input
+        type='tel'
+        name='mobile'
+        value={value}
+        onChange={onFormChange}
+        onBlur={onFormChange}
+        maxLength={11}
+        placeholder='01xxxxxxxxx'
+        autoComplete='off'
+      />
+      {renderError()}
+    </div>
+  );
+};
 
 export default InputMobile;
