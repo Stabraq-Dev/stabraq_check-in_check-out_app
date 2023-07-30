@@ -33,7 +33,6 @@ const ActiveSheet = (props) => {
 
   const [state, setState] = useState({
     totalCost: '',
-    updateSort: false,
     timeNow: 0,
     interval: null,
   });
@@ -50,21 +49,6 @@ const ActiveSheet = (props) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => {
-    // if (nonActiveUsersList) {
-    //   setState({ ...state, totalCost: '' });
-    // }
-
-    // if (props.sortList.sortBy) {
-    //   setState({ ...state, updateSort: true });
-    // }
-
-    const { index } = props.sortList;
-    if (state.updateSort) {
-      props.doSortActiveUsersList(index);
-    }
-  });
 
   function tick() {
     const localDate = new Date().toLocaleDateString('en-US');
