@@ -5,15 +5,19 @@ import {
   doOrderSortActiveUsersList,
   doSortClientsList,
   doOrderSortClientsList,
+  doSortActiveUsersList,
 } from '../actions';
 
 const ListSorting = (props) => {
   const sortList = (event, index) => {
-    const { clientsList } = props;
+    const { clientsList, activeUsersList, nonActiveUsersList } = props;
     props.doSortList(event.target.value, index);
     props.doOrderList(true);
     if (clientsList.length > 0) {
       props.doSortClientsList(index);
+    }
+    if (activeUsersList.length > 0 || nonActiveUsersList.length > 0) {
+      props.doSortActiveUsersList(index);
     }
   };
 
@@ -27,10 +31,8 @@ const ListSorting = (props) => {
 
     props.doOrderList(!orderListAscending);
 
-    if (orderListAscending) {
-      if (activeUsersList.length > 0 || nonActiveUsersList.length > 0) {
-        props.doOrderSortActiveUsersList();
-      }
+    if (activeUsersList.length > 0 || nonActiveUsersList.length > 0) {
+      props.doOrderSortActiveUsersList();
     }
     if (clientsList.length > 0) {
       props.doOrderSortClientsList();
@@ -111,4 +113,5 @@ export default connect(mapStateToProps, {
   doOrderSortActiveUsersList,
   doSortClientsList,
   doOrderSortClientsList,
+  doSortActiveUsersList,
 })(ListSorting);
