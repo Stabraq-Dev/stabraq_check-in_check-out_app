@@ -23,7 +23,7 @@ function Preferences() {
       <button
         className='ui primary button stabraq-bg'
         onClick={() => {
-          dispatch(doRedirectToSignIn);
+          dispatch(doRedirectToSignIn());
           navigate('/dashboard');
         }}
         type='submit'

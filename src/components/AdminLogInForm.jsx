@@ -58,7 +58,7 @@ const AdminLogInForm = ({ initialValues }) => {
   };
 
   const onSubmit = async (formValues) => {
-    const signedIn = dispatch(doLogIn(formValues));
+    const signedIn = await dispatch(doLogIn(formValues));
 
     if (signedIn[0] === 'TRUE') {
       if (fromURL) {
