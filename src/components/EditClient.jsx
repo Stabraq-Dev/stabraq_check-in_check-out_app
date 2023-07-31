@@ -1,28 +1,13 @@
 import React, { useEffect } from 'react';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { doGetSingleClient } from '../actions';
 import EditClientForm from './EditClientForm';
 
-const EditClient = (props) => {
+const EditClient = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const row = new URLSearchParams(location.search).get('row');
-
-  useEffect(() => {
-    // http://localhost:3000/preferences/main/edit-client/?row=3
-    // https://stabraq-logbook.netlify.app/preferences/main/edit-client/?row=3
-
-    if (
-      props.fromURL === null &&
-      props.fromURL !== '/preferences/main/clients-list'
-    ) {
-      // props.doGetSingleClient(row);
-      navigate('/preferences/main/clients-list');
-    }
-  });
-
+  const { fromURL } = useSelector((state) => state.auth);
   const {
     mobileNumber,
     userName,
@@ -38,7 +23,19 @@ const EditClient = (props) => {
     rating,
     gender,
     offers,
-  } = props;
+  } = useSelector((state) => state.user.clientStateToEdit);
+
+  const row = new URLSearchParams(location.search).get('row');
+
+  useEffect(() => {
+    // http://localhost:3000/preferences/main/edit-client/?row=3
+    // https://stabraq-logbook.netlify.app/preferences/main/edit-client/?row=3
+
+    if (fromURL === null && fromURL !== '/preferences/main/clients-list') {
+      navigate('/preferences/main/clients-list');
+    }
+  });
+
   return (
     <div className='ui segment'>
       <EditClientForm
@@ -64,43 +61,4 @@ const EditClient = (props) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  const { loading } = state.app;
-  const { fromURL } = state.auth;
-  const {
-    mobileNumber,
-    userName,
-    eMailAddress,
-    membership,
-    expiryDate,
-    remainDays,
-    hoursPackage,
-    registrationDateTime,
-    remainingHours,
-    remainingOfTenDays,
-    invitations,
-    rating,
-    gender,
-    offers,
-  } = state.user.clientStateToEdit;
-  return {
-    loading,
-    mobileNumber,
-    userName,
-    eMailAddress,
-    membership,
-    expiryDate,
-    remainDays,
-    hoursPackage,
-    registrationDateTime,
-    remainingHours,
-    remainingOfTenDays,
-    invitations,
-    rating,
-    gender,
-    offers,
-    fromURL,
-  };
-};
-
-export default connect(mapStateToProps, { doGetSingleClient })(EditClient);
+export default EditClient;

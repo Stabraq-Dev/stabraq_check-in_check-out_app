@@ -25,10 +25,9 @@ const INITIAL_STATE = {
   showMyModal: false,
   submitType: '',
   error: '',
-  pickedDate: new Date(),
+  pickedDate: new Date().toLocaleString(),
 };
 
-/* eslint import/no-anonymous-default-export: [2, {"allowArrowFunction": true}] */
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case SHRINK_LOGO:

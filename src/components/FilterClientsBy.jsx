@@ -1,36 +1,43 @@
 import React, { useState } from 'react';
-import { Form, Field } from 'react-final-form';
-import { connect } from 'react-redux';
-import { doFilterClientsList } from '../actions';
-import { renderInput } from './react-final-form/renderInput';
+import { useDispatch } from 'react-redux';
+import { doFilterClientsList, doFilterClientsListValue } from '../actions';
 
-const FilterClientsBy = ({ doFilterClientsList }) => {
+const FilterClientsBy = () => {
+  const dispatch = useDispatch();
   const [filterBy, setFilterBy] = useState('Name');
+  const [filterValue, setFilterValue] = useState('');
 
   const filterIndex = filterBy === 'Name' ? 1 : 0;
   const placeholder = filterBy === 'Name' ? 'arabic / english' : '01xxxxxxxx';
   const maxLength = filterBy === 'Mobile' ? 11 : '';
 
-  const onSubmit = async (formValues) => {
-    const formValuesToFilter =
-      filterBy === 'Name' ? formValues.name : formValues.mobile;
+  const onChange = (e) => {
+    const formValuesToFilter = e.target.value;
+    setFilterValue(formValuesToFilter);
+    dispatch(doFilterClientsListValue(formValuesToFilter))
     if (formValuesToFilter === undefined) {
-      await doFilterClientsList(filterIndex, '', '');
+      dispatch(doFilterClientsList(filterIndex, '', ''));
+    } else if (formValuesToFilter === '') {
+      dispatch(doFilterClientsList('', 'CLEAR_FILTER', ''));
     } else {
-      await doFilterClientsList(filterIndex, formValuesToFilter, filterBy);
+      dispatch(doFilterClientsList(filterIndex, formValuesToFilter, filterBy));
     }
   };
+  const onClickResetFilter = () => {
+    setFilterValue('');
+    dispatch(doFilterClientsListValue(''))
+    dispatch(doFilterClientsList('', 'CLEAR_FILTER', ''));
+  };
 
-  const renderFilterBar = (form, submitting, pristine) => {
+  const renderFilterBar = () => {
     return (
       <div className='text-center'>
         <div className='text-center'>
-          {renderFilterButtons(form)}
+          {renderFilterButtons()}
           <button
             className={`ui primary button me-3 mt-1`}
             type='button'
-            onClick={form.reset}
-            disabled={submitting || pristine}
+            onClick={onClickResetFilter}
           >
             Reset Filter
           </button>
@@ -39,7 +46,7 @@ const FilterClientsBy = ({ doFilterClientsList }) => {
     );
   };
 
-  const renderFilterButtons = (form) => {
+  const renderFilterButtons = () => {
     const buttons = [
       { name: 'filterByName', filterMapIndex: 1, value: 'Name' },
       { name: 'filterByMobile', filterMapIndex: 0, value: 'Mobile' },
@@ -55,7 +62,7 @@ const FilterClientsBy = ({ doFilterClientsList }) => {
           name={name}
           onClick={(e) => {
             setFilterBy(e.target.value);
-            form.reset();
+            onClickResetFilter()
           }}
           type='submit'
           value={value}
@@ -67,28 +74,20 @@ const FilterClientsBy = ({ doFilterClientsList }) => {
   };
 
   return (
-    <Form
-      initialValues={{ name: '', mobile: '' }}
-      onSubmit={onSubmit /* NOT USED, but required */}
-      validate={(formValues) => {
-        setTimeout(() => onSubmit(formValues), 100);
-      }}
-      render={({ handleSubmit, form, submitting, pristine }) => (
-        <form onSubmit={handleSubmit} className='ui form segment error'>
-          {renderFilterBar(form, submitting, pristine)}
-          <Field
-            name={filterBy.toLowerCase()}
-            component={renderInput}
-            label={`Filter by ${filterBy}`}
-            maxLength={maxLength}
-            placeholder={placeholder}
-          ></Field>
-        </form>
-      )}
-    ></Form>
+    <>
+      {renderFilterBar()}
+      <div className='ui form segment error'>
+        <input
+          name={filterBy.toLowerCase()}
+          label={`Filter by ${filterBy}`}
+          maxLength={maxLength}
+          placeholder={placeholder}
+          onChange={onChange}
+          value={filterValue}
+        ></input>
+      </div>
+    </>
   );
 };
 
-export default connect(null, {
-  doFilterClientsList,
-})(FilterClientsBy);
+export default FilterClientsBy;

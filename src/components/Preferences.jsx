@@ -1,14 +1,16 @@
 import { useNavigate, Outlet } from 'react-router-dom';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { doRedirectToSignIn } from '../actions';
 import MyModalUser from './MyModalUser';
 
-function Preferences({ isSignedIn, doRedirectToSignIn }) {
+function Preferences() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { isSignedIn } = useSelector((state) => state.auth);
   if (isSignedIn) {
     return (
       <>
-        <Outlet/>
+        <Outlet />
         <MyModalUser />
       </>
     );
@@ -21,8 +23,8 @@ function Preferences({ isSignedIn, doRedirectToSignIn }) {
       <button
         className='ui primary button stabraq-bg'
         onClick={() => {
-          doRedirectToSignIn;
-          navigate('/dashboard')
+          dispatch(doRedirectToSignIn);
+          navigate('/dashboard');
         }}
         type='submit'
       >
@@ -33,11 +35,4 @@ function Preferences({ isSignedIn, doRedirectToSignIn }) {
   );
 }
 
-const mapStateToProps = (state) => {
-  const { isSignedIn } = state.auth;
-  return {
-    isSignedIn,
-  };
-};
-
-export default connect(mapStateToProps, { doRedirectToSignIn })(Preferences);
+export default Preferences;

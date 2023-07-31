@@ -21,11 +21,12 @@ import Footer from './Footer';
 import ActiveHistory from './ActiveHistory';
 
 import { doCheckSignedIn } from '../actions/index';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import MyAlert from './MyAlert';
 import { loadAuth } from '../api/auth';
 
-const App = ({ doCheckSignedIn }) => {
+const App = () => {
+  const dispatch = useDispatch();
   const [online, setOnline] = useState(true);
   const [downlink, setDownlink] = useState(0);
   useEffect(() => {
@@ -37,7 +38,7 @@ const App = ({ doCheckSignedIn }) => {
 
   const load = async () => {
     await axiosAuth(import.meta.env.VITE_SHEET_ID);
-    await doCheckSignedIn();
+    await dispatch(doCheckSignedIn());
     await loadAuth();
   };
 
@@ -105,4 +106,4 @@ const App = ({ doCheckSignedIn }) => {
   );
 };
 
-export default connect(null, { doCheckSignedIn })(App);
+export default App;

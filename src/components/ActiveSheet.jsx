@@ -1,15 +1,8 @@
 import { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import {
-  doOrderSortActiveUsersList,
-  doSortActiveUsersList,
-  doSortList,
-  doOrderList,
-  doClearActiveUsersList,
-  doClearSorting,
-} from '../actions';
+import { doSortList, doClearActiveUsersList, doClearSorting } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
 import { getWorkBookWorkSheetValues } from '../functions/executeFunc';
 import { VAR_SHEET_TOTAL_COST_RANGE } from '../ranges';
@@ -22,15 +15,18 @@ const buttons = [
   { name: 'sortByCheckInTime', sortIndex: 5, value: 'Check In Time' },
 ];
 
-const ActiveSheet = (props) => {
+const ActiveSheet = () => {
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.app);
   const {
     activeUsersList,
     nonActiveUsersList,
     activeSheetFilteredBy,
+    sortList,
+    activeSheetTitle,
     activeUsersListFiltered,
     nonActiveUsersListFiltered,
-  } = props;
-
+  } = useSelector((state) => state.user);
   const [state, setState] = useState({
     totalCost: '',
     timeNow: 0,
@@ -39,12 +35,12 @@ const ActiveSheet = (props) => {
 
   useEffect(() => {
     setState({ ...state, totalCost: '' });
-    props.doSortList('Check In Time', 5);
+    dispatch(doSortList('Check In Time', 5));
     setState({ ...state, interval: setInterval(() => tick(), 60000) });
     tick();
     return () => {
-      // props.doClearActiveUsersList();
-      props.doClearSorting();
+      // dispatch(doClearActiveUsersList());
+      dispatch(doClearSorting());
       clearInterval(state.interval);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -60,8 +56,6 @@ const ActiveSheet = (props) => {
   }
 
   const renderFilterActiveUsers = () => {
-    const { activeUsersList, nonActiveUsersList } = props;
-
     if (activeUsersList.length > 0 || nonActiveUsersList.length > 0) {
       return <FilterByMembership />;
     }
@@ -81,7 +75,6 @@ const ActiveSheet = (props) => {
   };
 
   const renderList = ({ list, type }) => {
-    const { activeSheetFilteredBy } = props;
     if (list.length === 0) {
       return (
         <div className='ui segment'>
@@ -109,7 +102,7 @@ const ActiveSheet = (props) => {
             return '';
         }
       };
-      const sortBy = props.sortList.sortBy;
+      const sortBy = sortList.sortBy;
       const membershipTextColor = getColor(active[3]);
       const rowColor =
         index % 2 === 0
@@ -201,15 +194,13 @@ const ActiveSheet = (props) => {
   };
 
   const onGetTotalCost = async () => {
-    const workSheetId = props.activeSheetTitle.selectedMonth;
-    const range = VAR_SHEET_TOTAL_COST_RANGE(props.activeSheetTitle.title);
+    const workSheetId = activeSheetTitle.selectedMonth;
+    const range = VAR_SHEET_TOTAL_COST_RANGE(activeSheetTitle.title);
     const totalCost = await getWorkBookWorkSheetValues(workSheetId, range);
     setState({ ...state, totalCost: totalCost[0][0] });
   };
 
   const renderActiveSortBar = () => {
-    const { activeUsersList, activeSheetFilteredBy } = props;
-
     if (activeUsersList.length > 0 && !activeSheetFilteredBy.filterBy)
       return (
         <div className='ui segment text-center'>
@@ -228,8 +219,6 @@ const ActiveSheet = (props) => {
       },
     ];
 
-    const { nonActiveUsersList, activeSheetFilteredBy } = props;
-
     if (nonActiveUsersList.length > 0 && !activeSheetFilteredBy.filterBy)
       return (
         <div className='ui segment text-center'>
@@ -239,8 +228,6 @@ const ActiveSheet = (props) => {
   };
 
   const renderGetTotalCostButtons = () => {
-    const { nonActiveUsersList } = props;
-
     if (nonActiveUsersList.length > 0)
       return (
         <div className='ui segment text-center'>
@@ -275,7 +262,7 @@ const ActiveSheet = (props) => {
   const activeProps = { list: finalActiveList, type: 'Active' };
   const nonActiveProps = { list: finalNonActiveList, type: 'Non-Active' };
 
-  if (props.loading) {
+  if (loading) {
     return <LoadingSpinner />;
   }
 
@@ -293,36 +280,4 @@ const ActiveSheet = (props) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  const { loading } = state.app;
-  const {
-    activeSheetTitle,
-    activeUsersList,
-    nonActiveUsersList,
-    activeSheetFilteredBy,
-    activeUsersListFiltered,
-    nonActiveUsersListFiltered,
-    sortList,
-    orderListAscending,
-  } = state.user;
-  return {
-    loading,
-    activeSheetTitle,
-    activeUsersList,
-    nonActiveUsersList,
-    activeSheetFilteredBy,
-    activeUsersListFiltered,
-    nonActiveUsersListFiltered,
-    sortList,
-    orderListAscending,
-  };
-};
-
-export default connect(mapStateToProps, {
-  doSortActiveUsersList,
-  doOrderSortActiveUsersList,
-  doSortList,
-  doOrderList,
-  doClearActiveUsersList,
-  doClearSorting,
-})(ActiveSheet);
+export default ActiveSheet;

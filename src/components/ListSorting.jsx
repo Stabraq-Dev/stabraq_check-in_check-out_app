@@ -1,4 +1,4 @@
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   doSortList,
   doOrderList,
@@ -9,39 +9,39 @@ import {
 } from '../actions';
 
 const ListSorting = (props) => {
-  const sortList = (event, index) => {
-    const { clientsList, activeUsersList, nonActiveUsersList } = props;
-    props.doSortList(event.target.value, index);
-    props.doOrderList(true);
+  const dispatch = useDispatch();
+  const {
+    sortList,
+    orderListAscending,
+    activeUsersList,
+    nonActiveUsersList,
+    clientsList,
+  } = useSelector((state) => state.user);
+  const onClickSortList = (event, index) => {
+    dispatch(doSortList(event.target.value, index));
+    dispatch(doOrderList(true));
     if (clientsList.length > 0) {
-      props.doSortClientsList(index);
+      dispatch(doSortClientsList(index));
     }
     if (activeUsersList.length > 0 || nonActiveUsersList.length > 0) {
-      props.doSortActiveUsersList(index);
+      dispatch(doSortActiveUsersList(index));
     }
   };
 
   const orderList = () => {
-    const {
-      orderListAscending,
-      activeUsersList,
-      nonActiveUsersList,
-      clientsList,
-    } = props;
-
-    props.doOrderList(!orderListAscending);
+    dispatch(doOrderList(!orderListAscending));
 
     if (activeUsersList.length > 0 || nonActiveUsersList.length > 0) {
-      props.doOrderSortActiveUsersList();
+      dispatch(doOrderSortActiveUsersList());
     }
     if (clientsList.length > 0) {
-      props.doOrderSortClientsList();
+      dispatch(doOrderSortClientsList());
     }
   };
 
   const renderSortButtons = () => {
     return props.buttons.map((active, index) => {
-      const { sortBy } = props.sortList;
+      const { sortBy } = sortList;
       const { name, sortIndex, value } = active;
       const activeClass = sortBy === value ? 'bg-dark' : 'stabraq-bg';
       return (
@@ -50,7 +50,7 @@ const ListSorting = (props) => {
           className={`ui primary button ${activeClass} me-3 mt-1`}
           name={name}
           onClick={(e) => {
-            sortList(e, sortIndex);
+            onClickSortList(e, sortIndex);
           }}
           type='submit'
           value={value}
@@ -62,7 +62,6 @@ const ListSorting = (props) => {
   };
 
   const renderSortBar = () => {
-    const { orderListAscending } = props;
     const orderClass = orderListAscending
       ? 'sort amount down'
       : 'sort amount up';
@@ -90,28 +89,4 @@ const ListSorting = (props) => {
   return <div>{renderSortBar()}</div>;
 };
 
-const mapStateToProps = (state) => {
-  const {
-    sortList,
-    orderListAscending,
-    activeUsersList,
-    nonActiveUsersList,
-    clientsList,
-  } = state.user;
-  return {
-    sortList,
-    orderListAscending,
-    activeUsersList,
-    nonActiveUsersList,
-    clientsList,
-  };
-};
-
-export default connect(mapStateToProps, {
-  doSortList,
-  doOrderList,
-  doOrderSortActiveUsersList,
-  doSortClientsList,
-  doOrderSortClientsList,
-  doSortActiveUsersList,
-})(ListSorting);
+export default ListSorting;

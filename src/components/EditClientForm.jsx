@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { Form, Field } from 'react-final-form';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import {
   doOnEditClientFormSubmit,
@@ -25,19 +25,14 @@ import {
 } from '../functions/helperFunc';
 import RatingBar from './RatingBar';
 
-const EditClientForm = ({
-  doShowMyModal,
-  loading,
-  doSetDatePicker,
-  doOnEditClientFormSubmit,
-  initialValues,
-  row,
-}) => {
+const EditClientForm = ({ initialValues, row }) => {
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.app);
   useEffect(() => {
     // Anything in here is fired on component mount.
     return () => {
       // Anything in here is fired on component unmount.
-      doShowMyModal(false);
+      dispatch(doShowMyModal(false));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -78,12 +73,12 @@ const EditClientForm = ({
             // ...update expiryDate to the result of this function
             expiryDate: (membershipValue, allValues) => {
               const { expiryDate } = calculateUserData(allValues);
-              doSetDatePicker(expiryDate);
+              dispatch(doSetDatePicker(expiryDate));
               const final =
                 JSON.stringify(initialValues) === JSON.stringify(allValues)
                   ? initialValues.expiryDate
                   : expiryDate;
-              doSetDatePicker(final);
+              dispatch(doSetDatePicker(final));
               return final;
             },
             remainDays: (membershipValue, allValues) => {
@@ -189,7 +184,7 @@ const EditClientForm = ({
 
     formValues.email = formValues.email.toLowerCase();
 
-    doOnEditClientFormSubmit(formValues, row);
+    dispatch(doOnEditClientFormSubmit(formValues, row));
   };
 
   return (
@@ -311,45 +306,4 @@ const EditClientForm = ({
   );
 };
 
-const mapStateToProps = (state) => {
-  const { loading } = state.app;
-  const {
-    mobileNumber,
-    userName,
-    eMailAddress,
-    membership,
-    expiryDate,
-    remainDays,
-    hoursPackage,
-    registrationDateTime,
-    remainingHours,
-    remainingOfTenDays,
-    invitations,
-    rating,
-    gender,
-    offers,
-  } = state.user.clientStateToEdit;
-  return {
-    loading,
-    mobileNumber,
-    userName,
-    eMailAddress,
-    membership,
-    expiryDate,
-    remainDays,
-    hoursPackage,
-    registrationDateTime,
-    remainingHours,
-    remainingOfTenDays,
-    invitations,
-    rating,
-    gender,
-    offers,
-  };
-};
-
-export default connect(mapStateToProps, {
-  doSetDatePicker,
-  doOnEditClientFormSubmit,
-  doShowMyModal,
-})(EditClientForm);
+export default EditClientForm;

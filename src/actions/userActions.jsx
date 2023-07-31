@@ -48,6 +48,7 @@ import {
   LIST_ALL_SHEETS_FILTERED,
   ACTIVE_SHEET_TITLE,
   USER_HISTORY_DATA,
+  FILTER_CLIENTS_LIST_VALUE,
 } from './types';
 
 import { doLoading, doShowMyModal, submitType } from './appActions';
@@ -659,15 +660,24 @@ export const setClientStateToEdit = (active) => async (dispatch) => {
 export const doFilterClientsList =
   (index, filterValue, filterBy) => async (dispatch, getState) => {
     const { clientsList } = getState().user;
-    const clientsListFiltered = clientsList.filter((value) =>
-      value[index].toLowerCase().includes(filterValue.toLowerCase())
-    );
+    const clientsListFiltered =
+      filterValue === 'CLEAR_FILTER'
+        ? []
+        : clientsList.filter((value) =>
+            value[index].toLowerCase().includes(filterValue.toLowerCase())
+          );
 
     await dispatch({
       type: CLIENTS_LIST_FILTERED,
       payload: clientsListFiltered,
     });
   };
+export const doFilterClientsListValue = (filterValue) => {
+  return {
+    type: FILTER_CLIENTS_LIST_VALUE,
+    payload: filterValue,
+  };
+};
 
 export const doConfirmDeleteUserCheckIn = () => async (dispatch, getState) => {
   dispatch(submitType(ON_CONFIRM_DELETE_CHECK_IN_SUBMIT));

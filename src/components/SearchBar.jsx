@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 
 import { checkForMobNum } from '../functions/validation';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import {
   searchMobileNumber,
   doSearchByMobile,
@@ -13,8 +13,11 @@ import LoadingSpinner from './LoadingSpinner';
 import { axiosAuth } from '../api/googleSheetsAPI';
 import InputMobile from './InputMobile';
 
-const SearchBar = (props) => {
+const SearchBar = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.app);
+
   const [mobileNumber, setMobileNumber] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -33,7 +36,7 @@ const SearchBar = (props) => {
 
     return () => {
       setMobileNumber('');
-      props.doShowMyModal(false);
+      dispatch(doShowMyModal(false));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -60,10 +63,10 @@ const SearchBar = (props) => {
   const onFormChange = async (e) => {
     if (window.location.pathname === '/preferences/main/user/check-in-out') {
       navigate('/preferences/main/user');
-      props.doShowMyModal(false);
+      dispatch(doShowMyModal(false));
     }
 
-    props.searchMobileNumber(e.target.value);
+    dispatch(searchMobileNumber(e.target.value));
     await onFormChangeSet(e);
     await checkForErrors(e.target.value);
   };
@@ -71,17 +74,18 @@ const SearchBar = (props) => {
   const onFormSubmit = async (event) => {
     event.preventDefault();
     await checkForErrors(mobileNumber);
-    if (props.loading) return;
+    await dispatch(doShowMyModal(false));
+    if (loading) return;
     await search(mobileNumber);
   };
 
   const search = async (mobile) => {
     if (errorMessage) return;
-    props.doSearchByMobile(mobile);
+    await dispatch(doSearchByMobile(mobile));
   };
 
   const renderSubmitButton = () => {
-    if (props.loading) {
+    if (loading) {
       return <LoadingSpinner />;
     }
     return (
@@ -115,16 +119,4 @@ const SearchBar = (props) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  const { loading, showMyModal } = state.app;
-  return {
-    loading,
-    showMyModal,
-  };
-};
-
-export default connect(mapStateToProps, {
-  searchMobileNumber,
-  doSearchByMobile,
-  doShowMyModal,
-})(SearchBar);
+export default SearchBar;

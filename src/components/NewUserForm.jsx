@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Form, Field } from 'react-final-form';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import {
   doOnNewUserFormSubmit,
@@ -19,19 +19,15 @@ import { renderRadio } from './react-final-form/renderRadio';
 import { validate } from './react-final-form/validate';
 const localFormValues = JSON.parse(sessionStorage.getItem('formValues'));
 
-const NewUserForm = ({
-  doShowMyModal,
-  loading,
-  mobileNumber,
-  searchMobileNumber,
-  doOnNewUserFormSubmit,
-}) => {
+const NewUserForm = () => {
+  const dispatch = useDispatch();
+  const { loading, mobileNumber } = useSelector((state) => state.app);
   useEffect(() => {
     // Anything in here is fired on component mount.
     return () => {
       // Anything in here is fired on component unmount.
-      searchMobileNumber('');
-      doShowMyModal(false);
+      dispatch(searchMobileNumber(''));
+      dispatch(doShowMyModal(false));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -74,7 +70,7 @@ const NewUserForm = ({
       formValues.email = formValues.email.toLowerCase();
     }
 
-    doOnNewUserFormSubmit(formValues);
+    dispatch(doOnNewUserFormSubmit(formValues));
   };
 
   const searchVal = {
@@ -149,16 +145,4 @@ const NewUserForm = ({
   );
 };
 
-const mapStateToProps = (state) => {
-  const { loading, mobileNumber } = state.app;
-  return {
-    loading,
-    mobileNumber,
-  };
-};
-
-export default connect(mapStateToProps, {
-  doOnNewUserFormSubmit,
-  doShowMyModal,
-  searchMobileNumber,
-})(NewUserForm);
+export default NewUserForm;

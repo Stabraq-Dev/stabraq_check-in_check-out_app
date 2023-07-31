@@ -1,21 +1,19 @@
 import { Form, Field } from 'react-final-form';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { checkForUserName } from '../functions/validation';
 import { doLogIn, doLogOut } from '../actions';
 import LoadingSpinner from './LoadingSpinner';
 
-const AdminLogInForm = ({
-  initialValues,
-  loading,
-  wrongUserPass,
-  isSignedIn,
-  fromURL,
-  doLogIn,
-  doLogOut,
-}) => {
+const AdminLogInForm = ({ initialValues }) => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.app);
+  const { isSignedIn, wrongUserPass, fromURL } = useSelector(
+    (state) => state.auth
+  );
+
   const renderError = ({ error, touched }) => {
     if (touched && error) {
       return (
@@ -60,7 +58,7 @@ const AdminLogInForm = ({
   };
 
   const onSubmit = async (formValues) => {
-    const signedIn = await doLogIn(formValues);
+    const signedIn = dispatch(doLogIn(formValues));
 
     if (signedIn[0] === 'TRUE') {
       if (fromURL) {
@@ -85,7 +83,7 @@ const AdminLogInForm = ({
         <button
           className='ui red button'
           onClick={() => {
-            doLogOut();
+            dispatch(doLogOut());
             navigate('/dashboard');
           }}
           type='submit'
@@ -135,15 +133,4 @@ const AdminLogInForm = ({
   );
 };
 
-const mapStateToProps = (state) => {
-  const { isSignedIn, wrongUserPass, fromURL } = state.auth;
-  const { loading } = state.app;
-  return {
-    loading,
-    wrongUserPass,
-    isSignedIn,
-    fromURL,
-  };
-};
-
-export default connect(mapStateToProps, { doLogIn, doLogOut })(AdminLogInForm);
+export default AdminLogInForm;

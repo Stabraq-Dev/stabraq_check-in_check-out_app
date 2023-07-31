@@ -1,51 +1,37 @@
 import React, { useEffect } from 'react';
-import TextField from '@mui/material/TextField';
-import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import Stack from '@mui/material/Stack';
-import LocalizationProvider from '@mui/lab/LocalizationProvider';
-import MobileDatePicker from '@mui/lab/MobileDatePicker';
-import { connect } from 'react-redux';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
+import { useDispatch, useSelector } from 'react-redux';
 import { doSetDatePicker } from '../actions';
 
-const ResponsiveDatePickers = ({
-  label,
-  onDateChange,
-  doSetDatePicker,
-  pickedDate,
-}) => {
+const ResponsiveDatePickers = ({ label, onDateChange }) => {
+  const { pickedDate } = useSelector((state) => state.app);
+  const dispatch = useDispatch();
   useEffect(() => {
-    doSetDatePicker(pickedDate);
+    dispatch(doSetDatePicker(pickedDate));
     return () => {
-      doSetDatePicker(new Date());
+      dispatch(doSetDatePicker(new Date()));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pickedDate]);
 
   return (
-    <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
       <Stack spacing={3}>
         <MobileDatePicker
           label={label}
-          value={pickedDate}
+          defaultValue={dayjs(pickedDate)}
           onChange={(newValue) => {
-            doSetDatePicker(newValue);
-            onDateChange(newValue.toLocaleDateString('en-US'));
+            dispatch(doSetDatePicker(newValue));
+            onDateChange(newValue);
           }}
-          renderInput={(params) => <TextField {...params} />}
         />
       </Stack>
     </LocalizationProvider>
   );
 };
 
-const mapStateToProps = (state) => {
-  const { loading, pickedDate } = state.app;
-  return {
-    loading,
-    pickedDate,
-  };
-};
-
-export default connect(mapStateToProps, { doSetDatePicker })(
-  ResponsiveDatePickers
-);
+export default ResponsiveDatePickers;

@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, Outlet } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Zoom, Bounce, Roll } from 'react-awesome-reveal';
 import {
   doShowCheckInOut,
@@ -26,98 +26,99 @@ const revealAll = [
   'ACTIVE-HISTORY-USERS-BTN',
 ];
 
-const Main = (props) => {
+const Main = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { reveal } = useSelector((state) => state.app);
 
   useEffect(() => {
-    props.doReveal(revealAll);
+    dispatch(doReveal(revealAll));
     return () => {
-      props.doReveal([]);
+      dispatch(doReveal([]));
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    props.doCheckSignedIn();
+    dispatch(doCheckSignedIn());
   });
 
   const onFormSubmitUser = async () => {
-    const { doClearPrevUserState, doReveal, doShowCheckInOut } = props;
-    await doClearPrevUserState();
-    await doReveal([
-      'NEW-USER-BTN',
-      'QR-CODE-GEN-BTN',
-      'ACTIVE-USERS-BTN',
-      'CLIENTS-BTN',
-      'ACTIVE-HISTORY-USERS-BTN',
-    ]);
-    await doReveal(revealAll);
-    await doShowCheckInOut(true);
+    await dispatch(doClearPrevUserState());
+    await dispatch(
+      doReveal([
+        'NEW-USER-BTN',
+        'QR-CODE-GEN-BTN',
+        'ACTIVE-USERS-BTN',
+        'CLIENTS-BTN',
+        'ACTIVE-HISTORY-USERS-BTN',
+      ])
+    );
+    await dispatch(doShowCheckInOut(true));
   };
 
   const onFormSubmitNewUser = async () => {
-    const { doReveal, doShowCheckInOut } = props;
-    await doReveal([
-      'USER-BTN',
-      'QR-CODE-GEN-BTN',
-      'ACTIVE-USERS-BTN',
-      'CLIENTS-BTN',
-      'ACTIVE-HISTORY-USERS-BTN',
-    ]);
-    await doReveal(revealAll);
-    await doShowCheckInOut(false);
+    await dispatch(
+      doReveal([
+        'USER-BTN',
+        'QR-CODE-GEN-BTN',
+        'ACTIVE-USERS-BTN',
+        'CLIENTS-BTN',
+        'ACTIVE-HISTORY-USERS-BTN',
+      ])
+    );
+    await dispatch(doShowCheckInOut(false));
   };
   const onFormSubmitQRCodeGen = async () => {
-    const { doReveal } = props;
-    await doReveal([
-      'USER-BTN',
-      'NEW-USER-BTN',
-      'ACTIVE-USERS-BTN',
-      'CLIENTS-BTN',
-      'ACTIVE-HISTORY-USERS-BTN',
-    ]);
-    await doReveal(revealAll);
+    await dispatch(
+      doReveal([
+        'USER-BTN',
+        'NEW-USER-BTN',
+        'ACTIVE-USERS-BTN',
+        'CLIENTS-BTN',
+        'ACTIVE-HISTORY-USERS-BTN',
+      ])
+    );
   };
   const onFormSubmitActiveUsers = async () => {
-    const { doReveal, doGetAllCheckedInUsers, doGetActiveUsersList } = props;
-    await doReveal([
-      'USER-BTN',
-      'NEW-USER-BTN',
-      'QR-CODE-GEN-BTN',
-      'CLIENTS-BTN',
-      'ACTIVE-HISTORY-USERS-BTN',
-    ]);
-    await doReveal(revealAll);
-    await doGetAllCheckedInUsers(DATA_SHEET_ACTIVE_RANGE);
-    await doGetActiveUsersList();
+    await dispatch(
+      doReveal([
+        'USER-BTN',
+        'NEW-USER-BTN',
+        'QR-CODE-GEN-BTN',
+        'CLIENTS-BTN',
+        'ACTIVE-HISTORY-USERS-BTN',
+      ])
+    );
+    // dispatch(doGetAllCheckedInUsers(DATA_SHEET_ACTIVE_RANGE));
+    // dispatch(doGetActiveUsersList());
   };
   const onFormSubmitClients = async () => {
-    const { doReveal, doGetClientsList } = props;
-    await doReveal([
-      'USER-BTN',
-      'NEW-USER-BTN',
-      'QR-CODE-GEN-BTN',
-      'ACTIVE-USERS-BTN',
-      'ACTIVE-HISTORY-USERS-BTN',
-    ]);
-    await doReveal(revealAll);
-    await doGetClientsList();
+    await dispatch(
+      doReveal([
+        'USER-BTN',
+        'NEW-USER-BTN',
+        'QR-CODE-GEN-BTN',
+        'ACTIVE-USERS-BTN',
+        'ACTIVE-HISTORY-USERS-BTN',
+      ])
+    );
+    // dispatch(doGetClientsList());
   };
 
   const onFormSubmitActiveHistory = async () => {
-    const { doReveal, doGetAllWorkSheetsList } = props;
-    await doReveal([
-      'USER-BTN',
-      'NEW-USER-BTN',
-      'QR-CODE-GEN-BTN',
-      'ACTIVE-USERS-BTN',
-      'CLIENTS-BTN',
-    ]);
-    await doReveal(revealAll);
-    await doGetAllWorkSheetsList();
+    await dispatch(
+      doReveal([
+        'USER-BTN',
+        'NEW-USER-BTN',
+        'QR-CODE-GEN-BTN',
+        'ACTIVE-USERS-BTN',
+        'CLIENTS-BTN',
+      ])
+    );
+    await dispatch(doGetAllWorkSheetsList());
   };
 
-  const { reveal, doLogOut } = props;
   return (
     <div className='row mt-3 mb-3'>
       <h4 className='text-center'>
@@ -126,9 +127,10 @@ const Main = (props) => {
         </Zoom>
       </h4>
       <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
-        <Roll left when={reveal.includes('USER-BTN')}>
+        <Roll left>
           <Link to='/preferences/main/user'>
             <button
+              disabled={reveal.includes('USER-BTN') ? false : true}
               className='ui text-stabraq button bg-dark'
               type='button'
               onClick={onFormSubmitUser}
@@ -141,9 +143,10 @@ const Main = (props) => {
       </div>
 
       <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
-        <Roll right when={reveal.includes('NEW-USER-BTN')}>
+        <Roll right>
           <Link to='/preferences/main/new-user'>
             <button
+              disabled={reveal.includes('NEW-USER-BTN') ? false : true}
               className='ui text-stabraq button bg-dark'
               type='button'
               onClick={onFormSubmitNewUser}
@@ -155,9 +158,10 @@ const Main = (props) => {
         </Roll>
       </div>
       <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
-        <Roll left when={reveal.includes('QR-CODE-GEN-BTN')}>
+        <Roll left>
           <Link to='/preferences/main/qr-code-gen'>
             <button
+              disabled={reveal.includes('QR-CODE-GEN-BTN') ? false : true}
               className='ui text-stabraq button bg-dark'
               type='button'
               onClick={onFormSubmitQRCodeGen}
@@ -169,9 +173,10 @@ const Main = (props) => {
         </Roll>
       </div>
       <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
-        <Roll right when={reveal.includes('ACTIVE-USERS-BTN')}>
+        <Roll right>
           <Link to='/preferences/main/active-sheet'>
             <button
+              disabled={reveal.includes('ACTIVE-USERS-BTN') ? false : true}
               className='ui text-stabraq button bg-dark'
               type='button'
               onClick={onFormSubmitActiveUsers}
@@ -183,9 +188,10 @@ const Main = (props) => {
         </Roll>
       </div>
       <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
-        <Roll left when={reveal.includes('CLIENTS-BTN')}>
+        <Roll left>
           <Link to='/preferences/main/clients-list'>
             <button
+              disabled={reveal.includes('CLIENTS-BTN') ? false : true}
               className='ui text-stabraq button bg-dark'
               type='button'
               onClick={onFormSubmitClients}
@@ -197,9 +203,12 @@ const Main = (props) => {
         </Roll>
       </div>
       <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
-        <Roll when={reveal.includes('ACTIVE-HISTORY-USERS-BTN')}>
+        <Roll>
           <Link to='/preferences/main/active-history'>
             <button
+              disabled={
+                reveal.includes('ACTIVE-HISTORY-USERS-BTN') ? false : true
+              }
               className='ui text-stabraq button bg-dark'
               type='button'
               onClick={onFormSubmitActiveHistory}
@@ -215,7 +224,7 @@ const Main = (props) => {
           <button
             className='ui red button'
             onClick={() => {
-              doLogOut();
+              dispatch(doLogOut());
               navigate('/dashboard');
             }}
           >
@@ -224,27 +233,9 @@ const Main = (props) => {
           </button>
         </div>
       </Bounce>
-      <Outlet/>
+      <Outlet />
     </div>
   );
 };
 
-const mapStateToProps = (state) => {
-  const { showCheckInOut, reveal } = state.app;
-  return {
-    showCheckInOut,
-    reveal,
-  };
-};
-
-export default connect(mapStateToProps, {
-  doShowCheckInOut,
-  doReveal,
-  doLogOut,
-  doClearPrevUserState,
-  doGetAllCheckedInUsers,
-  doGetAllWorkSheetsList,
-  doGetActiveUsersList,
-  doGetClientsList,
-  doCheckSignedIn,
-})(Main);
+export default Main;

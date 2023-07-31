@@ -1,42 +1,44 @@
 import MyModal from './MyModal';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import {
-  doShowMyModal,
   doRevealLogo,
   doDeleteUserCheckIn,
   doDeleteUserCheckOut,
   doSignInAgain,
 } from '../actions';
 
-export const MyModalUser = (props) => {
+export const MyModalUser = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const {
+    userName,
+    membership,
+    expiryDate,
+    remainDays,
+    rowNumber,
+    checkedOut,
+    remainingHours,
+    remainingOfTenDays,
+    roomChecked,
+    invite,
+  } = useSelector((state) => state.user.valuesMatched);
+  const { showMyModal, submitType, mobileNumber, error } = useSelector(
+    (state) => state.app
+  );
+  const { numberExists, checkInOutStatus } = useSelector((state) => state.user);
+  const { duration, approxDuration, cost } = useSelector(
+    (state) => state.user.durationCost
+  );
+  const { userNameInvitation } = useSelector(
+    (state) => state.user.inviteValuesMatched.userName
+  );
+
   /**
    *
    * @a renderBody
    */
   const renderBody = () => {
-    const {
-      submitType,
-      numberExists,
-      checkInOutStatus,
-      userName,
-      membership,
-      expiryDate,
-      remainDays,
-      rowNumber,
-      checkedOut,
-      remainingHours,
-      remainingOfTenDays,
-      roomChecked,
-      duration,
-      approxDuration,
-      cost,
-      error,
-      invite,
-      userNameInvitation,
-    } = props;
-
     const DefaultBody = ({ message }) => {
       return (
         <div className='text-center'>
@@ -166,20 +168,10 @@ export const MyModalUser = (props) => {
    * @a renderAction
    */
   const renderAction = () => {
-    const {
-      submitType,
-      numberExists,
-      checkInOutStatus,
-      checkedOut,
-      mobileNumber,
-      error,
-      doRevealLogo,
-    } = props;
-
     const goToHome = async () => {
       navigate('/');
-      await doRevealLogo(false);
-      await doRevealLogo(true);
+      await dispatch(doRevealLogo(false));
+      await dispatch(doRevealLogo(true));
     };
     const goToUser = () => {
       navigate('/preferences/main/user');
@@ -298,17 +290,11 @@ export const MyModalUser = (props) => {
    * @a renderYesAction
    */
   const renderYesAction = () => {
-    const {
-      submitType,
-      doDeleteUserCheckIn,
-      doDeleteUserCheckOut,
-      doSignInAgain,
-    } = props;
     const deleteUserCheckIn = async () => {
-      await doDeleteUserCheckIn();
+      await dispatch(doDeleteUserCheckIn());
     };
     const deleteUserCheckOut = async () => {
-      await doDeleteUserCheckOut();
+      await dispatch(doDeleteUserCheckOut());
     };
     const signInAgain = async () => {
       await doSignInAgain();
@@ -329,7 +315,6 @@ export const MyModalUser = (props) => {
    * @a renderBodyBackground
    */
   const renderBodyBackground = () => {
-    const { error, submitType } = props;
     if (error) {
       return 'error-bg';
     } else if (
@@ -347,7 +332,7 @@ export const MyModalUser = (props) => {
    * @q React render
    */
 
-  if (props.showMyModal) {
+  if (showMyModal) {
     return (
       <MyModal
         body={renderBody()}
@@ -360,52 +345,4 @@ export const MyModalUser = (props) => {
   return null;
 };
 
-const mapStateToProps = (state) => {
-  const {
-    userName,
-    membership,
-    expiryDate,
-    remainDays,
-    rowNumber,
-    checkedOut,
-    remainingHours,
-    remainingOfTenDays,
-    roomChecked,
-    invite,
-  } = state.user.valuesMatched;
-  const { showMyModal, submitType, mobileNumber, error } = state.app;
-  const { numberExists, checkInOutStatus } = state.user;
-  const { duration, approxDuration, cost } = state.user.durationCost;
-  const userNameInvitation = state.user.inviteValuesMatched.userName;
-
-  return {
-    showMyModal,
-    submitType,
-    mobileNumber,
-    error,
-    numberExists,
-    checkInOutStatus,
-    userName,
-    membership,
-    expiryDate,
-    remainDays,
-    rowNumber,
-    checkedOut,
-    remainingHours,
-    remainingOfTenDays,
-    roomChecked,
-    duration,
-    approxDuration,
-    cost,
-    invite,
-    userNameInvitation,
-  };
-};
-
-export default connect(mapStateToProps, {
-  doShowMyModal,
-  doRevealLogo,
-  doDeleteUserCheckIn,
-  doDeleteUserCheckOut,
-  doSignInAgain,
-})(MyModalUser);
+export default MyModalUser;

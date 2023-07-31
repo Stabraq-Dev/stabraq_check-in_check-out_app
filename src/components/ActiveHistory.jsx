@@ -1,5 +1,5 @@
-import  { useEffect, useState } from 'react';
-import { connect } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Form, Field } from 'react-final-form';
 import { renderSelectOptions } from './react-final-form/renderSelectOptions';
 
@@ -14,18 +14,16 @@ import LoadingSpinner from './LoadingSpinner';
 
 import ActiveSheet from './ActiveSheet';
 
-export const ActiveHistory = ({
-  doGetAllWorkSheetsList,
-  doGetAllSheetsList,
-  doSetDayAsActiveHistory,
-  listAllFilesFiltered,
-  listAllSheetsFiltered,
-  doClearActiveHistoryLists,
-  allCheckedInUsers,
-  doGetUserHistory,
-  userHistoryData,
-  mobileNumber,
-}) => {
+export const ActiveHistory = () => {
+  const dispatch = useDispatch();
+  const {
+    listAllFilesFiltered,
+    listAllSheetsFiltered,
+    allCheckedInUsers,
+    userHistoryData,
+  } = useSelector((state) => state.user);
+  const { mobileNumber } = useSelector((state) => state.user.valuesMatched);
+
   const [selectedMonth, setSelectedMonth] = useState('');
   const [selectedDay, setSelectedDay] = useState('');
   useEffect(() => {
@@ -39,12 +37,12 @@ export const ActiveHistory = ({
 
   const onStart = async () => {
     setTimeout(async () => {
-      await doGetAllWorkSheetsList();
+      dispatch(doGetAllWorkSheetsList());
     }, 100);
   };
 
   const onExit = async () => {
-    await doClearActiveHistoryLists();
+    dispatch(doClearActiveHistoryLists());
   };
 
   const onSubmitMonth = async (formValues) => {
@@ -52,11 +50,11 @@ export const ActiveHistory = ({
   };
   const onMonthChange = async (month) => {
     setSelectedMonth(month);
-    await doGetAllSheetsList(month);
+    dispatch(doGetAllSheetsList(month));
   };
 
   const onFilterByMobile = async () => {
-    await doGetUserHistory(mobileNumber, selectedMonth);
+    dispatch(doGetUserHistory(mobileNumber, selectedMonth));
   };
 
   const onSubmitDay = async (formValues) => {
@@ -64,7 +62,7 @@ export const ActiveHistory = ({
   };
   const onDayChange = async (id) => {
     setSelectedDay(id);
-    if (id) await doSetDayAsActiveHistory(id, selectedMonth);
+    if (id) dispatch(doSetDayAsActiveHistory(id, selectedMonth));
   };
 
   const renderFilterByMonth = () => {
@@ -166,30 +164,4 @@ export const ActiveHistory = ({
   );
 };
 
-const mapStateToProps = (state) => {
-  const { loading } = state.app;
-  const {
-    listAllFilesFiltered,
-    listAllSheetsFiltered,
-    allCheckedInUsers,
-    userHistoryData,
-  } = state.user;
-  const { mobileNumber } = state.user.valuesMatched;
-
-  return {
-    loading,
-    listAllFilesFiltered,
-    listAllSheetsFiltered,
-    allCheckedInUsers,
-    userHistoryData,
-    mobileNumber,
-  };
-};
-
-export default connect(mapStateToProps, {
-  doGetAllWorkSheetsList,
-  doGetAllSheetsList,
-  doSetDayAsActiveHistory,
-  doClearActiveHistoryLists,
-  doGetUserHistory,
-})(ActiveHistory);
+export default ActiveHistory;

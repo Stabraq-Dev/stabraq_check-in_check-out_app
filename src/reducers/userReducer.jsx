@@ -29,6 +29,7 @@ import {
   LIST_ALL_SHEETS_FILTERED,
   ACTIVE_SHEET_TITLE,
   USER_HISTORY_DATA,
+  FILTER_CLIENTS_LIST_VALUE,
 } from '../actions/types';
 import { mapArrayDataObject } from '../functions/helperFunc';
 
@@ -105,6 +106,7 @@ const INITIAL_STATE = {
     offers: '',
   },
   clientsListFiltered: [],
+  filterClientsListValue: '',
   clientsListSorted: [],
   sortList: {
     sortBy: '',
@@ -169,7 +171,6 @@ let hoursDailyRatesKeys = [
   'girlsFullDayRate',
 ];
 
-/* eslint import/no-anonymous-default-export: [2, {"allowArrowFunction": true}] */
 export default (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case NUMBER_EXISTS:
@@ -293,6 +294,11 @@ export default (state = INITIAL_STATE, action) => {
       return {
         ...state,
         clientsListFiltered: action.payload,
+      };
+    case FILTER_CLIENTS_LIST_VALUE:
+      return {
+        ...state,
+        filterClientsListValue: action.payload,
       };
     case CLIENTS_LIST_SORTED:
       return {

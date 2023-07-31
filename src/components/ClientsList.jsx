@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { connect } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
 import {
@@ -25,7 +25,16 @@ const buttons = [
   { name: 'sortByGender', sortIndex: 12, value: 'Gender' },
 ];
 
-export const ClientsList = (props) => {
+export const ClientsList = () => {
+  const dispatch = useDispatch();
+  const { loading } = useSelector((state) => state.app);
+  const {
+    clientsList,
+    clientsListFiltered,
+    clientsListSorted,
+    filterClientsListValue,
+  } = useSelector((state) => state.user);
+
   const [mobile, setMobile] = useState('');
   const [activeIndex, setActiveIndex] = useState();
   const [currentPage, setCurrentPage] = useState(1);
@@ -36,7 +45,7 @@ export const ClientsList = (props) => {
   useEffect(() => {
     const mobileURL = new URLSearchParams(window.location.search).get('mobile');
     setMobile(mobileURL);
-    props.doSortList('Sheet', 999);
+    dispatch(doSortList('Sheet', 999));
 
     if (btnRef.current !== null) {
       window.addEventListener('scroll', handleScroll);
@@ -44,12 +53,13 @@ export const ClientsList = (props) => {
     // setActiveIndex(null);
     // setCurrentPage(1);
 
-    onStart();
+    dispatch(doGetClientsList());
+    dispatch(doSortClientsList(999));
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      props.doClearSorting();
-      props.doClearClientsList();
+      dispatch(doClearSorting());
+      dispatch(doClearClientsList());
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -69,14 +79,8 @@ export const ClientsList = (props) => {
     }
   };
 
-  const onStart = async () => {
-    await props.doGetClientsList();
-    await props.doSortClientsList(999);
-  };
-
   const onScroll = async () => {
     // await props.doGetClientsList();
-    const { clientsList } = props;
     const userIndex = clientsList.findIndex((x) => x[0] === mobile);
     const userCurrentPage = Math.ceil(userIndex / clientsPerPage);
 
@@ -90,7 +94,6 @@ export const ClientsList = (props) => {
   };
 
   const getOriginalRow = (mobile) => {
-    const { clientsList } = props;
     const row = clientsList.findIndex((x) => x[0] === mobile) + 3;
     return row;
   };
@@ -217,8 +220,8 @@ export const ClientsList = (props) => {
           to={`/preferences/main/edit-client/?row=${row}`}
           className='ui button primary'
           onClick={() => {
-            props.setClientStateToEdit(active);
-            props.fromURL();
+            dispatch(setClientStateToEdit(active));
+            dispatch(fromURL());
           }}
         >
           Edit
@@ -253,18 +256,19 @@ export const ClientsList = (props) => {
   };
 
   const renderListCount = () => {
-    const { clientsList, clientsListFiltered } = props;
     const usersText = clientsListFiltered.length <= 1 ? 'User' : 'Users';
-    const filteredText =
-      clientsList.length === clientsListFiltered.length ? ' ' : ' Filtered ';
+    const filteredText = clientsListFiltered.length === 0 ? ' ' : ' Filtered ';
+    const count = filterClientsListValue
+      ? clientsListFiltered.length
+      : clientsList.length;
     const bgColor =
-      clientsList.length === clientsListFiltered.length
+    filterClientsListValue.length === 0
         ? 'active-bg-color'
         : 'non-active-bg-color';
     return (
       <div className={`ui segment ${bgColor}`}>
         <div className='ui center aligned header'>
-          All{filteredText}Users: {clientsListFiltered.length} {usersText}
+          All{filteredText}Users: {count} {usersText}
         </div>
       </div>
     );
@@ -292,13 +296,12 @@ export const ClientsList = (props) => {
     );
   };
 
-  if (props.loading) {
+  if (loading) {
     return <LoadingSpinner />;
   }
-  const { clientsList, clientsListFiltered, clientsListSorted } = props;
 
   const finalClientsList =
-    clientsListFiltered.length !== clientsList.length
+    clientsListFiltered.length !== clientsList.length && filterClientsListValue
       ? clientsListFiltered
       : clientsListSorted.length > 0
       ? clientsListSorted
@@ -334,31 +337,4 @@ export const ClientsList = (props) => {
   );
 };
 
-const mapStateToProps = (state) => {
-  const { loading } = state.app;
-  const {
-    clientsList,
-    clientsListFiltered,
-    clientsListSorted,
-    sortList,
-    orderListAscending,
-  } = state.user;
-  return {
-    loading,
-    clientsList,
-    clientsListFiltered,
-    clientsListSorted,
-    sortList,
-    orderListAscending,
-  };
-};
-
-export default connect(mapStateToProps, {
-  doGetClientsList,
-  setClientStateToEdit,
-  fromURL,
-  doSortList,
-  doClearSorting,
-  doClearClientsList,
-  doSortClientsList,
-})(ClientsList);
+export default ClientsList;

@@ -2,15 +2,17 @@ import React from 'react';
 import { Form, Field } from 'react-final-form';
 import { renderSelectOptions } from './react-final-form/renderSelectOptions';
 import { membershipOptions } from './react-final-form/options';
-import { connect } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { doFilterActiveUsersList } from '../actions';
 
-const FilterByMembership = ({ doFilterActiveUsersList }) => {
+const FilterByMembership = () => {
+  const dispatch = useDispatch();
+
   const onSubmit = async (formValues) => {
     if (formValues.membership === undefined) {
-      await doFilterActiveUsersList(3, '', '');
+      dispatch(doFilterActiveUsersList(3, '', ''));
     } else {
-      await doFilterActiveUsersList(3, formValues.membership, 'membership');
+      dispatch(doFilterActiveUsersList(3, formValues.membership, 'membership'));
     }
   };
 
@@ -34,6 +36,4 @@ const FilterByMembership = ({ doFilterActiveUsersList }) => {
   );
 };
 
-export default connect(null, {
-  doFilterActiveUsersList,
-})(FilterByMembership);
+export default FilterByMembership;
