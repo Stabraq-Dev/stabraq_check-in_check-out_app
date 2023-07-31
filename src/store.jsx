@@ -6,6 +6,7 @@ const store = configureStore({
   reducer: reducers,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
+      immutableCheck:false,
       serializableCheck: false,
     }),
 });
