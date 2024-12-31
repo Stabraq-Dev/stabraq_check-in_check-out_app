@@ -14,10 +14,4 @@ export default defineConfig({
     global: 'globalThis',
     'process.env': {},
   },
-  build: {
-    rollupOptions: {
-      // Externalize react-redux if necessary
-      external: ['react-redux'],
-    },
-  },
 });
