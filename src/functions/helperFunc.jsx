@@ -87,10 +87,13 @@ export const calcApproxDuration = (hours, minutes) => {
   }
 
   if (hr >= 1) {
-    if (min >= 10 && min <= 40) {
-      return hr + 0.5;
-    }
-    if (min > 40) {
+    // if (min >= 10 && min <= 40) {
+    //   return hr + 0.5;
+    // }
+    // if (min > 40) {
+    //   return hr + 1;
+    // }
+    if (min >= 10) {
       return hr + 1;
     }
   }
