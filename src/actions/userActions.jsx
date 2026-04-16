@@ -113,7 +113,6 @@ import {
   VALUES_MATCHED_RANGES,
   VAR_SHEET_ACTIVE_RANGE,
 } from '../ranges';
-import { getToken, tokenInitd } from '../api/auth';
 import { checkAuthorizedUser } from './authActions';
 
 export const doCheckedIn = (checkedInStatus) => {
@@ -327,56 +326,25 @@ export const doCreateNewSheet = () => async (dispatch, getState) => {
   const diffMonths = await checkMonthDiff(dateOne, dateTwo);
 
   if (diffMonths >= 1 && hrsFromMidnight >= 1) {
-    if (tokenInitd === false) {
-      await getToken();
+    const workSheetTitle = await changeYearMonthFormat(dateTwo);
+    const newWorkSheetId = await executeAddNewWorkSheet(workSheetTitle);
+    if (newWorkSheetId) {
+      await executeChangeWorkSheetPermission(newWorkSheetId);
+      await executeChangeWorkSheetPermission(
+        newWorkSheetId,
+        'abdalrahman.yousrii@gmail.com'
+      );
+      await executeValuesUpdateCheckOut({
+        value: newWorkSheetId,
+        range: CURR_MONTH_WORKSHEET_RANGE,
+      });
     }
-
-    const checkFlag = async () => {
-      if (tokenInitd === false) {
-        window.setTimeout(
-          checkFlag,
-          100
-        ); /* this checks the flag every 100 milliseconds*/
-      } else {
-        /* do something*/
-        const workSheetTitle = await changeYearMonthFormat(dateTwo);
-        const newWorkSheetId = await executeAddNewWorkSheet(workSheetTitle);
-        await executeChangeWorkSheetPermission(newWorkSheetId);
-        await executeChangeWorkSheetPermission(
-          newWorkSheetId,
-          'abdalrahman.yousrii@gmail.com'
-        );
-        await executeValuesUpdateCheckOut({
-          value: newWorkSheetId,
-          range: CURR_MONTH_WORKSHEET_RANGE,
-        });
-      }
-    };
-
-    checkFlag();
   }
 };
 
-export const checkAuthorization = () => async (dispatch, getState) => {
-  await dispatch(checkAuthorizedUser(false));
-  if (tokenInitd === false) {
-    await getToken();
-  }
-
-  const checkFlag = async () => {
-    if (tokenInitd === false) {
-      window.setTimeout(
-        checkFlag,
-        100
-      ); /* this checks the flag every 100 milliseconds*/
-    } else {
-      /* do something*/
-      await dispatch(checkAuthorizedUser(true));
-      dispatch(doLoading(false));
-    }
-  };
-
-  checkFlag();
+export const checkAuthorization = () => async (dispatch) => {
+  await dispatch(checkAuthorizedUser(true));
+  dispatch(doLoading(false));
 };
 
 export const doGetAllWorkSheetsList = () => async (dispatch, getState) => {
@@ -388,7 +356,7 @@ export const doGetAllWorkSheetsList = () => async (dispatch, getState) => {
       clearInterval(interval);
       dispatch(doLoading(true));
       const list = await executeGetAllFilesList();
-      const listAllFiles = list.result.files;
+      const listAllFiles = list.data.files;
       const listAllFilesFiltered = listAllFiles
         .filter((value) => value.name.includes('20'))
         .map((value, index) => {

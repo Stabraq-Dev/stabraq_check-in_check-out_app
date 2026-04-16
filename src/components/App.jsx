@@ -23,8 +23,6 @@ import ActiveHistory from './ActiveHistory';
 import { doCheckSignedIn } from '../actions/index';
 import { useDispatch } from 'react-redux';
 import MyAlert from './MyAlert';
-import { loadAuth } from '../api/auth';
-
 const App = () => {
   const dispatch = useDispatch();
   const [online, setOnline] = useState(true);
@@ -39,7 +37,6 @@ const App = () => {
   const load = async () => {
     await axiosAuth(import.meta.env.VITE_SHEET_ID);
     await dispatch(doCheckSignedIn());
-    await loadAuth();
   };
 
   // We are "offline".

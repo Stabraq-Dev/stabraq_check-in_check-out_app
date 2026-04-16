@@ -1,4 +1,4 @@
-import { axiosAuth } from '../api/googleSheetsAPI';
+import { axiosAuth, axiosDriveAuth } from '../api/googleSheetsAPI';
 import {
   calculateUserData,
   changeDateFormat,
@@ -889,22 +889,21 @@ export const getWorkSheetData = async (sheetID) => {
 
 export const executeAddNewWorkSheet = async (title) => {
   try {
-    const response = await window.gapi.client.sheets.spreadsheets.create({
-      resource: {
-        properties: {
-          title: title,
-        },
+    const googleSheetsAPI = await axiosAuth(SHEET_ID);
+    const response = await googleSheetsAPI.post('', {
+      properties: {
+        title: title,
       },
     });
 
     if (global.config.debuggingMode === 'TRUE') {
       console.log(
         'Response executeAddNewWorkSheet',
-        response.result.spreadsheetId
+        response.data.spreadsheetId
       );
     }
 
-    return response.result.spreadsheetId;
+    return response.data.spreadsheetId;
   } catch (err) {
     console.error('Execute error executeAddNewWorkSheet', err);
     return false;
@@ -913,13 +912,11 @@ export const executeAddNewWorkSheet = async (title) => {
 
 export const executeChangeWorkSheetPermission = async (fileId, email) => {
   try {
-    const response = await window.gapi.client.drive.permissions.create({
-      fileId: fileId,
-      resource: {
-        role: 'writer',
-        type: 'user',
-        emailAddress: email ? email : GOOGLE_SERVICE_ACCOUNT_EMAIL,
-      },
+    const driveAPI = await axiosDriveAuth(SHEET_ID);
+    const response = await driveAPI.post(`files/${fileId}/permissions`, {
+      role: 'writer',
+      type: 'user',
+      emailAddress: email ? email : GOOGLE_SERVICE_ACCOUNT_EMAIL,
     });
 
     if (global.config.debuggingMode === 'TRUE') {
@@ -930,15 +927,21 @@ export const executeChangeWorkSheetPermission = async (fileId, email) => {
   } catch (err) {
     console.error(
       'Execute error executeChangeWorkSheetPermission',
-      err.response.data.error
+      err?.response?.data?.error || err
     );
-    return err.response.data.error;
+    return err?.response?.data?.error;
   }
 };
 
 export const executeGetAllFilesList = async () => {
   try {
-    const response = await window.gapi.client.drive.files.list({});
+    const driveAPI = await axiosDriveAuth(SHEET_ID);
+    const response = await driveAPI.get('files', {
+      params: {
+        pageSize: 100,
+        fields: 'files(id, name)',
+      },
+    });
 
     if (global.config.debuggingMode === 'TRUE') {
       console.log('Response executeGetAllFilesList', response);
@@ -948,8 +951,8 @@ export const executeGetAllFilesList = async () => {
   } catch (err) {
     console.error(
       'Execute error executeGetAllFilesList',
-      err.response.data.error
+      err?.response?.data?.error || err
     );
-    return err.response.data.error;
+    return err?.response?.data?.error;
   }
 };

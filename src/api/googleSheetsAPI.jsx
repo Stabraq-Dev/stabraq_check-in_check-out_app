@@ -38,3 +38,35 @@ export const axiosAuth = async (sheetID) => {
     return;
   }
 };
+
+export const axiosDriveAuth = async (sheetID) => {
+  try {
+    const getNewToken = async () => {
+      const doc = await authenticate(sheetID);
+      const NEW_ACCESS_TOKEN = await doc.auth.credentials.access_token;
+      const new_expiry_date = await doc.auth.credentials.expiry_date;
+      sessionStorage.setItem('token', NEW_ACCESS_TOKEN);
+      sessionStorage.setItem('expiry_date', new_expiry_date);
+      console.log('NEW TOKEN');
+    };
+
+    const ACCESS_TOKEN = sessionStorage.getItem('token');
+    const expiry_date = sessionStorage.getItem('expiry_date');
+
+    if (expiry_date < Date.now()) {
+      await getNewToken();
+    }
+
+    return axios.create({
+      baseURL: `https://www.googleapis.com/drive/v3/`,
+      headers: {
+        Authorization: `Bearer ${ACCESS_TOKEN}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (err) {
+    console.error('Execute error', err);
+    return;
+  }
+};
