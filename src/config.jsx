@@ -1,4 +1,4 @@
-export default global.config = {
+export default globalThis.config = {
   homepage: 'https://stabraq-logbook.netlify.app',
   source: {
     sheetId: 541264310,

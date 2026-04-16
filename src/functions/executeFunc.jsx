@@ -42,7 +42,7 @@ export const executeValuesUpdate = async (val) => {
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesUpdate', response);
     }
 
@@ -69,7 +69,7 @@ export const executeValuesUpdateCheckOut = async (props) => {
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesUpdateCheckOut', response);
     }
 
@@ -103,7 +103,7 @@ export const executeValuesUpdateAdminAuth = async (
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesUpdate', response);
     }
 
@@ -131,7 +131,7 @@ export const executeBatchUpdateAddSheet = async (sheetDate) => {
       ],
     });
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log(
         'Response executeBatchUpdateAddSheet',
         response.data.replies[0].addSheet.properties.sheetId
@@ -162,7 +162,7 @@ export const executeBatchUpdateDeleteSheet = async (sheetId) => {
       ],
     });
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log(
         'Response executeBatchUpdateDeleteSheet',
         response.data.replies[0]
@@ -188,7 +188,7 @@ export const executeBatchUpdateCopyPaste = async (destSheetId) => {
         {
           copyPaste: {
             source: {
-              sheetId: global.config.source.sheetId,
+              sheetId: globalThis.config.source.sheetId,
             },
             destination: {
               sheetId: destSheetId,
@@ -199,7 +199,7 @@ export const executeBatchUpdateCopyPaste = async (destSheetId) => {
       ],
     });
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeBatchUpdateCopyPaste', response);
     }
 
@@ -231,7 +231,7 @@ export const executeBatchUpdateSheetPropertiesRenameSheet = async (
       ],
     });
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log(
         'Response executeBatchUpdateSheetPropertiesRenameSheet',
         response
@@ -261,7 +261,7 @@ export const executeBatchUpdateCopyToWorksheet = async (
       }
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeBatchUpdateCopyToWorksheet', response);
     }
 
@@ -285,7 +285,7 @@ export const executeBatchUpdateDeleteRange = async (rowNumber) => {
           deleteRange: {
             shiftDimension: 'ROWS',
             range: {
-              sheetId: global.config.source.sheetId,
+              sheetId: globalThis.config.source.sheetId,
               startRowIndex: rowNumber - 1,
               endRowIndex: rowNumber,
             },
@@ -294,7 +294,7 @@ export const executeBatchUpdateDeleteRange = async (rowNumber) => {
       ],
     });
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeBatchUpdateDeleteRange', response);
     }
 
@@ -320,7 +320,7 @@ export const executeValuesBatchClear = async () => {
       }
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesBatchClear', response);
     }
 
@@ -357,7 +357,7 @@ export const executeValuesAppendAddSheet = async () => {
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesAppendAddSheet', response);
     }
 
@@ -421,7 +421,7 @@ export const executeValuesAppendNewUserData = async (
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesAppendNewUserData', response);
     }
 
@@ -459,7 +459,7 @@ export const executeValuesAppendUserComment = async (
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesAppendUserComment', response);
     }
 
@@ -513,7 +513,7 @@ export const executeValuesAppendCheckIn = async (
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesAppendCheckIn', response);
     }
 
@@ -551,7 +551,7 @@ export const executeValuesAppendCheckOut = async (
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesAppendCheckOut', response);
     }
 
@@ -577,7 +577,7 @@ export const executeValuesAppendDeleteCheckOut = async (rowNumber) => {
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesAppendDeleteCheckOut', response);
     }
 
@@ -629,7 +629,7 @@ export const executeValuesAppendUpdateCheckIn = async (
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesAppendUpdateCheckIn', response);
     }
 
@@ -661,7 +661,7 @@ export const executeValuesUpdateClientCheckIn = async (
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesUpdateClientCheckIn', response);
     }
 
@@ -720,7 +720,7 @@ export const executeValuesUpdateEditClient = async (formValues, rowNumber) => {
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesUpdateEditClient', response);
     }
 
@@ -749,7 +749,7 @@ export const executeValuesAppendUpdateCheckOut = async (
       { params: { valueInputOption: valueInputOption } }
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeValuesAppendUpdateCheckOut', response);
     }
 
@@ -765,7 +765,7 @@ export const getSheetValues = async (range) => {
 
     const response = await googleSheetsAPI.get(`${SHEET_ID}/values/${range}`);
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response getSheetValues', range, response.data.values);
     }
 
@@ -784,7 +784,7 @@ export const getWorkBookWorkSheetValues = async (workSheetId, range) => {
       `${finalWorkSheetId}/values/${range}`
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log(
         'Response getWorkBookWorkSheetValues',
         range,
@@ -813,7 +813,7 @@ export const getSheetValuesBatchGet = async (ranges) => {
 
     const finalRes = await getData(response.data.valueRanges, 'values');
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response getSheetValuesBatchGet', ranges, finalRes);
     }
 
@@ -836,7 +836,7 @@ export const getSheetValuesWorkSheetBatchGet = async (sheetId, ranges) => {
         qs.stringify(params, { arrayFormat: 'repeat' }),
     });
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log(
         'Response getSheetValuesWorkSheetBatchGet',
         response.data.valueRanges
@@ -857,7 +857,7 @@ export const getSheetValuesAdminAuth = async (range) => {
       `${AUTH_SHEET_ID}/values/${range}`
     );
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log(
         'Response getSheetValuesAdminAuth',
         range,
@@ -877,7 +877,7 @@ export const getWorkSheetData = async (sheetID) => {
 
     const response = await googleSheetsAPI.get(sheetID);
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response getWorkSheetData', response.data.sheets);
     }
 
@@ -896,7 +896,7 @@ export const executeAddNewWorkSheet = async (title) => {
       },
     });
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log(
         'Response executeAddNewWorkSheet',
         response.data.spreadsheetId
@@ -919,7 +919,7 @@ export const executeChangeWorkSheetPermission = async (fileId, email) => {
       emailAddress: email ? email : GOOGLE_SERVICE_ACCOUNT_EMAIL,
     });
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeChangeWorkSheetPermission', response);
     }
 
@@ -943,7 +943,7 @@ export const executeGetAllFilesList = async () => {
       },
     });
 
-    if (global.config.debuggingMode === 'TRUE') {
+    if (globalThis.config.debuggingMode === 'TRUE') {
       console.log('Response executeGetAllFilesList', response);
     }
 

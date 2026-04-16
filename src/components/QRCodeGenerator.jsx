@@ -36,7 +36,7 @@ const QRCodeGenerator = () => {
     ],
     fgColor: '#ff5500',
     size: '350',
-    value: `${global.config.homepage}/preferences/main/user/`,
+    value: `${globalThis.config.homepage}/preferences/main/user/`,
     ecLevel: 'Q',
     qrStyle: 'dots',
     logoImage: '/logo.png',
@@ -49,7 +49,7 @@ const QRCodeGenerator = () => {
     setState((prevState) => ({
       ...prevState,
       mobile: mobile,
-      value: `${global.config.homepage}/preferences/main/user/?mobile=${mobile}`,
+      value: `${globalThis.config.homepage}/preferences/main/user/?mobile=${mobile}`,
     }));
   };
 
