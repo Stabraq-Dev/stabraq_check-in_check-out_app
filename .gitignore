@@ -10,7 +10,6 @@
 
 # production
 /build
-package-lock.json
 
 # misc
 .DS_Store
@@ -26,3 +25,4 @@ yarn-error.log*
 .vscode
 
 dist
+package-lock.json

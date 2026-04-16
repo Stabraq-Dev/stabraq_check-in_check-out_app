@@ -8,13 +8,16 @@ export default defineConfig({
   server: {
     port: 3000,
   },
-  plugins: [react(), nodePolyfills()],
-  define: {
-    // By default, Vite doesn't include shims for NodeJS/
-    // necessary for segment analytics lib to work
-    global: 'globalThis',
-    'process.env': {},
-  },
+  plugins: [
+    react(),
+    nodePolyfills({
+      globals: {
+        global: true,
+        process: true,
+        Buffer: true,
+      },
+    }),
+  ],
   resolve: {
     alias: {
       'node-fetch': path.resolve(__dirname, 'src/node-fetch-shim.js'),
