@@ -16,7 +16,7 @@ import InputMobile from './InputMobile';
 const SearchBar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { loading } = useSelector((state) => state.app);
+  const { loading, loadingMessage } = useSelector((state) => state.app);
 
   const [mobileNumber, setMobileNumber] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -86,13 +86,14 @@ const SearchBar = () => {
 
   const renderSubmitButton = () => {
     if (loading) {
-      return <LoadingSpinner />;
+      return <LoadingSpinner message={loadingMessage} />;
     }
     return (
       <button
         className='ui primary button stabraq-bg'
         onClick={onFormSubmit}
         type='submit'
+        disabled={loading}
       >
         <i className='chevron circle right icon me-1' />
         Search
@@ -102,8 +103,8 @@ const SearchBar = () => {
 
   return (
     <>
-      <div className='ui segment'>
-        <form onSubmit={onFormSubmit} className='ui form error'>
+      <div className='ui segment content-card'>
+        <form onSubmit={onFormSubmit} className='ui form error enhanced-form'>
           <InputMobile
             value={mobileNumber}
             label='Search By Mobile Number'

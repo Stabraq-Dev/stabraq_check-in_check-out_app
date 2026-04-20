@@ -98,7 +98,7 @@ const QRCodeGenerator = () => {
   const renderQRCode = () => {
     if (state.mobile && !errorMessage) {
       return (
-        <div className='ui segment mb-3 mt-1'>
+        <div className='ui segment content-card mb-3 mt-1'>
           <QRCode
             {...{
               ...state,
@@ -134,7 +134,7 @@ const QRCodeGenerator = () => {
   const renderButtons = () => {
     if (state.mobile && !errorMessage) {
       return (
-        <div className='ui segment mb-3 mt-1'>
+        <div className='ui segment content-card mb-3 mt-1'>
           {buttonsData.map((item) => {
             const { id, onClick, text, icon } = item;
             return (
@@ -157,8 +157,8 @@ const QRCodeGenerator = () => {
 
   return (
     <div className='text-center'>
-      <form className='ui form error'>
-        <div className='ui segment'>
+      <form className='ui form error enhanced-form'>
+        <div className='ui segment content-card'>
           <InputMobile
             value={state.mobile}
             label='QR By Mobile Number'

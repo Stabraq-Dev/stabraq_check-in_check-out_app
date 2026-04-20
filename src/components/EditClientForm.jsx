@@ -194,7 +194,7 @@ const EditClientForm = ({ initialValues, row }) => {
       decorators={[calculator]}
       validate={(formValues) => validate(formValues)}
       render={({ values, handleSubmit }) => (
-        <form onSubmit={handleSubmit} className='ui form segment error'>
+        <form onSubmit={handleSubmit} className='ui form segment error content-card enhanced-form'>
           <Field
             name='username'
             component={renderInput}

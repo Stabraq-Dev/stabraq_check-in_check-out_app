@@ -2,17 +2,24 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 
-import { doSortList, doClearActiveUsersList, doClearSorting } from '../actions';
+import {
+  doSortList,
+  doClearSorting,
+  doSortActiveUsersList,
+  doOrderSortActiveUsersList,
+  doOrderList,
+  doFilterActiveUsersList,
+} from '../actions';
 import LoadingSpinner from './LoadingSpinner';
 import { getWorkBookWorkSheetValues } from '../functions/executeFunc';
 import { VAR_SHEET_TOTAL_COST_RANGE } from '../ranges';
-import FilterByMembership from './FilterByMembership';
-import ListSorting from './ListSorting';
+import { membershipOptions } from './react-final-form/options';
 
-const buttons = [
-  { name: 'sortByMembership', sortIndex: 3, value: 'Membership' },
+const sortButtons = [
   { name: 'sortByName', sortIndex: 0, value: 'Name' },
+  { name: 'sortByMembership', sortIndex: 3, value: 'Membership' },
   { name: 'sortByCheckInTime', sortIndex: 5, value: 'Check In Time' },
+  { name: 'sortByCheckOutTime', sortIndex: 6, value: 'Check Out Time' },
 ];
 
 const ActiveSheet = () => {
@@ -26,6 +33,7 @@ const ActiveSheet = () => {
     activeSheetTitle,
     activeUsersListFiltered,
     nonActiveUsersListFiltered,
+  orderListAscending,
   } = useSelector((state) => state.user);
   const [state, setState] = useState({
     totalCost: '',
@@ -34,14 +42,12 @@ const ActiveSheet = () => {
   });
 
   useEffect(() => {
-    setState({ ...state, totalCost: '' });
     dispatch(doSortList('Check In Time', 5));
-    setState({ ...state, interval: setInterval(() => tick(), 60000) });
+    const intervalId = setInterval(() => tick(), 60000);
     tick();
     return () => {
-      // dispatch(doClearActiveUsersList());
       dispatch(doClearSorting());
-      clearInterval(state.interval);
+      clearInterval(intervalId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -49,17 +55,31 @@ const ActiveSheet = () => {
   function tick() {
     const localDate = new Date().toLocaleDateString('en-US');
     const localTime = new Date().toLocaleTimeString('en-US');
-    setState(() => ({
-      ...state,
+    setState((prev) => ({
+      ...prev,
       timeNow: Date.parse(`${localDate} ${localTime}`),
     }));
   }
 
-  const renderFilterActiveUsers = () => {
-    if (activeUsersList.length > 0 || nonActiveUsersList.length > 0) {
-      return <FilterByMembership />;
-    }
+  const handleSort = (btn) => {
+    dispatch(doSortList(btn.value, btn.sortIndex));
+    dispatch(doOrderList(true));
+    dispatch(doSortActiveUsersList(btn.sortIndex));
   };
+
+  const toggleOrder = () => {
+    dispatch(doOrderList(!orderListAscending));
+    dispatch(doOrderSortActiveUsersList());
+  };
+
+  const applyFilter = (value) => {
+    dispatch(doFilterActiveUsersList(3, value, 'membership'));
+  };
+
+  const clearFilter = () => {
+    dispatch(doFilterActiveUsersList(3, '', ''));
+  };
+
   const renderCountActiveUsers = ({ list, type }) => {
     const usersText = list.length === 1 ? 'User' : 'Users';
     const bgColor =
@@ -77,7 +97,7 @@ const ActiveSheet = () => {
   const renderList = ({ list, type }) => {
     if (list.length === 0) {
       return (
-        <div className='ui segment'>
+        <div className='ui segment content-card'>
           <div className='ui center aligned header'>
             No {type} {activeSheetFilteredBy.filterValue} Users
           </div>
@@ -97,7 +117,6 @@ const ActiveSheet = () => {
             return 'text-hours-member-color';
           case 'NOT_MEMBER':
             return 'text-not-member-color';
-
           default:
             return '';
         }
@@ -117,7 +136,6 @@ const ActiveSheet = () => {
       const one = Date.parse(`${localDate} ${active[5]}`);
       const two = state.timeNow;
       const untilNow = (Math.abs(two - one) / 36e5).toFixed(1);
-
       const untilNowHM = new Date(two - one).toISOString().substring(11, 16);
 
       return (
@@ -180,6 +198,7 @@ const ActiveSheet = () => {
       </div>
     );
   };
+
   const renderEditClient = (mobile) => {
     return (
       <div className='col d-flex align-items-center justify-content-end my-1'>
@@ -197,59 +216,7 @@ const ActiveSheet = () => {
     const workSheetId = activeSheetTitle.selectedMonth;
     const range = VAR_SHEET_TOTAL_COST_RANGE(activeSheetTitle.title);
     const totalCost = await getWorkBookWorkSheetValues(workSheetId, range);
-    setState({ ...state, totalCost: totalCost[0][0] });
-  };
-
-  const renderActiveSortBar = () => {
-    if (activeUsersList.length > 0 && !activeSheetFilteredBy.filterBy)
-      return (
-        <div className='ui segment text-center'>
-          <ListSorting buttons={buttons} />
-        </div>
-      );
-  };
-
-  const renderNonActiveSortBar = () => {
-    const nonActiveButtons = [
-      ...buttons,
-      {
-        name: 'sortByCheckOutTime',
-        sortIndex: 6,
-        value: 'Check Out Time',
-      },
-    ];
-
-    if (nonActiveUsersList.length > 0 && !activeSheetFilteredBy.filterBy)
-      return (
-        <div className='ui segment text-center'>
-          <ListSorting buttons={nonActiveButtons} />
-        </div>
-      );
-  };
-
-  const renderGetTotalCostButtons = () => {
-    if (nonActiveUsersList.length > 0)
-      return (
-        <div className='ui segment text-center'>
-          <button
-            className={`ui primary button mt-1`}
-            name='getTotalCost'
-            onClick={onGetTotalCost}
-            type='submit'
-            value='GET_TOTAL_COST'
-          >
-            Get Total Cost
-          </button>
-          {renderTotalCost()}
-        </div>
-      );
-  };
-
-  const renderTotalCost = () => {
-    if (state.totalCost)
-      return (
-        <div className='description'>Total Cost: {state.totalCost} EGP</div>
-      );
+    setState((prev) => ({ ...prev, totalCost: totalCost[0][0] }));
   };
 
   const finalActiveList = activeSheetFilteredBy.filterBy
@@ -266,16 +233,84 @@ const ActiveSheet = () => {
     return <LoadingSpinner />;
   }
 
+  const hasUsers = activeUsersList.length > 0 || nonActiveUsersList.length > 0;
+
   return (
     <>
-      {renderFilterActiveUsers()}
+      {/* Unified Filter/Sort Toolbar */}
+      {hasUsers && (
+        <div className='ui segment content-card'>
+          <div className='filter-sort-toolbar'>
+            <div className='toolbar-group'>
+              <span className='toolbar-label'>Filter</span>
+              <button
+                className={`toolbar-btn ${!activeSheetFilteredBy.filterBy ? 'active' : ''}`}
+                onClick={clearFilter}
+              >
+                All
+              </button>
+              {membershipOptions
+                .filter((o) => o.value)
+                .map((opt) => (
+                  <button
+                    key={opt.key}
+                    className={`toolbar-btn ${activeSheetFilteredBy.filterValue === opt.value ? 'active' : ''}`}
+                    onClick={() => applyFilter(opt.value)}
+                  >
+                    {opt.text}
+                  </button>
+                ))}
+            </div>
+
+            <div className='toolbar-divider' />
+
+            <div className='toolbar-group'>
+              <span className='toolbar-label'>Sort</span>
+              {sortButtons.map((btn) => (
+                <button
+                  key={btn.name}
+                  className={`toolbar-btn ${sortList.sortBy === btn.value ? 'active' : ''}`}
+                  onClick={() => handleSort(btn)}
+                >
+                  {btn.value}
+                </button>
+              ))}
+              <button className='toolbar-btn' onClick={toggleOrder}>
+                <i
+                  className={`sort amount ${orderListAscending ? 'down' : 'up'} icon me-1`}
+                />
+                {orderListAscending ? 'Asc' : 'Desc'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Active Users */}
       {renderCountActiveUsers(activeProps)}
-      {renderActiveSortBar()}
       <div className='ui celled list'>{renderList(activeProps)}</div>
+
+      {/* Non-Active Users */}
       {renderCountActiveUsers(nonActiveProps)}
-      {renderNonActiveSortBar()}
       <div className='ui celled list'>{renderList(nonActiveProps)}</div>
-      {renderGetTotalCostButtons()}
+
+      {/* Total Cost */}
+      {nonActiveUsersList.length > 0 && (
+        <div className='ui segment content-card text-center'>
+          <button
+            className='ui primary button mt-1'
+            onClick={onGetTotalCost}
+            type='button'
+          >
+            Get Total Cost
+          </button>
+          {state.totalCost && (
+            <div className='description mt-2'>
+              Total Cost: {state.totalCost} EGP
+            </div>
+          )}
+        </div>
+      )}
     </>
   );
 };

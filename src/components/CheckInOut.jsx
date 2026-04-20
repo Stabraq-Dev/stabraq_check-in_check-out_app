@@ -689,7 +689,7 @@ const CheckInOut = () => {
   }
 
   return (
-    <div className='ui segment text-center'>
+    <div className='ui segment content-card text-center'>
       {renderCheckInOptions()}
       {renderCheckOutOptions()}
       {renderRating()}

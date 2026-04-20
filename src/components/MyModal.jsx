@@ -4,8 +4,13 @@ import { Bounce } from 'react-awesome-reveal';
 
 const MyModal = (props) => {
   useEffect(() => {
-    const myModal = new Modal(document.getElementById('exampleModal'), {});
+    const modalEl = document.getElementById('exampleModal');
+    const myModal = new Modal(modalEl, {});
     myModal.show();
+
+    modalEl.addEventListener('hide.bs.modal', () => {
+      document.activeElement?.blur();
+    });
   }, []);
 
   const renderYesButton = () => {

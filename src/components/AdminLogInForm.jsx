@@ -40,7 +40,7 @@ const AdminLogInForm = ({ initialValues }) => {
       return <LoadingSpinner />;
     }
     return (
-      <button className='ui primary button stabraq-bg' type='submit'>
+      <button className='ui primary button stabraq-bg' type='submit' disabled={loading}>
         <i className='sign-in icon' />
         Sign In
       </button>
@@ -71,8 +71,9 @@ const AdminLogInForm = ({ initialValues }) => {
 
   if (isSignedIn) {
     return (
-      <div className='ui segment text-center'>
-        <h1>You already signed in</h1>
+      <div className='login-container text-center'>
+        <img src='/logo.png' alt='Logo' className='login-logo' />
+        <h1 className='login-title'>Already Signed In</h1>
         <button
           className='ui primary button stabraq-bg'
           onClick={() => navigate('/preferences/main')}
@@ -95,7 +96,9 @@ const AdminLogInForm = ({ initialValues }) => {
   }
 
   return (
-    <div>
+    <div className='login-container text-center'>
+      <img src='/logo.png' alt='Logo' className='login-logo' />
+      <div className='login-title'>Admin Sign In</div>
       <Form
         initialValues={initialValues}
         onSubmit={onSubmit}
@@ -116,7 +119,7 @@ const AdminLogInForm = ({ initialValues }) => {
           return errors;
         }}
         render={({ handleSubmit }) => (
-          <form onSubmit={handleSubmit} className='ui form error'>
+          <form onSubmit={handleSubmit} className='ui form error enhanced-form'>
             <Field name='username' component={renderInput} label='User Name' />
             <Field
               name='password'

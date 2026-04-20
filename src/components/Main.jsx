@@ -1,20 +1,14 @@
 import { useEffect } from 'react';
-import { useNavigate, Outlet } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { Zoom, Bounce, Roll } from 'react-awesome-reveal';
+import { Roll } from 'react-awesome-reveal';
 import {
   doShowCheckInOut,
   doReveal,
-  doLogOut,
   doClearPrevUserState,
-  doGetAllCheckedInUsers,
   doGetAllWorkSheetsList,
-  doGetActiveUsersList,
-  doGetClientsList,
   doCheckSignedIn,
 } from '../actions';
-import { DATA_SHEET_ACTIVE_RANGE } from '../ranges';
 
 const revealAll = [
   'HEADER-TEXT',
@@ -27,7 +21,6 @@ const revealAll = [
 ];
 
 const Main = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { reveal } = useSelector((state) => state.app);
 
@@ -120,119 +113,91 @@ const Main = () => {
   };
 
   return (
-    <div className='row mt-3 mb-3'>
-      <h4 className='text-center'>
-        <Zoom damping={0.1} cascade when={reveal.includes('HEADER-TEXT')}>
-          STABRAQ COMMUNITY SPACE
-        </Zoom>
-      </h4>
-      <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
+    <div className='row g-3 mt-2 mb-3'>
+      <div className='col-md-4 col-sm-6 col-6'>
         <Roll left>
-          <Link to='/preferences/main/user'>
-            <button
-              disabled={reveal.includes('USER-BTN') ? false : true}
-              className='ui text-stabraq button bg-dark'
-              type='button'
-              onClick={onFormSubmitUser}
-            >
-              <i className='user icon' />
-              User
-            </button>
+          <Link
+            to='/preferences/main/user'
+            className={`dashboard-card ${!reveal.includes('USER-BTN') ? 'disabled' : ''}`}
+            tabIndex={!reveal.includes('USER-BTN') ? -1 : 0}
+            onClick={reveal.includes('USER-BTN') ? onFormSubmitUser : (e) => e.preventDefault()}
+          >
+            <i className='user icon card-icon' />
+            <span className='card-label'>User</span>
           </Link>
         </Roll>
       </div>
 
-      <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
+      <div className='col-md-4 col-sm-6 col-6'>
         <Roll right>
-          <Link to='/preferences/main/new-user'>
-            <button
-              disabled={reveal.includes('NEW-USER-BTN') ? false : true}
-              className='ui text-stabraq button bg-dark'
-              type='button'
-              onClick={onFormSubmitNewUser}
-            >
-              <i className='user plus icon' />
-              New User
-            </button>
-          </Link>
-        </Roll>
-      </div>
-      <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
-        <Roll left>
-          <Link to='/preferences/main/qr-code-gen'>
-            <button
-              disabled={reveal.includes('QR-CODE-GEN-BTN') ? false : true}
-              className='ui text-stabraq button bg-dark'
-              type='button'
-              onClick={onFormSubmitQRCodeGen}
-            >
-              <i className='qrcode icon' />
-              QR Code
-            </button>
-          </Link>
-        </Roll>
-      </div>
-      <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
-        <Roll right>
-          <Link to='/preferences/main/active-sheet'>
-            <button
-              disabled={reveal.includes('ACTIVE-USERS-BTN') ? false : true}
-              className='ui text-stabraq button bg-dark'
-              type='button'
-              onClick={onFormSubmitActiveUsers}
-            >
-              <i className='user circle icon' />
-              Active
-            </button>
-          </Link>
-        </Roll>
-      </div>
-      <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
-        <Roll left>
-          <Link to='/preferences/main/clients-list'>
-            <button
-              disabled={reveal.includes('CLIENTS-BTN') ? false : true}
-              className='ui text-stabraq button bg-dark'
-              type='button'
-              onClick={onFormSubmitClients}
-            >
-              <i className='list icon' />
-              Clients
-            </button>
-          </Link>
-        </Roll>
-      </div>
-      <div className='col-md-4 col-sm-4 col-xs-12 mt-3 text-center'>
-        <Roll>
-          <Link to='/preferences/main/active-history'>
-            <button
-              disabled={
-                reveal.includes('ACTIVE-HISTORY-USERS-BTN') ? false : true
-              }
-              className='ui text-stabraq button bg-dark'
-              type='button'
-              onClick={onFormSubmitActiveHistory}
-            >
-              <i className='user circle icon' />
-              History
-            </button>
-          </Link>
-        </Roll>
-      </div>
-      <Bounce>
-        <div className='col-md-12 col-sm-12 col-xs-12 mt-3 text-end align-self-center'>
-          <button
-            className='ui red button'
-            onClick={() => {
-              dispatch(doLogOut());
-              navigate('/dashboard');
-            }}
+          <Link
+            to='/preferences/main/new-user'
+            className={`dashboard-card ${!reveal.includes('NEW-USER-BTN') ? 'disabled' : ''}`}
+            tabIndex={!reveal.includes('NEW-USER-BTN') ? -1 : 0}
+            onClick={reveal.includes('NEW-USER-BTN') ? onFormSubmitNewUser : (e) => e.preventDefault()}
           >
-            <i className='sign-out icon' />
-            Sign Out
-          </button>
-        </div>
-      </Bounce>
+            <i className='user plus icon card-icon' />
+            <span className='card-label'>New User</span>
+          </Link>
+        </Roll>
+      </div>
+
+      <div className='col-md-4 col-sm-6 col-6'>
+        <Roll left>
+          <Link
+            to='/preferences/main/qr-code-gen'
+            className={`dashboard-card ${!reveal.includes('QR-CODE-GEN-BTN') ? 'disabled' : ''}`}
+            tabIndex={!reveal.includes('QR-CODE-GEN-BTN') ? -1 : 0}
+            onClick={reveal.includes('QR-CODE-GEN-BTN') ? onFormSubmitQRCodeGen : (e) => e.preventDefault()}
+          >
+            <i className='qrcode icon card-icon' />
+            <span className='card-label'>QR Code</span>
+          </Link>
+        </Roll>
+      </div>
+
+      <div className='col-md-4 col-sm-6 col-6'>
+        <Roll right>
+          <Link
+            to='/preferences/main/active-sheet'
+            className={`dashboard-card ${!reveal.includes('ACTIVE-USERS-BTN') ? 'disabled' : ''}`}
+            tabIndex={!reveal.includes('ACTIVE-USERS-BTN') ? -1 : 0}
+            onClick={reveal.includes('ACTIVE-USERS-BTN') ? onFormSubmitActiveUsers : (e) => e.preventDefault()}
+          >
+            <i className='user circle icon card-icon' />
+            <span className='card-label'>Active</span>
+          </Link>
+        </Roll>
+      </div>
+
+      <div className='col-md-4 col-sm-6 col-6'>
+        <Roll left>
+          <Link
+            to='/preferences/main/clients-list'
+            className={`dashboard-card ${!reveal.includes('CLIENTS-BTN') ? 'disabled' : ''}`}
+            tabIndex={!reveal.includes('CLIENTS-BTN') ? -1 : 0}
+            onClick={reveal.includes('CLIENTS-BTN') ? onFormSubmitClients : (e) => e.preventDefault()}
+          >
+            <i className='list icon card-icon' />
+            <span className='card-label'>Clients</span>
+          </Link>
+        </Roll>
+      </div>
+
+      <div className='col-md-4 col-sm-6 col-6'>
+        <Roll>
+          <Link
+            to='/preferences/main/active-history'
+            className={`dashboard-card ${!reveal.includes('ACTIVE-HISTORY-USERS-BTN') ? 'disabled' : ''}`}
+            tabIndex={!reveal.includes('ACTIVE-HISTORY-USERS-BTN') ? -1 : 0}
+            onClick={reveal.includes('ACTIVE-HISTORY-USERS-BTN') ? onFormSubmitActiveHistory : (e) => e.preventDefault()}
+          >
+            <i className='user circle icon card-icon' />
+            <span className='card-label'>History</span>
+          </Link>
+        </Roll>
+      </div>
+
       <Outlet />
     </div>
   );

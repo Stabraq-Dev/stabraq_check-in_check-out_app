@@ -23,7 +23,7 @@ const FilterByMembership = () => {
         setTimeout(() => onSubmit(formValues), 100);
       }}
       render={({ handleSubmit }) => (
-        <form onSubmit={handleSubmit} className='ui form segment error'>
+        <form onSubmit={handleSubmit} className='ui form segment error content-card'>
           <Field
             name='membership'
             component={renderSelectOptions}

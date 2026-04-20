@@ -31,7 +31,7 @@ const EditClient = () => {
     // http://localhost:3000/preferences/main/edit-client/?row=3
     // https://stabraq-logbook.netlify.app/preferences/main/edit-client/?row=3
 
-    if (fromURL === null && fromURL !== '/preferences/main/clients-list') {
+    if (fromURL === null || fromURL !== '/preferences/main/clients-list') {
       navigate('/preferences/main/clients-list');
     }
   });

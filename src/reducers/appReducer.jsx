@@ -3,6 +3,7 @@ import {
   SHOW_CHECK_IN_OUT,
   REVEAL,
   LOADING,
+  LOADING_MESSAGE,
   SHEET_DATE,
   NEW_SHEET_ID,
   SHOW_MY_MODAL,
@@ -19,6 +20,7 @@ const INITIAL_STATE = {
   reveal: [],
   showCheckInOut: false,
   loading: false,
+  loadingMessage: '',
   sheetDate: '',
   newSheetId: '',
   mobileNumber: '',
@@ -39,7 +41,9 @@ export default (state = INITIAL_STATE, action) => {
     case SHOW_CHECK_IN_OUT:
       return { ...state, showCheckInOut: action.payload };
     case LOADING:
-      return { ...state, loading: action.payload };
+      return { ...state, loading: action.payload, loadingMessage: action.payload ? state.loadingMessage : '' };
+    case LOADING_MESSAGE:
+      return { ...state, loadingMessage: action.payload };
     case SHEET_DATE:
       return { ...state, sheetDate: action.payload };
     case NEW_SHEET_ID:

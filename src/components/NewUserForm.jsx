@@ -21,7 +21,7 @@ const localFormValues = JSON.parse(sessionStorage.getItem('formValues'));
 
 const NewUserForm = () => {
   const dispatch = useDispatch();
-  const { loading, mobileNumber } = useSelector((state) => state.app);
+  const { loading, loadingMessage, mobileNumber } = useSelector((state) => state.app);
   useEffect(() => {
     // Anything in here is fired on component mount.
     return () => {
@@ -34,7 +34,7 @@ const NewUserForm = () => {
 
   const renderSubmitButton = () => {
     if (loading) {
-      return <LoadingSpinner />;
+      return <LoadingSpinner message={loadingMessage} />;
     }
     return (
       <button className='ui primary button stabraq-bg' type='submit'>
@@ -88,7 +88,7 @@ const NewUserForm = () => {
       onSubmit={onSubmit}
       validate={(formValues) => validate(formValues)}
       render={({ values, handleSubmit }) => (
-        <form onSubmit={handleSubmit} className='ui form segment error'>
+        <form onSubmit={handleSubmit} className='ui form segment error content-card enhanced-form'>
           <Field
             name='username'
             component={renderInput}

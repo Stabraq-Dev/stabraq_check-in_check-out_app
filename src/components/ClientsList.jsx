@@ -10,9 +10,11 @@ import {
   doClearSorting,
   doClearClientsList,
   doSortClientsList,
+  doOrderSortClientsList,
+  doOrderList,
+  doFilterClientsList,
+  doFilterClientsListValue,
 } from '../actions';
-import FilterClientsBy from './FilterClientsBy';
-import ListSorting from './ListSorting';
 import LoadingSpinner from './LoadingSpinner';
 import Pagination from './Pagination';
 
@@ -33,11 +35,15 @@ export const ClientsList = () => {
     clientsListFiltered,
     clientsListSorted,
     filterClientsListValue,
+    sortList,
+    orderListAscending,
   } = useSelector((state) => state.user);
 
   const [mobile, setMobile] = useState('');
   const [activeIndex, setActiveIndex] = useState();
   const [currentPage, setCurrentPage] = useState(1);
+  const [filterBy, setFilterBy] = useState('Name');
+  const [filterValue, setFilterValue] = useState('');
   const [clientsPerPage, setClientsPerPage] = useState(100);
   const btnRef = useRef(0);
   const refs = useRef([]);
@@ -96,6 +102,36 @@ export const ClientsList = () => {
   const getOriginalRow = (mobile) => {
     const row = clientsList.findIndex((x) => x[0] === mobile) + 3;
     return row;
+  };
+
+  const filterIndex = filterBy === 'Name' ? 1 : 0;
+
+  const handleFilterChange = (e) => {
+    const val = e.target.value;
+    setFilterValue(val);
+    dispatch(doFilterClientsListValue(val));
+    if (!val) {
+      dispatch(doFilterClientsList('', 'CLEAR_FILTER', ''));
+    } else {
+      dispatch(doFilterClientsList(filterIndex, val, filterBy));
+    }
+  };
+
+  const resetFilter = () => {
+    setFilterValue('');
+    dispatch(doFilterClientsListValue(''));
+    dispatch(doFilterClientsList('', 'CLEAR_FILTER', ''));
+  };
+
+  const handleSort = (btn) => {
+    dispatch(doSortList(btn.value, btn.sortIndex));
+    dispatch(doOrderList(true));
+    dispatch(doSortClientsList(btn.sortIndex));
+  };
+
+  const toggleOrder = () => {
+    dispatch(doOrderList(!orderListAscending));
+    dispatch(doOrderSortClientsList());
   };
 
   const onGotoTopBtn = () => {
@@ -317,12 +353,68 @@ export const ClientsList = () => {
   return (
     <>
       <div className='ui styled fluid accordion mb-3'>
-        <div className='ui segment'>
-          <ListSorting buttons={buttons} />
-          <FilterClientsBy />
+        <div className='ui segment content-card'>
+          <div className='filter-sort-toolbar'>
+            {/* Filter group */}
+            <div className='toolbar-group'>
+              <span className='toolbar-label'>Filter</span>
+              <button
+                className={`toolbar-btn ${filterBy === 'Name' ? 'active' : ''}`}
+                onClick={() => { setFilterBy('Name'); resetFilter(); }}
+              >
+                Name
+              </button>
+              <button
+                className={`toolbar-btn ${filterBy === 'Mobile' ? 'active' : ''}`}
+                onClick={() => { setFilterBy('Mobile'); resetFilter(); }}
+              >
+                Mobile
+              </button>
+              <button className='toolbar-btn' onClick={resetFilter}>
+                Reset
+              </button>
+            </div>
+
+            {/* Filter input */}
+            <input
+              className='toolbar-input'
+              placeholder={filterBy === 'Name' ? 'arabic / english' : '01xxxxxxxx'}
+              maxLength={filterBy === 'Mobile' ? 11 : ''}
+              value={filterValue}
+              onChange={handleFilterChange}
+            />
+
+            <div className='toolbar-divider' />
+
+            {/* Sort group */}
+            <div className='toolbar-group'>
+              <span className='toolbar-label'>Sort</span>
+              {buttons.map((btn) => (
+                <button
+                  key={btn.name}
+                  className={`toolbar-btn ${sortList.sortBy === btn.value ? 'active' : ''}`}
+                  onClick={() => handleSort(btn)}
+                >
+                  {btn.value}
+                </button>
+              ))}
+              <button className='toolbar-btn' onClick={toggleOrder}>
+                <i className={`sort amount ${orderListAscending ? 'down' : 'up'} icon me-1`} />
+                {orderListAscending ? 'Asc' : 'Desc'}
+              </button>
+            </div>
+          </div>
         </div>
         {renderListCount()}
-        {renderList(finalClientsListPage)}
+        {finalClientsListPage.length === 0 && filterClientsListValue ? (
+          <div className='ui segment content-card text-center'>
+            <p style={{ color: '#666', margin: '20px 0' }}>
+              No clients found. Try adjusting your filter.
+            </p>
+          </div>
+        ) : (
+          renderList(finalClientsListPage)
+        )}
         <button
           ref={btnRef}
           onClick={onGotoTopBtn}

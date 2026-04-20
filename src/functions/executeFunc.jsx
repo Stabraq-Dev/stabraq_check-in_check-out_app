@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { axiosAuth, axiosDriveAuth } from '../api/googleSheetsAPI';
 import {
   calculateUserData,
@@ -954,5 +955,71 @@ export const executeGetAllFilesList = async () => {
       err?.response?.data?.error || err
     );
     return err?.response?.data?.error;
+  }
+};
+
+export const executeSearchAllHistory = async (searchValue, searchBy) => {
+  try {
+    const url = import.meta.env.VITE_APPS_SCRIPT_SEARCH_URL;
+    if (!url) {
+      console.error('VITE_APPS_SCRIPT_SEARCH_URL not configured');
+      return { results: [], total: 0 };
+    }
+    const response = await axios.get(url, {
+      params: { action: 'search', q: searchValue, by: searchBy },
+    });
+
+    if (globalThis.config.debuggingMode === 'TRUE') {
+      console.log('Response executeSearchAllHistory', response.data);
+    }
+
+    return response.data;
+  } catch (err) {
+    console.error('Execute error executeSearchAllHistory', err);
+    return { results: [], total: 0 };
+  }
+};
+
+export const executeSearchUser = async (mobile) => {
+  try {
+    const url = import.meta.env.VITE_APPS_SCRIPT_SEARCH_URL;
+    if (!url) {
+      console.error('VITE_APPS_SCRIPT_SEARCH_URL not configured');
+      return { exists: false };
+    }
+    const response = await axios.get(url, {
+      params: { action: 'searchUser', q: mobile },
+    });
+
+    if (globalThis.config.debuggingMode === 'TRUE') {
+      console.log('Response executeSearchUser', response.data);
+    }
+
+    return response.data;
+  } catch (err) {
+    console.error('Execute error executeSearchUser', err);
+    return { exists: false };
+  }
+};
+
+export const executeLookupUser = async (searchValue, searchBy) => {
+  try {
+    const url = import.meta.env.VITE_APPS_SCRIPT_SEARCH_URL;
+    if (!url) {
+      console.error('VITE_APPS_SCRIPT_SEARCH_URL not configured');
+      return { found: false, user: null };
+    }
+    const response = await axios.get(url, {
+      params: { action: 'lookup', q: searchValue, by: searchBy },
+    });
+
+    if (globalThis.config.debuggingMode === 'TRUE') {
+      console.log('Response executeLookupUser', response.data);
+    }
+
+    return response.data;
+  } catch (err) {
+    console.error('Execute error executeLookupUser', err);
+    return { found: false, user: null };
   }
 };

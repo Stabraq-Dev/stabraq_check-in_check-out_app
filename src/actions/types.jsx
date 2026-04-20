@@ -7,6 +7,7 @@ export const AUTHORIZED_USER = 'AUTHORIZED_USER';
 
 /* App Actions Types */
 export const LOADING = 'LOADING';
+export const LOADING_MESSAGE = 'LOADING_MESSAGE';
 export const REVEAL = 'REVEAL';
 export const REVEAL_LOGO = 'REVEAL_LOGO';
 export const SHRINK_LOGO = 'SHRINK_LOGO';

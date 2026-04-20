@@ -1,5 +1,6 @@
 import {
   LOADING,
+  LOADING_MESSAGE,
   REVEAL,
   REVEAL_LOGO,
   SHRINK_LOGO,
@@ -12,6 +13,13 @@ export const doLoading = (loadingStatus) => {
   return {
     type: LOADING,
     payload: loadingStatus,
+  };
+};
+
+export const doLoadingMessage = (message) => {
+  return {
+    type: LOADING_MESSAGE,
+    payload: message,
   };
 };
 

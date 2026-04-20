@@ -16,20 +16,22 @@ function Preferences() {
     );
   }
   return (
-    <div className='text-center'>
-      <div className='alert alert-danger mt-5' role='alert'>
-        You need to login first!
-      </div>
+    <div className='login-container text-center'>
+      <img src='/logo.png' alt='Logo' className='login-logo' />
+      <div className='login-title'>Session Expired</div>
+      <p style={{ color: '#666', marginBottom: '20px' }}>
+        Your session has expired. Please sign in again.
+      </p>
       <button
         className='ui primary button stabraq-bg'
         onClick={() => {
           dispatch(doRedirectToSignIn());
           navigate('/dashboard');
         }}
-        type='submit'
+        type='button'
       >
         <i className='sign-in icon' />
-        Go to sign in page
+        Sign In
       </button>
     </div>
   );

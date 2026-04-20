@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import '../styles.css';
 
 import { axiosAuth } from '../api/googleSheetsAPI';
+import AppBar from './AppBar';
 import Splash from './Splash';
 import Preferences from './Preferences';
 import AdminLogInForm from './AdminLogInForm';
@@ -25,39 +26,49 @@ import { useDispatch } from 'react-redux';
 import MyAlert from './MyAlert';
 const App = () => {
   const dispatch = useDispatch();
+  const location = useLocation();
   const [online, setOnline] = useState(true);
   const [downlink, setDownlink] = useState(0);
   useEffect(() => {
     if (!navigator.onLine) {
       return;
     }
+    const load = async () => {
+      await axiosAuth(import.meta.env.VITE_SHEET_ID);
+      await dispatch(doCheckSignedIn());
+    };
     load();
   });
 
-  const load = async () => {
-    await axiosAuth(import.meta.env.VITE_SHEET_ID);
-    await dispatch(doCheckSignedIn());
-  };
+  useEffect(() => {
+    const handleOffline = () => {
+      console.log('offline');
+      setOnline(false);
+    };
+    const handleOnline = () => {
+      console.log('online');
+      setOnline(true);
+    };
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
 
-  // We are "offline".
-  window.addEventListener('offline', () => {
-    // Show "No Internet Connection." message.
-    console.log('offline');
-    setOnline(false);
-  });
-  // We are "online".
-  window.addEventListener('online', () => {
-    // Hide "No Internet Connection." message.
-    console.log('online');
-    setOnline(true);
-  });
+    let handleConnectionChange;
+    if (navigator.connection) {
+      handleConnectionChange = (e) => {
+        console.log(e.currentTarget.downlink);
+        setDownlink(e.currentTarget.downlink);
+      };
+      navigator.connection.addEventListener('change', handleConnectionChange);
+    }
 
-  // Register for event changes:
-  navigator.connection.addEventListener('change', (e) => {
-    // Handle change of connection type here.
-    console.log(e.currentTarget.downlink);
-    setDownlink(e.currentTarget.downlink);
-  });
+    return () => {
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
+      if (navigator.connection && handleConnectionChange) {
+        navigator.connection.removeEventListener('change', handleConnectionChange);
+      }
+    };
+  }, []);
 
   const renderNoInternet = () => {
     if (!online) return <MyAlert bodyContent='NO INTERNET CONNECTION' />;
@@ -76,9 +87,10 @@ const App = () => {
     <div className='container-fluid myOverflowHidden'>
       {renderNoInternet()}
       {renderSlowInternet()}
+      <AppBar />
       <div className='ui container mt-3'>
         <div>
-          <Splash />
+          {location.pathname === '/' && <Splash />}
           <Routes>
             <Route path='/' element={<></>} />
             <Route path='dashboard' element={<AdminLogInForm />} />

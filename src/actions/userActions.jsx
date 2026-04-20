@@ -51,7 +51,7 @@ import {
   FILTER_CLIENTS_LIST_VALUE,
 } from './types';
 
-import { doLoading, doShowMyModal, submitType } from './appActions';
+import { doLoading, doLoadingMessage, doShowMyModal, submitType } from './appActions';
 
 import {
   executeValuesUpdate,
@@ -81,6 +81,8 @@ import {
   executeGetAllFilesList,
   getWorkBookWorkSheetValues,
   getSheetValuesWorkSheetBatchGet,
+  executeSearchAllHistory,
+  executeSearchUser,
 } from '../functions/executeFunc';
 
 import {
@@ -287,15 +289,19 @@ export const doCreateNewSheet = () => async (dispatch, getState) => {
   let hrsFromMidnight = new Date(day).getHours();
 
   if (diffDays >= 1 && hrsFromMidnight >= 1) {
+    dispatch(doLoadingMessage('Creating new daily sheet...'));
     const newSheetId = await executeBatchUpdateAddSheet(sheetDate[0][0]);
     await dispatch(doCheckResponse(newSheetId));
     const errorNewSheetId = getState().app.error;
     if (errorNewSheetId.code === 400) return;
     await dispatch({ type: NEW_SHEET_ID, payload: newSheetId });
+
+    dispatch(doLoadingMessage('Copying template...'));
     await executeBatchUpdateCopyPaste(newSheetId);
     await executeValuesBatchClear();
     await executeValuesAppendAddSheet();
 
+    dispatch(doLoadingMessage('Syncing to monthly workbook...'));
     const destWorkSheetId = await getSheetValues(CURR_MONTH_WORKSHEET_RANGE);
 
     const resCopyToWorksheet = await executeBatchUpdateCopyToWorksheet(
@@ -308,31 +314,44 @@ export const doCreateNewSheet = () => async (dispatch, getState) => {
 
     await executeBatchUpdateDeleteSheet(newSheetId);
 
+    dispatch(doLoadingMessage('Renaming sheets...'));
     let worksheetSheetsData = await getWorkSheetData(destWorkSheetId[0][0]);
+    const allSheetTitles = worksheetSheetsData.map(
+      (s) => s.properties.title
+    );
     let sheetsIdsToRename = await getByValue(worksheetSheetsData, 'Copy of ');
     if (sheetsIdsToRename !== null) {
-      sheetsIdsToRename.forEach(async (o) => {
-        let title = o.title.replaceAll('Copy of ', '');
-        await executeBatchUpdateSheetPropertiesRenameSheet(
-          destWorkSheetId[0][0],
-          o.id,
-          title
-        );
-      });
+      for (const o of sheetsIdsToRename) {
+        const targetTitle = o.title.replaceAll('Copy of ', '');
+        if (!allSheetTitles.includes(targetTitle)) {
+          await executeBatchUpdateSheetPropertiesRenameSheet(
+            destWorkSheetId[0][0],
+            o.id,
+            targetTitle
+          );
+        }
+      }
     }
+
+    dispatch(doLoadingMessage('Updating memberships...'));
     await dispatch(changeExpiredMemberToNotMember());
   }
 
   const diffMonths = await checkMonthDiff(dateOne, dateTwo);
 
   if (diffMonths >= 1 && hrsFromMidnight >= 1) {
+    dispatch(doLoadingMessage('Creating new monthly workbook...'));
     const workSheetTitle = await changeYearMonthFormat(dateTwo);
     const newWorkSheetId = await executeAddNewWorkSheet(workSheetTitle);
     if (newWorkSheetId) {
-      await executeChangeWorkSheetPermission(newWorkSheetId);
+      dispatch(doLoadingMessage('Setting permissions...'));
       await executeChangeWorkSheetPermission(
         newWorkSheetId,
         'abdalrahman.yousrii@gmail.com'
+      );
+      await executeChangeWorkSheetPermission(
+        newWorkSheetId,
+        'stabraq.dev@gmail.com'
       );
       await executeValuesUpdateCheckOut({
         value: newWorkSheetId,
@@ -340,6 +359,8 @@ export const doCreateNewSheet = () => async (dispatch, getState) => {
       });
     }
   }
+
+  dispatch(doLoadingMessage(''));
 };
 
 export const checkAuthorization = () => async (dispatch) => {
@@ -359,11 +380,11 @@ export const doGetAllWorkSheetsList = () => async (dispatch, getState) => {
       const listAllFiles = list.data.files;
       const listAllFilesFiltered = listAllFiles
         .filter((value) => value.name.includes('20'))
+        .sort((a, b) => b.name.localeCompare(a.name))
         .map((value, index) => {
           const { name, id } = value;
           return { key: index + 1, value: id, text: name };
-        })
-        .reverse();
+        });
 
       const firstOption = { key: 0, value: '', text: '...Select...' };
       const finalOptions = [firstOption, ...listAllFilesFiltered];
@@ -384,7 +405,7 @@ export const doGetAllSheetsList = (month) => async (dispatch, getState) => {
         .filter((value) => value.properties.title.includes('20'))
         .map((value, index) => {
           const { title, sheetId } = value.properties;
-          return { key: index + 1, value: sheetId, text: title };
+          return { key: index + 1, value: sheetId, text: title, rowCount: null };
         })
     : '';
 
@@ -395,6 +416,28 @@ export const doGetAllSheetsList = (month) => async (dispatch, getState) => {
     type: LIST_ALL_SHEETS_FILTERED,
     payload: finalOptions,
   });
+
+  // Fetch actual row counts via batch request
+  if (sheetDataFiltered && sheetDataFiltered.length > 0) {
+    try {
+      const ranges = sheetDataFiltered.map((s) => `${s.text}!A4:A`);
+      const batchData = await getSheetValuesWorkSheetBatchGet(month, ranges);
+      if (batchData) {
+        const withCounts = finalOptions.map((opt, idx) => {
+          if (idx === 0) return opt;
+          const rangeData = batchData[idx - 1];
+          const rowCount = rangeData?.values?.length || 0;
+          return { ...opt, rowCount };
+        });
+        await dispatch({
+          type: LIST_ALL_SHEETS_FILTERED,
+          payload: withCounts,
+        });
+      }
+    } catch (err) {
+      console.error('Error fetching row counts', err);
+    }
+  }
 };
 
 export const doSetDayAsActiveHistory =
@@ -415,7 +458,7 @@ export const doSetDayAsActiveHistory =
   };
 
 export const doGetUserHistory =
-  (mobile, selectedMonth) => async (dispatch, getState) => {
+  (searchValue, selectedMonth, searchBy) => async (dispatch, getState) => {
     const { listAllSheetsFiltered } = getState().user;
     const ranges = listAllSheetsFiltered
       .map((value) => VAR_SHEET_ACTIVE_RANGE(value.text))
@@ -425,13 +468,41 @@ export const doGetUserHistory =
     const filterData = data
       .map((value) => {
         const record = value.values
-          ? value.values.filter((val) => val[1] === mobile)
+          ? value.values.filter((val) => {
+              if (searchBy === 'name') {
+                return val[0]?.toLowerCase().includes(searchValue.toLowerCase());
+              }
+              return val[1] === searchValue;
+            })
           : [];
         const day = value.range.split('!')[0];
         return { record, day };
       })
       .filter((v) => v.record.length > 0);
     await dispatch({ type: USER_HISTORY_DATA, payload: filterData });
+  };
+
+export const doSearchAllHistory =
+  (searchValue, searchBy) => async (dispatch) => {
+    const data = await executeSearchAllHistory(searchValue, searchBy);
+
+    if (!data || !data.results) {
+      await dispatch({ type: USER_HISTORY_DATA, payload: [] });
+      return;
+    }
+
+    // Group results by month+day (same format as single-month search)
+    const grouped = {};
+    data.results.forEach((item) => {
+      const key = `${item.month}|${item.day}`;
+      if (!grouped[key]) {
+        grouped[key] = { record: [], day: item.day, month: item.month };
+      }
+      grouped[key].record.push(item.record);
+    });
+
+    const payload = Object.values(grouped);
+    await dispatch({ type: USER_HISTORY_DATA, payload });
   };
 
 export const doClearActiveHistoryLists = () => async (dispatch, getState) => {
@@ -772,20 +843,23 @@ export const doSearchByMobile = (mobile) => async (dispatch, getState) => {
   if (error === '') {
     sessionStorage.removeItem('mobile');
   }
-  // Search for the user by mobile number
-  const res = await executeValuesUpdate(mobile);
-  dispatch(doCheckResponse(res));
+  // Search for the user by mobile number via Apps Script
+  dispatch(doLoadingMessage('Searching user...'));
+  const searchResult = await executeSearchUser(mobile);
 
-  const numberExists = await getSheetValues(NUMBER_EXISTS_RANGE);
-  dispatch({ type: NUMBER_EXISTS, payload: numberExists[0][0] });
-
-  if (numberExists[0][0] === 'EXISTS') {
-    const valuesMatched = await getSheetValuesBatchGet(VALUES_MATCHED_RANGES);
-    dispatch({ type: VALUES_MATCHED, payload: valuesMatched });
+  if (searchResult.error) {
+    dispatch(doCheckResponse({ status: 500, data: { error: searchResult.error } }));
+    dispatch(doLoading(false));
+    return;
   }
 
-  await executeValuesUpdate('');
+  dispatch({ type: NUMBER_EXISTS, payload: searchResult.numberExists });
 
+  if (searchResult.exists && searchResult.valuesMatched) {
+    dispatch({ type: VALUES_MATCHED, payload: searchResult.valuesMatched });
+  }
+
+  dispatch(doLoadingMessage(''));
   await dispatch(doGetHoursDailyRates());
 
   dispatch(doLoading(false));
@@ -801,20 +875,15 @@ export const doCheckByMobile = (mobile) => async (dispatch, getState) => {
 
   dispatch(doClearPrevInviteUserState());
   dispatch(doLoading(true));
-  // Search for the user by mobile number
-  const res = await executeValuesUpdate(mobile);
-  dispatch(doCheckResponse(res));
+  // Search for the user by mobile number via Apps Script
+  const searchResult = await executeSearchUser(mobile);
 
   dispatch({ type: INVITE_NUMBER_EXISTS, payload: '' });
-  const numberExists = await getSheetValues(NUMBER_EXISTS_RANGE);
-  dispatch({ type: INVITE_NUMBER_EXISTS, payload: numberExists[0][0] });
+  dispatch({ type: INVITE_NUMBER_EXISTS, payload: searchResult.numberExists });
 
-  if (numberExists[0][0] === 'EXISTS') {
-    const valuesMatched = await getSheetValuesBatchGet(VALUES_MATCHED_RANGES);
-    dispatch({ type: INVITE_VALUES_MATCHED, payload: valuesMatched });
+  if (searchResult.exists && searchResult.valuesMatched) {
+    dispatch({ type: INVITE_VALUES_MATCHED, payload: searchResult.valuesMatched });
   }
-
-  await executeValuesUpdate('');
 
   dispatch(doLoading(false));
 };
